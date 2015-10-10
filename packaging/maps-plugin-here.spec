@@ -61,5 +61,7 @@ cp -a %{ARCH}/libmaps-plugin-here.so* %{buildroot}%{_prefix}/lib/maps/plugins/
 cp -a %{ARCH}/libheremaps-engine.so* %{buildroot}%{_prefix}/lib/
 
 %files
+%manifest maps-plugin-here.manifest
+%defattr(-,root,root,-)
 %{_prefix}/lib/maps/plugins/libmaps-plugin-here.so*
 %{_prefix}/lib/libheremaps-engine.so*
