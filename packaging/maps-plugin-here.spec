@@ -1,6 +1,6 @@
 Name:       maps-plugin-here
 Summary:    Tizen HERE Maps Plug-in Library
-Version:    0.1.2
+Version:    0.1.5
 Release:    1
 Group:      Location/Libraries
 License:    Apache-2.0 and HERE
@@ -8,6 +8,23 @@ Source0:    %{name}-%{version}.tar.gz
 ExclusiveArch:  %ix86 x86_64 %arm aarch64
 
 BuildRequires: cmake
+# for here plugin
+BuildRequires: pkgconfig(glib-2.0)
+BuildRequires: pkgconfig(gmodule-2.0)
+BuildRequires: pkgconfig(dlog)
+BuildRequires: pkgconfig(capi-maps-service)
+BuildRequires: capi-maps-service-plugin-devel
+BuildRequires: pkgconfig(capi-network-connection)
+BuildRequires: pkgconfig(capi-appfw-app-manager)
+# for here engine
+BuildRequires: pkgconfig(libcurl)
+BuildRequires: pkgconfig(libxml-2.0)
+BuildRequires: pkgconfig(json-c)
+BuildRequires: pkgconfig(libpng)
+BuildRequires: pkgconfig(capi-system-info)
+BuildRequires: pkgconfig(cairo)
+BuildRequires: pkgconfig(evas)
+BuildRequires: boost-devel
 
 %ifarch %arm
 %define ARCH arm
