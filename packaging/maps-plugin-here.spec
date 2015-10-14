@@ -1,6 +1,6 @@
 Name:       maps-plugin-here
 Summary:    Tizen HERE Maps Plug-in Library
-Version:    0.1.5
+Version:    0.1.6
 Release:    1
 Group:      Location/Libraries
 License:    Apache-2.0 and HERE
@@ -11,6 +11,7 @@ BuildRequires: cmake
 # for here plugin
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(gmodule-2.0)
+BuildRequires: pkgconfig(libxml-2.0)
 BuildRequires: pkgconfig(dlog)
 BuildRequires: pkgconfig(capi-maps-service)
 BuildRequires: capi-maps-service-plugin-devel
@@ -18,7 +19,6 @@ BuildRequires: pkgconfig(capi-network-connection)
 BuildRequires: pkgconfig(capi-appfw-app-manager)
 # for here engine
 BuildRequires: pkgconfig(libcurl)
-BuildRequires: pkgconfig(libxml-2.0)
 BuildRequires: pkgconfig(json-c)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(capi-system-info)
@@ -56,6 +56,9 @@ cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DARCH=%{ARCH}
 rm -rf %{buildroot}
 %make_install
 
+mkdir -p %{buildroot}/usr/share/license
+cp LICENSE %{buildroot}/usr/share/license/%{name}
+
 mkdir -p %{buildroot}%{_prefix}/lib/maps/plugins/
 cp -a %{ARCH}/libmaps-plugin-here.so* %{buildroot}%{_prefix}/lib/maps/plugins/
 cp -a %{ARCH}/libheremaps-engine.so* %{buildroot}%{_prefix}/lib/
@@ -65,3 +68,4 @@ cp -a %{ARCH}/libheremaps-engine.so* %{buildroot}%{_prefix}/lib/
 %defattr(-,root,root,-)
 %{_prefix}/lib/maps/plugins/libmaps-plugin-here.so*
 %{_prefix}/lib/libheremaps-engine.so*
+/usr/share/license/maps-plugin-here
