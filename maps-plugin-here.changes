@@ -1,0 +1,29 @@
+[Version]   maps-plugin-here_0.1.5
+[Date]      06 Oct 2015
+[Title]     Fixed to return more proper error codes
+[Developer] Seechan Kim <cbible.kim@samsung.com>
+
+[Version]   maps-plugin-here_0.1.4
+[Date]      24 Sep 2015
+[Title]     Fixed to use reference count of handler
+[Developer] Seechan Kim <cbible.kim@samsung.com>
+
+[Version]   maps-plugin-here_0.1.3
+[Date]      21 Sep 2015
+[Title]     Get here_key from metadata of application manifest
+[Developer] Young-Ae Kang <youngae.kang@samsung.com>
+
+[Version]   maps-plugin-here_0.1.2
+[Date]      18 Oct 2015
+[Title]     Fixed route query bugs
+[Developer] Seechan Kim <cbible.kim@samsung.com>
+
+[Version]   maps-plugin-here_0.1.1
+[Date]      09 Jun 2015
+[Title]     Fixed memory leaks
+[Developer] Seechan Kim <cbible.kim@samsung.com>
+
+[Version]   maps-plugin-here_0.1.0
+[Date]      01 July 2015
+[Title]     Initialize version
+[Developer] Seechan Kim <cbible.kim@samsung.com>
