@@ -25,6 +25,9 @@ BuildRequires: pkgconfig(capi-system-info)
 BuildRequires: pkgconfig(cairo)
 BuildRequires: pkgconfig(evas)
 BuildRequires: boost-devel
+#
+Requires(post): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
 
 %ifarch %arm
 %define ARCH arm
@@ -49,8 +52,15 @@ This packages provides Plugin APIs capsulating HERE Maps Engine Library for Maps
 %setup -q
 
 %build
-cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DARCH=%{ARCH}
-#make %{?_smp_mflags}
+%if 0%{?tizen_build_binary_release_type_eng}
+export CFLAGS="$CFLAGS -DTIZEN_ENGINEER_MODE -g"
+export CXXFLAGS="$CXXFLAGS -DTIZEN_ENGINEER_MODE -g"
+export FFLAGS="$FFLAGS -DTIZEN_ENGINEER_MODE"
+%endif
+
+MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
+cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DMAJORVER=${MAJORVER} -DFULLVER=%{version} -DLIBDIR=%{_libdir} -DARCH=%{ARCH}
+make %{?jobs:-j%jobs}
 
 %install
 rm -rf %{buildroot}
@@ -58,14 +68,17 @@ rm -rf %{buildroot}
 
 mkdir -p %{buildroot}/usr/share/license
 cp LICENSE %{buildroot}/usr/share/license/%{name}
+cp -a lib/%{ARCH}/libheremaps-engine.so* %{buildroot}%{_prefix}/lib/
 
-mkdir -p %{buildroot}%{_prefix}/lib/maps/plugins/
-cp -a %{ARCH}/libmaps-plugin-here.so* %{buildroot}%{_prefix}/lib/maps/plugins/
-cp -a %{ARCH}/libheremaps-engine.so* %{buildroot}%{_prefix}/lib/
+%post
+/sbin/ldconfig
+
+%postun
+/sbin/ldconfig
 
 %files
 %manifest maps-plugin-here.manifest
 %defattr(-,root,root,-)
-%{_prefix}/lib/maps/plugins/libmaps-plugin-here.so*
+%{_libdir}/maps/plugins/libmaps-plugin-here.so*
 %{_prefix}/lib/libheremaps-engine.so*
 /usr/share/license/maps-plugin-here
