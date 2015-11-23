@@ -1,6 +1,6 @@
 Name:       maps-plugin-here
 Summary:    Tizen HERE Maps Plug-in Library
-Version:    0.1.6
+Version:    0.1.7
 Release:    1
 Group:      Location/Libraries
 License:    Apache-2.0 and HERE
