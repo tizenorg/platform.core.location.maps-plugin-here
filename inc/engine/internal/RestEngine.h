@@ -50,9 +50,18 @@ class RestEngineArgument
 : public Tizen::Maps::Object
 {
 public:
+#ifdef TIZEN_SUPPORT_POST_METHOD
+    RestEngineArgument(const String& sUrl, RestItem* pRestItem,
+                       bool bPost = false, const String& sPostData = "")
+    : m_sUrl(sUrl)
+    , m_pRestItem(pRestItem)
+    , m_bPost(bPost)
+    , m_sPostData(sPostData)
+#else
     RestEngineArgument(const String& sUrl, RestItem* pRestItem)
     : m_sUrl(sUrl)
     , m_pRestItem(pRestItem)
+#endif
     {
     }
 
@@ -73,9 +82,13 @@ public:
     String m_sUrl;
     RestItem* m_pRestItem;
     RestItemHandle::RequestId m_aRequestId;
-    #ifdef TIZEN_MIGRATION
+#ifdef TIZEN_MIGRATION
     Tizen::Maps::MemoryStruct_s m_Chunk;
-    #endif
+#endif
+#ifdef TIZEN_SUPPORT_POST_METHOD
+    bool m_bPost;
+    String m_sPostData;
+#endif
 };
 
 //this is an internal class and should not be used outside
@@ -88,7 +101,12 @@ class RestEngine
 public:
     static RestEngine& GetInstance();
 
+#ifdef TIZEN_SUPPORT_POST_METHOD
+    RestItemHandle::RequestId OpenRequest(const String& sUrl, QueryListener* pListener, BaseReplyPtr pReply,
+                                          bool bPost = false, const String& sPostData = "");
+#else
     RestItemHandle::RequestId OpenRequest(const String& sUrl, QueryListener* pListener, BaseReplyPtr pReply);
+#endif
     size_t GetNumPendingRequests() const;
     void ShutdownEngine();
     void AbortRequest(RestItemHandle::RequestId aRequestId);
@@ -111,6 +129,7 @@ private:
         RT_CloseRestItem,
         RT_DeleteRestItem
     };
+
     bool CheckRequestIn(RestItem* pRestItem);
     RestItem* GetChechedInRequest(RestItemHandle::RequestId aRequestId) const;
 
@@ -163,7 +182,12 @@ private:
 
     void RegisterListener(QueryListener* rListener);
 
+#ifdef TIZEN_SUPPORT_POST_METHOD
+    bool DoOpenRequest(const String& sUrl, RestItem* pRestItem,
+                       bool bPost = false, const String& sPostData = "");
+#else
     bool DoOpenRequest(const String& sUrl, RestItem* pRestItem);
+#endif
     void DoCloseRestItemLater(RestItemHandle::RequestId aRequestId);
     void DoDeleteRestItemLater(RestItem* pRestItem);
 

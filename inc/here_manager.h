@@ -64,7 +64,8 @@ public:
 		HERE_SVC_GEOCODE,
 		HERE_SVC_REV_GEOCODE,
 		HERE_SVC_PLACE,
-		HERE_SVC_ROUTE
+		HERE_SVC_ROUTE,
+		HERE_SVC_MULTI_REV_GEOCODE
 	};
 
 	void* CreateInstance(HereSvcType nHereSvc, void* pCbFunc, void* pUserData, int *nReqId);

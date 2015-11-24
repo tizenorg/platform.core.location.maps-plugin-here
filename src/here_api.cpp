@@ -18,6 +18,7 @@
 #include "here_types.h"
 #include "here_geocode.h"
 #include "here_revgeocode.h"
+#include "here_multirevgeocode.h"
 #include "here_place.h"
 #include "here_route.h"
 #include <common/HereConfig.h>
@@ -260,6 +261,45 @@ int HerePluginReverseGeocode(double dLatitude, double dLongitude,
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
 		pRevGeocode->TerminateService();
+
+	return error;
+}
+
+int HerePluginMultiReverseGeocode(const maps_coordinates_list_h hGeocodeList,
+	maps_item_hashtable_h hPref, maps_service_multi_reverse_geocode_cb pCbFunc,
+	void *pUserData, int *nReqId)
+{
+	/* checking parmaters */
+	if (!hGeocodeList || !pCbFunc || !nReqId)
+		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (!HereManager::GetHandler())
+		return HERE_ERROR_INVALID_OPERATION;
+
+	/* creating instance */
+	HereMultiRevGeocode *pMultiRevGeocode =
+		(HereMultiRevGeocode*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_MULTI_REV_GEOCODE,
+		(void*)pCbFunc, pUserData, nReqId));
+
+	if(!pMultiRevGeocode)
+		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
+
+	/* sending request */
+	here_error_e error = HERE_ERROR_UNKNOWN;
+
+	do {
+		error = pMultiRevGeocode->PrepareQuery();
+		if (error != HERE_ERROR_NONE) break;
+
+		error = pMultiRevGeocode->PreparePositionList(hGeocodeList);
+		if (error != HERE_ERROR_NONE) break;
+
+		error = pMultiRevGeocode->StartMultiReverse(hPref);
+	} while(0);
+
+	/* finishing task */
+	if(error != HERE_ERROR_NONE)
+		pMultiRevGeocode->TerminateService();
 
 	return error;
 }

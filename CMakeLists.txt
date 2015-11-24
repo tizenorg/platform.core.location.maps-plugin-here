@@ -32,7 +32,7 @@ ADD_DEFINITIONS("-DTIZEN_DEBUG")
 
 # Main Include file
 SET(INC_DIR
-	inc	
+	inc
 	inc/engine
 )
 
@@ -54,6 +54,7 @@ SET(SRCS
 	src/here_geocode.cpp
 	src/here_place.cpp
 	src/here_revgeocode.cpp
+	src/here_multirevgeocode.cpp
 	src/here_route.cpp
 	src/here_utils.cpp
 )
@@ -67,7 +68,9 @@ SET_TARGET_PROPERTIES(${pkg_name}
     CLEAN_DIRECT_OUTPUT 1
 )
 
-TARGET_LINK_LIBRARIES(${pkg_name} ${pkgs_LDFLAGS})
+FIND_LIBRARY(HERE_ENGINE heremaps-engine lib/${ARCH})
+
+TARGET_LINK_LIBRARIES(${pkg_name} ${HERE_ENGINE} ${pkgs_LDFLAGS})
 
 # Install
 INSTALL(TARGETS ${pkg_name} DESTINATION ${LIBDIR}/maps/plugins)

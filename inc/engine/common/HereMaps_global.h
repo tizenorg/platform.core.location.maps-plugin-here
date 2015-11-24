@@ -18,12 +18,23 @@
 #ifndef HEREMAPS_GLOBAL_H
 #define HEREMAPS_GLOBAL_H
 
-#ifndef TIZEN_MIGRATION // Migration for Tizen 2.4
 #define TIZEN_MIGRATION
-#endif
 
-#ifndef TIZEN_CUSTOMIZATION
+#ifdef TIZEN_MIGRATION
+/* enhancement for updated HERE APIs */
 #define TIZEN_CUSTOMIZATION
+
+/* sub-features */
+#define TIZEN_SUPPORT_POST_METHOD
+#define TIZEN_SUPPORT_CRYPTO_LOCK			/* mutex locking system for SSL */
+
+/* configuration */
+#define TIZEN_CFG_CURL_TIMEOUT		20	/* seconds */
+#define TIZEN_CFG_CURL_MULTITHREADS	8	/* the limit of multi-threads for CURL */
+
+/* for debugging */
+//#define TIZEN_PROFILING_CURL_TIME
+//#define TIZEN_PROFILING_MEMLEAK
 #endif
 
 
@@ -41,6 +52,7 @@ typedef unsigned char byte;
 #define null    0
 #endif // null
 #endif
+
 
 
 /*
@@ -65,15 +77,10 @@ typedef unsigned char byte;
 #endif
 #define LOG_TAG "HERE_PLUGIN"
 
-#define MAPS_LOGD(fmt,args...)  LOGD(fmt, ##args)
-#define MAPS_LOGW(fmt,args...)  LOGW(fmt, ##args)
-#define MAPS_LOGI(fmt,args...)  LOGI(fmt, ##args)
-#define MAPS_LOGE(fmt,args...)  LOGE(fmt, ##args)
-#define MAPS_SECLOG(fmt,args...)  SECURE_LOGD(fmt, ##args)
-
 #define HERE_MAPS_LOG_DBG_INFO(fmt,args...)  LOGD(fmt, ##args);
 #define HERE_MAPS_LOG_ERROR(fmt,args...)     LOGE(fmt, ##args);
 #define HERE_MAPS_LOG_WARNING(fmt,args...)   LOGW(fmt, ##args);
+#define HERE_MAPS_SECLOG(fmt,args...)  SECURE_LOGD(fmt, ##args)
 
 #define HERE_MAPS_RETURN_RESULT(cond,ret,fmt,args...)\
         if (!cond) {\

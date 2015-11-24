@@ -1,3 +1,13 @@
+[Version]   maps-plugin-here_0.1.7
+[Date]      19 Nov 2015
+[Title]     Support multi reverse geocode
+[Developer] Kyoungjun Sung <kj7.sung@samsung.com>
+
+[Version]   maps-plugin-here_0.1.6
+[Date]      10 Nov 2015
+[Title]     Fixed to manage dropped requests of PlaceDetails
+[Developer] Seechan Kim <cbible.kim@samsung.com>
+
 [Version]   maps-plugin-here_0.1.5
 [Date]      06 Oct 2015
 [Title]     Fixed to return more proper error codes

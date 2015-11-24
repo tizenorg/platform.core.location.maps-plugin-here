@@ -100,6 +100,7 @@ private:
 	void ProcessPlaceRated(PlaceDetails herePlace, maps_place_h mapsPlace);
 
 	void __sortList(PlaceList &list);
+	void __flushReplies(int error);
 	static bool __compareWithTitle(const maps_place_h &item1, const maps_place_h &item2);
 	static bool __compareWithId(const maps_place_h &item1, const maps_place_h &item2);
 	static bool __compareWithType(const maps_place_h &item1, const maps_place_h &item2);
@@ -114,6 +115,7 @@ private:
 	int m_nReplyCnt;
 	int m_nReplyIdx;
 	char *m_szSortBy;
+	bool m_bPlaceDetailsInternal;
 
 	PlaceList m_PlaceList;
 

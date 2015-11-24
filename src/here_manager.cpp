@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <sys/types.h>
 #include <unistd.h>
 #include <libxml/xpath.h>
 
@@ -22,6 +21,7 @@
 #include "here_base.h"
 #include "here_geocode.h"
 #include "here_revgeocode.h"
+#include "here_multirevgeocode.h"
 #include "here_place.h"
 #include "here_route.h"
 #include "here_utils.h"
@@ -85,7 +85,10 @@ bool HereManager::Create()
 void HereManager::Close()
 {
 	pthread_mutex_lock(&g_mtxRef);
-	if (--m_nRefCnt == 0 && m_pHereManager)
+	bool terminate = (--m_nRefCnt == 0 && m_pHereManager);
+	pthread_mutex_unlock(&g_mtxRef);
+
+	if (terminate)
 	{
 		m_pHereManager->TerminateAllServices();
 		HereConfig::Shutdown();
@@ -94,7 +97,6 @@ void HereManager::Close()
 		m_pHereManager = NULL;
 	}
 	MAPS_LOGD("Closed a HereManager instance (%d).", m_nRefCnt);
-	pthread_mutex_unlock(&g_mtxRef);
 }
 
 HereManager* HereManager::GetHandler()
@@ -127,6 +129,10 @@ void* HereManager::CreateInstance(HereSvcType nHereSvc, void* pCbFunc,
 		pHere = (HereBase*)new HereRoute(pCbFunc, pUserData, *nReqId);
 		break;
 
+	case HERE_SVC_MULTI_REV_GEOCODE:
+		pHere = (HereBase*)new HereMultiRevGeocode(pCbFunc, pUserData, *nReqId);
+		break;
+
 	default:
 		return NULL;
 	}
@@ -152,7 +158,7 @@ here_error_e HereManager::CloseInstance(int nReqId)
 		}
 	}
 	pthread_mutex_unlock(&m_mtxHereList);
-	
+
 	return HERE_ERROR_NONE;
 }
 
@@ -350,6 +356,7 @@ void HereManager::TerminateAllServices(void)
 			m_HereList.erase(it);
 		}
 		catch (std::exception &e) {
+			MAPS_LOGD("Exception caught: %s", e.what());
 		}
 	};
 

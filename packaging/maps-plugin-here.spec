@@ -1,6 +1,6 @@
 Name:       maps-plugin-here
 Summary:    Tizen HERE Maps Plug-in Library
-Version:    0.1.6
+Version:    0.1.7
 Release:    1
 Group:      Location/Libraries
 License:    Apache-2.0 and HERE
@@ -59,7 +59,7 @@ export FFLAGS="$FFLAGS -DTIZEN_ENGINEER_MODE"
 %endif
 
 MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
-cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DMAJORVER=${MAJORVER} -DFULLVER=%{version} -DLIBDIR=%{_libdir} -DARCH=%{ARCH}
+cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DMAJORVER=${MAJORVER} -DFULLVER=%{version} -DLIBDIR=lib -DARCH=%{ARCH}
 make %{?jobs:-j%jobs}
 
 %install
@@ -79,6 +79,6 @@ cp -a lib/%{ARCH}/libheremaps-engine.so* %{buildroot}%{_prefix}/lib/
 %files
 %manifest maps-plugin-here.manifest
 %defattr(-,root,root,-)
-%{_libdir}/maps/plugins/libmaps-plugin-here.so*
+%{_prefix}/lib/maps/plugins/libmaps-plugin-here.so*
 %{_prefix}/lib/libheremaps-engine.so*
 /usr/share/license/maps-plugin-here
