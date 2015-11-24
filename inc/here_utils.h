@@ -26,8 +26,6 @@
 #include <vector>
 
 //maps-service header
-#include <maps_extra_types.h>
-#include <maps_plugin_types.h>
 #include <maps_area.h>
 #include <maps_preference.h>
 #include <maps_route_maneuver.h>

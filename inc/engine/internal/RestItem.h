@@ -54,7 +54,11 @@ public:
     RestItem(QueryListener* rListener, BaseReplyPtr pBaseReply);
     ~RestItem();
 
+#ifdef TIZEN_SUPPORT_POST_METHOD
+    bool Run(const String& rUri, bool bPost = false, const String& rPostData = "");
+#else
     bool Run(const String& rUri);
+#endif
     void Stop();
 
     void OnError(ErrorBase& rError);

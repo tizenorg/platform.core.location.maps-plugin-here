@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <sys/types.h>
 #include <unistd.h>
 #include <libxml/xpath.h>
 
@@ -85,7 +84,10 @@ bool HereManager::Create()
 void HereManager::Close()
 {
 	pthread_mutex_lock(&g_mtxRef);
-	if (--m_nRefCnt == 0 && m_pHereManager)
+	bool terminate = (--m_nRefCnt == 0 && m_pHereManager);
+	pthread_mutex_unlock(&g_mtxRef);
+
+	if (terminate)
 	{
 		m_pHereManager->TerminateAllServices();
 		HereConfig::Shutdown();
@@ -94,7 +96,6 @@ void HereManager::Close()
 		m_pHereManager = NULL;
 	}
 	MAPS_LOGD("Closed a HereManager instance (%d).", m_nRefCnt);
-	pthread_mutex_unlock(&g_mtxRef);
 }
 
 HereManager* HereManager::GetHandler()
@@ -350,6 +351,7 @@ void HereManager::TerminateAllServices(void)
 			m_HereList.erase(it);
 		}
 		catch (std::exception &e) {
+			MAPS_LOGD("Exception caught: %s", e.what());
 		}
 	};
 

@@ -30,6 +30,7 @@ HerePlace::HerePlace(void *pCbFunc, void *pUserData, int nReqId)
 	m_nReplyCnt = 0;
 	m_nReplyIdx = 0;
 	m_szSortBy = NULL;
+	m_bPlaceDetailsInternal = false;
 }
 
 HerePlace::~HerePlace()
@@ -329,7 +330,6 @@ here_error_e HerePlace::StartPlaceDetailsInternal(const char *szUrl)
 
 	std::unique_ptr<PlaceDetailsQuery> pPlaceDetailsQuery (new (std::nothrow)PlaceDetailsQuery());
 
-
 	bool bExcuted = (int)(pPlaceDetailsQuery->Execute(*this, NULL, szUrl) > 0);
 
 	return (bExcuted ? HERE_ERROR_NONE : HERE_ERROR_INVALID_OPERATION);
@@ -465,10 +465,13 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 				hereLinkObj = herePlaceIt->GetLinkObject();
 				if (!hereLinkObj.GetHref().empty() && !hereLinkObj.GetId().empty())
 				{
-					m_PlaceList.push_back(mapsPlace);
-					isPending = true;
-					StartPlaceDetailsInternal(hereLinkObj.GetHref().c_str());
-					MAPS_LOGD("Add maps_place_h to the pending list. id=%s", hereLinkObj.GetId().data());
+					if (StartPlaceDetailsInternal(hereLinkObj.GetHref().c_str()) == HERE_ERROR_NONE)
+					{
+						m_PlaceList.push_back(mapsPlace);
+						isPending = true;
+						m_bPlaceDetailsInternal = true;
+						MAPS_LOGD("Add maps_place_h to the pending list. id=%s", hereLinkObj.GetId().data());
+					}
 				}
 			}
 		}
@@ -526,30 +529,18 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 
 	if (m_nReplyIdx == m_nReplyCnt)
 	{
-		m_nReplyIdx = 0;
-		__sortList(m_PlaceList);
-	
-		while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty())
-		{
-			mapsPlace = m_PlaceList.front();
-			m_PlaceList.pop_front();
-
-			/* callback function */
-			if (((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId,
-				m_nReplyIdx++, m_nReplyCnt, mapsPlace, m_pUserData) == FALSE)
-			{
-				break;
-			}
-		}
+		__flushReplies(error);
 		delete this;
 	}
 }
 
 void HerePlace::OnDiscoverFailure(const DiscoveryReply& Reply)
 {
-	if (!m_bCanceled)
-		((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 1, NULL, m_pUserData);
-	delete this;
+	if (++m_nReplyIdx == m_nReplyCnt)
+	{
+		__flushReplies((maps_error_e)GetErrorCode(Reply));
+		delete this;
+	}
 }
 
 void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
@@ -652,35 +643,21 @@ void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
 	if (!isPending)
 		m_PlaceList.push_back(mapsPlace);
 
-	m_nReplyIdx++;
 
-
-	if (m_nReplyIdx == m_nReplyCnt)
+	if (++m_nReplyIdx == m_nReplyCnt)
 	{
-		m_nReplyIdx = 0;
-		__sortList(m_PlaceList);
-	
-		while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty())
-		{
-			mapsPlace = m_PlaceList.front();
-			m_PlaceList.pop_front();
-
-			/* callback function */
-			if (((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId,
-				m_nReplyIdx++, m_nReplyCnt, mapsPlace, m_pUserData) == FALSE)
-			{
-				break;
-			}
-		}
+		__flushReplies(error);
 		delete this;
 	}
 }
 
 void HerePlace::OnPlaceDetailsFailure(const PlaceDetailsReply& Reply)
 {
-	if (!m_bCanceled)
-		((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 1, NULL, m_pUserData);
-	delete this;
+	if (++m_nReplyIdx == m_nReplyCnt)
+	{
+		__flushReplies(m_bPlaceDetailsInternal ? MAPS_ERROR_NONE : GetErrorCode(Reply));
+		delete this;
+	}
 }
 
 void HerePlace::ProcessPlaceLocation(PlaceDetails herePlace, maps_place_h mapsPlace)
@@ -1193,6 +1170,27 @@ void HerePlace::ProcessPlaceRated(PlaceDetails herePlace, maps_place_h mapsPlace
 		maps_place_set_related_link(mapsPlace, mapsRelated);
 	}
 	maps_place_link_object_destroy(mapsRelated);
+}
+
+void HerePlace::__flushReplies(int error)
+{
+	maps_place_h mapsPlace;
+
+	m_nReplyIdx = 0;
+	__sortList(m_PlaceList);
+
+	while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty())
+	{
+		mapsPlace = m_PlaceList.front();
+		m_PlaceList.pop_front();
+
+		/* callback function */
+		if (((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId,
+			m_nReplyIdx++, m_nReplyCnt, mapsPlace, m_pUserData) == FALSE)
+		{
+			break;
+		}
+	}
 }
 
 bool HerePlace::__compareWithTitle(const maps_place_h &item1, const maps_place_h &item2)
