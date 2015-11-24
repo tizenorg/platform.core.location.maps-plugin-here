@@ -46,6 +46,10 @@ int HerePluginReverseGeocode(double dLatitude, double dLongitude,
 	maps_item_hashtable_h hPref, maps_service_reverse_geocode_cb pCbFunc,
 	void *pUserData, int *nReqId);
 
+int HerePluginMultiReverseGeocode(const maps_coordinates_list_h hGeocodeList,
+	maps_item_hashtable_h hPref, maps_service_multi_reverse_geocode_cb pCbFunc,
+	void *pUserData, int *nReqId);
+
 int HerePluginSearchPlace(maps_coordinates_h hPos, int nDistance,
 	maps_item_hashtable_h hPref, maps_place_filter_h hFilter, maps_service_search_place_cb pCbFunc,
 	void * pUserData, int *nReqId);

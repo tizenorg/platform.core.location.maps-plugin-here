@@ -30,16 +30,17 @@
 #include "base/BaseByteBuffer.h"
 #include "base/EventDrivenThread.h"
 
-#define RESTCURL_CRYPTO_LOCK
-
 TIZEN_MAPS_BEGIN_NAMESPACE
 
 using namespace Tizen::Maps;
 
 typedef struct MemoryStruct {
+	MemoryStruct() : memory(NULL), size(0), http_code(0), error(0) {};
+
 	char *memory;
 	size_t size;
 	long http_code;
+	int error;
 } MemoryStruct_s;
 
 class RestCurl
@@ -47,17 +48,34 @@ class RestCurl
 public:
 	RestCurl();
 	virtual ~RestCurl();
-	bool Commit(void *pArgs);
-	void Clear();
-	void Shutdown();
-	void Abort(const Here::Maps::RestItemHandle::RequestId aRequestId);
-	int EasyCurl(String sUrl, MemoryStruct_s* pChunk);
-	String UrlEncode(String sStr);
+
 	static RestCurl& GetInstance();
+	bool Commit(void *pArgs);
+	void Abort(const Here::Maps::RestItemHandle::RequestId aRequestId);
+	void Clear();
+	void Join();
+	void Shutdown();
+	#ifdef TIZEN_MIGRATION_TO_SUPPORT_POST_METHOD
+	int EasyCurl(String sUrl, MemoryStruct_s* pChunk, bool bPost = false, String sPostData = "");
+	#else
+	int EasyCurl(String sUrl, MemoryStruct_s* pChunk);
+	#endif
+	String UrlEncode(String sStr);
 
 private:
-	static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 	static void *ThreadFunc(void *pArgs);
+	static size_t WriteMemoryCb(void *pContents, size_t nSize, size_t nNmemb, void *pUser);
+	static int XferInfoCb(void *pUser, curl_off_t dlTotal, curl_off_t dlNow,
+	                                   curl_off_t ulTotal, curl_off_t ulNow);
+	String UrlEncode(String sStr);
+	bool CreateDetachedThread(void* (*pFunc)(void*), void *pArgs);
+
+	#ifdef TIZEN_SUPPORT_CRYPTO_LOCK
+	static void CRYPTO_MutexLock(int mode, int type, char *file, int line);
+	static void CRYPTO_InitMutexLocks(void);
+	static void CRYPTO_KillMutexLocks(void);
+	static unsigned long CRYPTO_ThreadId(void);
+	#endif
 
 	class RestCurlImpl;
 	RestCurlImpl* m_pImpl;

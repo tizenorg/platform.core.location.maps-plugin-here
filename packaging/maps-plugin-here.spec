@@ -1,6 +1,6 @@
 Name:       maps-plugin-here
 Summary:    Tizen HERE Maps Plug-in Library
-Version:    0.1.6
+Version:    0.1.7
 Release:    1
 Group:      Location/Libraries
 License:    Apache-2.0 and HERE
@@ -79,6 +79,7 @@ cp -a lib/%{ARCH}/libheremaps-engine.so* %{buildroot}%{_prefix}/lib/
 %files
 %manifest maps-plugin-here.manifest
 %defattr(-,root,root,-)
-%{_libdir}/maps/plugins/libmaps-plugin-here.so*
+#%{_libdir}/maps/plugins/libmaps-plugin-here.so*
+%{_prefix}/lib/maps/plugins/libmaps-plugin-here.so*
 %{_prefix}/lib/libheremaps-engine.so*
 /usr/share/license/maps-plugin-here

@@ -125,6 +125,7 @@ EXPORT_API int maps_plugin_is_service_supported(maps_service_e service, bool *su
 		case MAPS_SERVICE_SEARCH_ROUTE:
 		case MAPS_SERVICE_SEARCH_ROUTE_WAYPOINTS:
 		case MAPS_SERVICE_CANCEL_REQUEST:
+		case MAPS_SERVICE_MULTI_REVERSE_GEOCODE:
 			*supported = TRUE;
 			return MAPS_ERROR_NONE;
 		default:
@@ -210,6 +211,20 @@ EXPORT_API int maps_plugin_reverse_geocode(double latitude, double longitude,
 		return MAPS_ERROR_INVALID_PARAMETER;
 
 	int ret = HerePluginReverseGeocode(latitude, longitude, preference, callback, user_data, request_id);
+
+	MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_multi_reverse_geocode(const maps_coordinates_list_h geocode_list,
+	const maps_preference_h preference, maps_service_multi_reverse_geocode_cb callback,
+	void *user_data, int *request_id)
+{
+	if (!callback || !request_id)
+		return MAPS_ERROR_INVALID_PARAMETER;
+
+	int ret = HerePluginMultiReverseGeocode(geocode_list, preference, callback, user_data, request_id);
 
 	MAPS_LOGD("here_error_e = %d", ret);
 

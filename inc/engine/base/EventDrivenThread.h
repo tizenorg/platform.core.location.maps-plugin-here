@@ -100,26 +100,10 @@ private:
 	GIOChannel* __pChannel;
 	GMainContext* __pGmainContext;
 
-	int __WorkingThreadNum;
-	bool __WaitingForJoin;
-	pthread_cond_t __join_condition;
-	pthread_mutex_t __join_mutex;
-
-	class ThreadArg
-	{
-	public:
-		int requestType;
-		void* pArg;
-		void* ReqInstance;
-	};
-
 	FireArg_List FireArgs;
 	pthread_mutex_t FireArgsLock;
-
-	static void* EventDrivenThreadHandler(void* thread_arg);
 	static gboolean OnEventReceived(GIOChannel* pChannel, GIOCondition condition, gpointer data);
-	static gboolean __stopWaitingForJoin(gpointer data);
-
+	static void __flush(EventDrivenThread *pArg);
 }; // EventDrivenThread
 
 TIZEN_MAPS_END_NAMESPACE

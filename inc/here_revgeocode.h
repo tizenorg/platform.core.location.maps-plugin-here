@@ -20,7 +20,6 @@
 //plug-in header
 #include "here_manager.h"
 
-#include <maps_extra_types.h>
 #include <maps_coordinates.h>
 
 //map engine header

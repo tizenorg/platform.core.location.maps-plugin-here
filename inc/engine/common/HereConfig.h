@@ -38,4 +38,3 @@ public:
 TIZEN_MAPS_END_NAMESPACE
 
 #endif /* HERE_CONFIG_H */
-

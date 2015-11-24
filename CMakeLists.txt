@@ -32,7 +32,7 @@ ADD_DEFINITIONS("-DTIZEN_DEBUG")
 
 # Main Include file
 SET(INC_DIR
-	inc	
+	inc
 	inc/engine
 )
 
@@ -70,7 +70,8 @@ SET_TARGET_PROPERTIES(${pkg_name}
 TARGET_LINK_LIBRARIES(${pkg_name} ${pkgs_LDFLAGS})
 
 # Install
-INSTALL(TARGETS ${pkg_name} DESTINATION ${LIBDIR}/maps/plugins)
+#INSTALL(TARGETS ${pkg_name} DESTINATION ${LIBDIR}/maps/plugins)
+INSTALL(TARGETS ${pkg_name} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/maps/plugins)
 INSTALL(FILES lib/${ARCH}/libheremaps-engine.so DESTINATION lib)
 
 # Test Suite
