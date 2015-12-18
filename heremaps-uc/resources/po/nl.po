@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Akkoord"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Niet akkoord"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Het apparaat gebruikt kaarttechnologieen geleverd door HERE. HERE verzamelt info over uw interacties met ons platform zoals uw vragen en zoekopdrachten uitgevoerd rond uw locatie. Deze informatie wordt verwerkt overeenkomstig ons privacybeleid en wordt niet gebruikt om u persoonlijk te identificeren. Door verder te gaan, gaat u akkoord met de servicevoorwaarden: (here.com/terms) en het privacybeleid: (here.com/privacy) van het HERE-platform."
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Welkom"

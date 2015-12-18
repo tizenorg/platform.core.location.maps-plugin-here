@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Godta"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Avslå"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Enheten bruker kartteknologi som leveres av HERE. HERE samler inn informasjon om din samhandling med plattformen, for eksempel beslektede spørsmål og søk som er utført i nærheten av din posisjon. Denne informasjonen behandles i tråd med vår personvernerklæring og brukes ikke til å identifisere deg personlig. Ved å fortsette godtar du HERE-plattformens tjenestevilkår: (here.com/terms) og personvernpolicy: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Velkommen"

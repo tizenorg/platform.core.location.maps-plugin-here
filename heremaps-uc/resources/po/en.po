@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Agree"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Disagree"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Your device uses mapping technologies provided by HERE. HERE collects info about your interactions with our platform such as your related queries and searches performed near your location. This information is processed in accordance with our privacy policy and is not used to identify you personally. By continuing, you agree to the HERE platform Service Terms: (here.com/terms) and Privacy Policy: (here.com/privacy)."
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Welcome"

@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Nõustu"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Ei nõustu"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Teie seade kasutab ettevõtte HERE kaarditehnoloogiaid. HERE kogub teavet selle kohta, kuidas te meie tarkvaraplatvormi kasutate, sh teie asukohas sooritatud seonduvad päringud ja otsingud. Seda teavet töödeldakse meie privaatsuspoliitika alusel ega kasutata teie isiku tuvastamiseks. Jätkamine tähendab, et nõustute rakenduse HERE platvormi kasutustingimuste: (here.com/terms) ja privaatsusavaldusega: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Tere tulemast"

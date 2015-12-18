@@ -6,7 +6,7 @@ SET(CMAKE_INSTALL_PREFIX /usr)
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
 
 # Dependencies
-SET(dependents "glib-2.0 gmodule-2.0 libxml-2.0 dlog capi-network-connection capi-appfw-app-manager capi-maps-service")
+SET(dependents "glib-2.0 gmodule-2.0 libxml-2.0 dlog capi-network-connection capi-appfw-app-manager capi-maps-service capi-appfw-application")
 
 INCLUDE(FindPkgConfig)
 pkg_check_modules(pkgs REQUIRED ${dependents})
@@ -29,6 +29,7 @@ ADD_DEFINITIONS("-DPREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 ADD_DEFINITIONS("-DEXPORT_API=__attribute__((visibility(\"default\")))")
 ADD_DEFINITIONS("-DTIZEN_DEBUG")
 
+SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--as-needed -Wl,--rpath=${LIBDIR}")
 
 # Main Include file
 SET(INC_DIR
@@ -79,3 +80,5 @@ INSTALL(FILES lib/${ARCH}/libheremaps-engine.so DESTINATION lib)
 # Test Suite
 #IF("${BINTYPE}" STREQUAL "eng")
 #ENDIF("${BINTYPE}" STREQUAL "eng")
+
+ADD_SUBDIRECTORY(heremaps-uc)

@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Sprejmem"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Se ne strinjam"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Vaša naprava uporablja tehnologije preslikav, ki jih zagotavlja HERE. HERE zbira informacije o tem, kako uporabljate našo platformo. Na primer o povezanih poizvedbah in iskanjih, ki so bili izvedeni blizu vaše lokacije. Informacije so obdelane v skladu s pravilnikom o zasebnosti in se ne uporabljajo za namene prepoznavanja. Če nadaljujete, s tem sprejmete pogoje za uporabo storitev platforme HERE: (here.com/terms) in pravilnik o zasebnosti: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Dobrodošli"

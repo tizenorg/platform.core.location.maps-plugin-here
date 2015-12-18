@@ -31,6 +31,10 @@ int HerePluginInit(maps_plugin_h *hPlugin)
 	if (!hPlugin)
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	here_error_e error = HereManager::CheckAgreement();
+	if (error != HERE_ERROR_NONE)
+		return error;
+
 	HereManager::Create();
 
 	if (!HereManager::GetHandler())

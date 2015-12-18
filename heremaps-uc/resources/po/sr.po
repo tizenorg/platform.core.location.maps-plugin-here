@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Slažem se"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Ne slažem se"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Uređaj koristi HERE tehnologije mapiranja. HERE skuplja informacije o interakcijama sa platformom, kao što su povezani upiti i pretrage blizu vaše lokacije. Ove informacije se obrađuju u skladu sa našom politikom privatnosti i ne koriste se da vas identifikuju. Ako nastavite, pristajete na uslove korišćenja HERE platforme: (here.com/terms) i politiku privatnosti: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Dobro došli"

@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Zustimmen"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Ablehnen"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Ihr Gerät verwendet von HERE bereitgestellte Kartentechnologien. HERE erfasst Informationen zu Ihren Interaktionen mit unserer Plattform, beispielsweise Ihre entsprechenden Abfragen und Suchen in der Nähe Ihres Standorts. Diese Informationen werden gemäß unseren Datenschutzregelungen verarbeitet und nicht dazu verwendet, Sie persönlich zu identifizieren. Wenn Sie fortfahren, bestätigen Sie Ihre Zustimmung zu den HERE Plattform-Nutzungsbeding-ungen: (here.com/terms) und Datenschutzricht-linien: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Willkommen!"

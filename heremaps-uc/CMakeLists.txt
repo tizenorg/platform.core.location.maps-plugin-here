@@ -1,0 +1,47 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+PROJECT(heremaps-uc C)
+SET(PKG_NAME org.tizen.heremaps-uc)
+
+# Version control
+SET(VERSION_MAJOR 0)
+SET(VERSION "${VERSION_MAJOR}.0.1")
+
+# Architecture
+FIND_PROGRAM(UNAME NAMES uname)
+EXEC_PROGRAM("${UNAME}" ARGS "-m" OUTPUT_VARIABLE "ARCH")
+IF("${ARCH}" STREQUAL "arm")
+    ADD_DEFINITIONS("-D_SOUND_EQ_ARCH_ARM_")
+ENDIF()
+
+SET(COMMON_C_FLAGS "${CMAKE_C_FLAGS} -fPIE")
+
+SET(HERE_PREFIX /usr/apps/org.tizen.heremaps-uc)
+SET(BINDIR "${HERE_PREFIX}/bin")
+SET(LIBDIR "${HERE_PREFIX}/lib")
+SET(RESDIR "${HERE_PREFIX}/res")
+SET(LOCALE_DIR "${RESDIR}/locale")
+
+IF("${CMAKE_BUILD_TYPE}" STREQUAL "")
+	SET(CMAKE_BUILD_TYPE "Release")
+ENDIF("${CMAKE_BUILD_TYPE}" STREQUAL "")
+MESSAGE("Build type: ${CMAKE_BUILD_TYPE}")
+
+INCLUDE(FindPkgConfig)
+
+# Check external libraries
+INCLUDE(FindPkgConfig)
+pkg_check_modules(HEREMAPS_UC_EXT_LIBS "REQUIRED" glib-2.0 gthread-2.0 efl-extension capi-appfw-application capi-system-info evas elementary dlog vconf appcore-efl ecore)
+
+SET(EXTRA_CFLAGS "")
+FOREACH(flag ${${HEREMAPS_UC_EXT_LIBS}_CFLAGS})
+	SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} ${flag}")
+ENDFOREACH(flag)
+
+SET(CMAKE_C_FLAGS "${COMMON_C_FLAGS} ${EXTRA_CFLAGS}")
+
+ADD_DEFINITIONS("-DHEREMAPS_UC_PKG=\"${PKG_NAME}\"")
+ADD_DEFINITIONS("-DRES_DIR=\"${RESDIR}\"")
+ADD_DEFINITIONS("-DLOCALE_DIR=\"${LOCALE_DIR}\"")
+
+ADD_SUBDIRECTORY(src)
+ADD_SUBDIRECTORY(resources/po)

@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Ados"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Ez nago ados"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Zure gailuak HERE-k hornitutako mapa-teknologia erabiltzen du. HERE-k gure plataformekin dituzun interakzioei buruzko informazioa biltzen du, hala nola zure kokalekuarekin lotutako kontsultak edo kokaleku horretan egindako bilaketak. Informazio hori gure pribatutasun-gidalerroei jarraiki prozesatuko dira eta ez da zu pertsonalki identifikatzeko erabiliko. Jarraituz gero, HERE plataformaren Zerbitzu-baldintzak (here.com/terms) eta Pribatutasun-gidalerroak (here.com/privacy) onartzen dituzu."
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Ongi etorri"

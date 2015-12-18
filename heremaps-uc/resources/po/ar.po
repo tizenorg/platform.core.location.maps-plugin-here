@@ -1,0 +1,9 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "موافق"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "غير موافق"
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "يستخدم جهازك تقنيات إعداد الخرائط المقدمة من HERE. يجمع HERE معلومات حول تفاعلاتك مع النظام الأساسي لدينا مثل الاستفسارات ذات الصلة الخاصة بك وعمليات البحث التي أجريتها بالقرب من موقعك. تتم معالجة هذه المعلومات وفقا لنهج الخصوصية الخاص بنا ولا يتم استخدامها للتعرف عليك شخصيًا. بالمتابعة، أنت توافق على بنود خدمة النظام الأساسي لتطبيق HERE:(here.com/terms) ونهج الخصوصية: (here.com/privacy)."
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "مرحبًا"

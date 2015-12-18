@@ -1,6 +1,6 @@
 Name:       maps-plugin-here
 Summary:    Tizen HERE Maps Plug-in Library
-Version:    0.1.7
+Version:    0.1.8
 Release:    1
 Group:      Location/Libraries
 License:    Apache-2.0 and HERE
@@ -17,13 +17,20 @@ BuildRequires: pkgconfig(capi-maps-service)
 BuildRequires: capi-maps-service-plugin-devel
 BuildRequires: pkgconfig(capi-network-connection)
 BuildRequires: pkgconfig(capi-appfw-app-manager)
+BuildRequires: pkgconfig(capi-appfw-application)
+BuildRequires: pkgconfig(capi-system-info)
+BuildRequires: pkgconfig(efl-extension)
+BuildRequires: pkgconfig(elementary)
+BuildRequires: pkgconfig(vconf)
+BuildRequires: pkgconfig(appcore-efl)
+BuildRequires: pkgconfig(ecore)
+BuildRequires: pkgconfig(evas)
+BuildRequires: gettext-tools
 # for here engine
 BuildRequires: pkgconfig(libcurl)
 BuildRequires: pkgconfig(json-c)
 BuildRequires: pkgconfig(libpng)
-BuildRequires: pkgconfig(capi-system-info)
 BuildRequires: pkgconfig(cairo)
-BuildRequires: pkgconfig(evas)
 BuildRequires: boost-devel
 #
 Requires(post): /sbin/ldconfig
@@ -82,3 +89,17 @@ cp -a lib/%{ARCH}/libheremaps-engine.so* %{buildroot}%{_prefix}/lib/
 %{_prefix}/lib/maps/plugins/libmaps-plugin-here.so*
 %{_prefix}/lib/libheremaps-engine.so*
 /usr/share/license/maps-plugin-here
+
+%package -n org.tizen.heremaps-uc
+Summary:    HereMaps UC popup
+Requires:   %{name} = %{version}-%{release}
+
+%description -n org.tizen.heremaps-uc
+HereMaps UC popup
+
+%files -n org.tizen.heremaps-uc
+%manifest heremaps-uc/org.tizen.heremaps-uc.manifest
+%defattr(-,root,root,-)
+/usr/apps/org.tizen.heremaps-uc/bin/*
+/usr/apps/org.tizen.heremaps-uc/res/locale
+/usr/share/packages/org.tizen.heremaps-uc.xml

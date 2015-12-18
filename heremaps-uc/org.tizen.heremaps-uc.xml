@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://tizen.org/ns/packages" package="org.tizen.heremaps-uc" version="1.0.0" install-location="internal-only">
+	<label>HereMaps UC</label>
+	<author email="youngae.kang@samsung.com" href="www.samsung.com">Youngae kang</author>
+	<author email="jongmun.woo@samsung.com" href="www.samsung.com">JongMun Woo</author>
+	<description>HereMaps User Consent application</description>
+	<privileges>
+		<privilege>http://tizen.org/privilege/application.launch</privilege>
+		<privilege>http://tizen.org/privilege/appmanager.launch</privilege>
+		<privilege>http://tizen.org/privilege/packagemanager.info</privilege>
+		<privilege>http://tizen.org/privilege/haptic</privilege>
+		<privilege>http://tizen.org/privilege/mapservice</privilege>
+	</privileges>
+	<ui-application appid="org.tizen.heremaps-uc" exec="/usr/apps/org.tizen.heremaps-uc/bin/heremaps-uc" launch_mode="caller" nodisplay="true" multiple="false" type="capp" taskmanage="false">
+		<label>HereMaps UC</label>
+		<application-service>
+			<operation name="http://tizen.org/appcontrol/operation/configure/heremaps_uc"/>
+		</application-service>
+	</ui-application>
+</manifest>

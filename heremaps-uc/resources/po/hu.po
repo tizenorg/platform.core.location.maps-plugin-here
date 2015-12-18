@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Elfogad"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Elutasít"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Az eszköze a HERE térképtechnológiáit használja. A HERE összegyűjti a platformunkkal végzett műveleteit, például a helyzetéhez közel végrehajtott, kapcsolódó lekérdezéseket és kereséseket. Ezek az információk az adatvédelmi irányelveinknek megfelelően vannak feldolgozva, és nincsenek felhasználva az Ön személy szerinti azonosítására. A folytatáshoz el kell fogadnia a HERE platform szolgáltatási feltételeit: (here.com/terms) és adatvédelmi irányelvét: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Üdvözöljük!"

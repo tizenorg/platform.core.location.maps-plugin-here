@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Aontaim"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Ní aontaím"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Úsáidtear teicneolaíochtaí léarscáilíochta arna gcur ar fáil ag HERE ar do ghléas. Bailíonn HERE faisnéis faoi do chuid idirghníomhaíochtaí lenár n-ardán, amhail d’iarratais ghaolmhara agus na cuardaigh a dhéantar gar do do shuíomh. Déantar an fhaisnéis seo a phróiseáil de réir ár mbeartais príobháideachais agus ní úsáidtear chun tú a aithint go pearsanta í. Má leannan tú ar aghaidh, tá tú ag aontú le Téarmaí Seirbhísí: (here.com/terms) agus le Beartas Príobháideachais: (here.com/privacy) ardán HERE."
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Fáilte"

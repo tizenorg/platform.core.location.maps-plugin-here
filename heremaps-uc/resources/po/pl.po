@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Akceptuję"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Brak zgody"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Twoje urządzenie wykorzystuje technologie map udostępniane przez usługę HERE. Usługa HERE gromadzi informacje na temat Twoich interakcji z naszą platformą, na przykład powiązane zapytania i wyszukiwania przeprowadzone w pobliżu Twojej lokalizacji. Te informacje są przetwarzane zgodnie z naszymi zasadami ochrony prywatności i nie są używane do zidentyfikowania Ciebie. Kontynuując, wyrażasz zgodę na Warunki korzystania z usługi platformy HERE: (here.com/terms)i Zasady ochrony prywatności: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Witamy"

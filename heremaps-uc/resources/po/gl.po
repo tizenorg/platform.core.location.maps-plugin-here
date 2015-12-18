@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Acepto"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Non acepto"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "O dispositivo utiliza tecnoloxia de mapas proporcionada por HERE. HERE recolle informacion sobre a interaccion coa nosa plataforma, como consultas e buscas relacionadas na proximidade da tua situacion. Esta informacion procesase de acordo coa nosa politica de privacidade e non se utiliza para te identificar persoalmente. Ao continuar, aceptas os Termos do Servizo da plataforma HERE: (here.com/terms) e a Politica de Privacidade: (here.com/privacy)."
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Benvido"

@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "同意"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "不同意"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "您的裝置使用 HERE 所提供的地圖技術。HERE 會收集您與我們平台互動的相關資訊，例如您在您的位置附近執行的相關查詢與搜尋。這項資訊會根據我們的隱私權政策進行處理，而且不會用於識別您的個人身分。 如果您選擇繼續，則視為您同意 HERE 平台「服務條款」: (here.com/terms) 和「隱私權政策」: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "歡迎"

@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Prihvaćam"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Ne prihvaćam"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Uređaj koristi tehnologije karata koje je omogućio HERE. HERE prikuplja podatke o vašoj interakciji s našom platformom, kao što su povezani upiti i pretraživanja pokrenuta u blizini vaše lokacije. Ti se podaci obrađuju u skladu s našim pravilima o zaštiti podataka i ne koriste se za utvrđivanje vašeg identiteta. Ako nastavite, prihvaćate uvjete korištenja usluge za platformu HERE: (here.com/terms) i pravila zaštite privatnosti: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Dobro došli"

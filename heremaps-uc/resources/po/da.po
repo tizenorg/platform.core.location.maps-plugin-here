@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Acceptér"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Uenig"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Din enhed bruger kortlægningsteknologier fra HERE. HERE indsamler oplysninger om dine interaktioner med vores platform, f.eks. dine relaterede forespørgsler og søgninger, der udføres tæt på din placering. Disse oplysninger behandles i overensstemmelse med vores politik for beskyttelse af personlige oplysninger og bruges ikke til at identificere dig personligt. Ved at fortsætte erklærer du, at du er enig i vilkårene for HERE-platformen: (here.com/terms) samt Politik til beskyttelse af personlige oplysninger: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Velkommen"

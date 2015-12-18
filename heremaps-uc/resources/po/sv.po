@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Godkänn"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Samtycker inte"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Din enhet använder kartteknik från HERE. HERE samlar in information om hur du använder vår plattform, till exempel om vilka förfrågningar och sökningar du gjort i närheten av din position. Informationen bearbetas i enlighet med vår sekretesspolicy och den används inte för att identifiera dig personligen. Genom att fortsätta accepterar du HERE-plattformens tjänstevillkor: (here.com/terms) och sekretesspolicyn: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Välkommen"

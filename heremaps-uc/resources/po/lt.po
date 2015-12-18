@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Sutikti"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Nesutikti"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Prietaise naudojamos HERE teikiamos žemėlapių technologijos. HERE kaupia informaciją apie platformoje jūsų atliktus veiksmus, pavyzdžiui, susijusias užklausas ir netoli jūsų buvimo vietos atliktas paieškas. Ši informacija apdorojama pagal mūsų privatumo taisykles ir nenaudojama jums identifikuoti. Tęsdami sutinkate su HERE platformos paslaugos sąlygomis: (here.com/terms) ir privatumo taisyklėmis: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Sveiki"

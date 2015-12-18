@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Razıyam"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Müvafiq deyil"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Cihazınız HERE tərəfindən təmin olunan xəritə texnologiyalarından istifadə edir. HERE aidiyyəti olan sorğularınız və məkanınıza yaxın etdiyiniz sorğularınız kimi platforma ilə əməliyyatlarınız haqda məlumatı toplayır. Bu məlumat bizim məxfilik siyasətimizə uyğun olaraq emal olunur və şəxsiyyətinizi müəyyən etmək üçün istifadə edilmir. Davam etməklə siz HERE platformasının Xidmət şərtləri: (here.com/terms) və Məxfilik siyasəti ilə razılaşırsınız: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Xoş gəlmisiniz"

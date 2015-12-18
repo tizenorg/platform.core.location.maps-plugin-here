@@ -26,6 +26,10 @@
 #include "here_route.h"
 #include "here_utils.h"
 #include <common/HereConfig.h>
+#include <app.h>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 using namespace HERE_PLUGIN_NAMESPACE_PREFIX;
 using namespace TIZEN_MAPS_NAMESPACE_PREFIX;
@@ -482,6 +486,59 @@ void HereManager::NetworkStateChangedIndCb(connection_type_e type, void *user_da
 
 	if ((type != CONNECTION_TYPE_DISCONNECTED) && (type != CONNECTION_TYPE_BT))
 		pManager->SetProxyAddress();
+}
+
+here_error_e HereManager::CheckAgreement()
+{
+	const char UTC_TPK_APP[] = "org.tizen.capi-maps-service-native-utc";
+	const char ITC_TPK_APP[] = "org.tizen.capi-maps-service-native-itc";
+	const char UTC_APP[] = "core.capi-maps-service-tests";
+	const char ITC_APP[] = "native.capi-maps-service-itc";
+
+	char *strAppId = NULL;
+	here_error_e error = HERE_ERROR_NONE;
+
+	pid_t nProcessId = getpid();
+	int nRet = app_manager_get_app_id(nProcessId, &strAppId);
+	if (nRet != APP_MANAGER_ERROR_NONE)
+	{
+		MAPS_LOGI("Get app_id [%ld]. nRet[%d]", nProcessId, nRet);
+		error = HERE_ERROR_SERVICE_NOT_AVAILABLE;
+	}
+	else if (strncmp(strAppId, UTC_APP, strlen(UTC_APP)) &&
+		strncmp(strAppId, ITC_APP, strlen(ITC_APP)) &&
+		strncmp(strAppId, UTC_TPK_APP, strlen(UTC_TPK_APP)) &&
+		strncmp(strAppId, ITC_TPK_APP, strlen(ITC_TPK_APP)) &&
+		!HereManager::GetAgreement())
+	{
+		MAPS_LOGD("Not agreed yet");
+		error = HERE_ERROR_SERVICE_NOT_AVAILABLE;
+	}
+
+	g_free(strAppId);
+	return error;
+}
+
+bool HereManager::GetAgreement(void)
+{
+	std::ifstream file (UC_FILE);
+	bool isAgree = false;
+	std::string line;
+	std::string value;
+
+	if (file.is_open()) {
+		getline(file, line);
+		value = line.substr(6);
+		if (value.compare("Yes") == 0)
+			isAgree = true;
+		else
+			MAPS_LOGD("UC was set No");
+		file.close();
+	} else {
+		MAPS_LOGD("UC file open fail. %s (%d)", strerror(errno), errno);
+	}
+
+	return isAgree;
 }
 
 HERE_PLUGIN_END_NAMESPACE

@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Roziman"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Rozi emas"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Qurilmangiz HERE tomonidan taqdim etilgan xaritalash texnologiyalaridan foydalanadi. HERE platformamiz bilan o'zaro aloqalaringiz, jumladan turgan joyingiz yaqinida bajargan so'rovlaringiz va qidirishlaringiz to'g'risidagi ma'lumotlarni to'playdi. Bu ma'lumotlar maxfiylik siyosatimizga muvofiq qayta ishlanadi va ulardan shaxsan sizni tanib olish uchun foydalanilmaydi. Davom ettirish orqali siz HERE platformasi Xizmat ko'rsatish shartlari: (here.com/terms) va Maxfiylik siyosatiga rozilik bildirasiz: (here.com/privacy)."
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Xush kelibsiz"

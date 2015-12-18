@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Hyväksyn"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Eri mieltä"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Laitteesi käyttää karttateknologioita, joiden toimittaja on HERE. HERE kerää tietoja järjestelmissämme tekemistäsi toimista, kuten kyselyistäsi ja sijaintisi lähellä tehdyistä hauista. Näin kerättyjä tietoja käsitellään tietosuojakäytäntömme mukaisesti, eikä niitä käytetä sinun tunnistamiseesi. Jatkamalla hyväksyt HERE-käyttöympäristön palveluehdot: (here.com/terms) ja tietosuojakäytännön: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Tervetuloa"

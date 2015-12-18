@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Piekrist"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Nepiekrītu"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Jūsu ierīce izmanto HERE nodrošinātās kartēšanas tehnoloģijas. HERE apkopo informāciju par jūsu mijiedarbību ar mūsu platformu, piemēram, jūsu saistītos vaicājumus un meklēšanas gadījumus, kas veikti jūsu atrašanās vietas tuvumā. Šī informācija tiek apstrādāta saskaņā ar mūsu konfidencialitātes politiku, un netiek izmantota, lai jūs identificētu personiski. Turpinot jūs piekrītat HERE platformas pakalpojumu sniegšanas noteikumiem: (here.com/terms) un konfidencialitātes politikai: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Sveicināti!"

@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "De acord"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Refuzare"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Dispozitivul folosește tehnologii de cartografiere furnizate de HERE. HERE colectează informații despre interacțiunile dvs. cu platforma noastră, cum ar fi interogările și căutările efectuate în apropierea locației dvs. Aceste informații sunt procesate în conformitate cu politica noastră de confidențialitate și nu sunt utilizate pentru a vă identifica. Continuând, sunteți de acord cu Condițiile de utilizare ale platformei HERE: (here.com/terms) și cu Politica de confidențialitate: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Bun venit"

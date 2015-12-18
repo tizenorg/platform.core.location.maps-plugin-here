@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "同意"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "同意しない"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "お客様の電話は、 HERE から提供されたマッピング技術を使用しています。 HEREは、現在位置近辺で行われた関連質問や検索など、お客様のプラットフォームとのインタラクションに関する情報を収集します。情報は、当社プライバシーポリシーに従って処理され、お客様を個人的に特定するために使用されることはありません。 続けることで HERE プラットフォームご利用規約: (here.com/terms) とプライバシーポリシー: (here.com/privacy)に同意とされます。"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "ようこそ"

@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Onayla"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Onaylama"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Cihazınız HERE tarafından sağlanan harita teknolojisini kullanmaktadır. HERE ilgili sorgularınız veya yakınınızda gerçekleştirilen aramalar gibi platformumuzdaki etkileşimleriniz hakkında bilgi toplar. Bu bilgili gizlilik poliçemiz dahilindedir ve kimliğinizi belirlemek için kullanılmaz. Devam ederek HERE platformu Hizmet Şartları'nı: (here.com/terms) ve Gizlilik İlkesi'ni: (here.com/privacy) kabul etmiş olursunuz."
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Hoş geldiniz"

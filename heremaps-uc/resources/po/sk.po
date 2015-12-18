@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Súhlasím"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Nesúhlasím"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Vaše zariadenie používa technológie máp platformy HERE. HERE zbiera informácie o tom, ako platformu využívate, napríklad vaše dotazy a hľadania uskutočňované v blízkosti vašej polohy. Tieto informácie sú spracovávané v súlade s našimi pravidlami ochrany súkromia a neslúžia k vašej osobnej identifikácii. Pokračovaním vyjadrujete súhlas s Podmienkami poskytovania služieb platformy HERE: (here.com/terms) a s Pravidlami ochrany súkromia: (here.com/privacy)"
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Vitajte"

@@ -1,0 +1,8 @@
+<manifest>
+	<define>
+		<domain name="org.tizen.heremaps-uc" />
+	</define>
+	<request>
+		<domain name="org.tizen.heremaps-uc" />
+	</request>
+</manifest>

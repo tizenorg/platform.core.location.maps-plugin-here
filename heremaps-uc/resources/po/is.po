@@ -1,0 +1,11 @@
+msgid "IDS_ST_BUTTON_AGREE"
+msgstr "Samþykkt"
+
+msgid "IDS_ST_BUTTON_DISAGREE"
+msgstr "Hafna"
+
+msgid "IDS_POSITIONING_CONSENT_BODY"
+msgstr "Tækið þitt notar kortatækni frá HERE. HERE safnar upplýsingum um notkun þína á  verkvangi okkar, eins og tengdar fyrirspurnir og leitir nærri þinni staðsetningu. Unnið er með þessar upplýsingar í samræmi við persónuverndarstefnu okkar og þær eru ekki notaðar til að bera kennsl á þig. Með því að halda áfram samþykkirðu þjónustuskilmála HERE: (here.com/terms) og persónuverndarstefnu: (here.com/privacy)."
+
+msgid "IDS_POSITIONING_CONSENT_TITLE"
+msgstr "Velkomin(n)"
