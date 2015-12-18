@@ -1,3 +1,8 @@
+[Version]   maps-plugin-here_0.1.8
+[Date]      18 Dec 2015
+[Title]     Support HERE User consent
+[Developer] Jongmun Woo <jongmun.woo@samsung.com>
+
 [Version]   maps-plugin-here_0.1.7
 [Date]      19 Nov 2015
 [Title]     Support multi reverse geocode
