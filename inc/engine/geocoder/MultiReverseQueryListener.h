@@ -19,10 +19,9 @@
 #define MULTIREVERSEQUERYLISTENER_H
 
 #include "common/HereMaps_global.h"
-
 #include "common/QueryListener.h"
 
-HERE_MAPS_BEGIN_NAMESPACE
+TIZEN_MAPS_BEGIN_NAMESPACE
 
 class MultiReverseReply;
 
@@ -35,7 +34,7 @@ class MultiReverseReply;
  *
  * @ingroup geocoding
  */
-class EXPORT_API MultiReverseQueryListener : public QueryListener
+class EXPORT_API MultiReverseQueryListener : public Here::Maps::QueryListener
 {
 public:
     /**
@@ -67,14 +66,14 @@ public:
 
 private:
 
-    void OnReplySuccess(BaseReply& rReply);
+    void OnReplySuccess(Here::Maps::BaseReply& rReply);
 
     #ifdef TIZEN_MIGRATION
-    void OnFailure(const BaseReply& rReply);
+    void OnFailure(const Here::Maps::BaseReply& rReply);
     #endif
 
 };
 
-HERE_MAPS_END_NAMESPACE
+TIZEN_MAPS_END_NAMESPACE
 
 #endif

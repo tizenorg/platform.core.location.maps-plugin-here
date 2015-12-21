@@ -33,6 +33,7 @@
 HERE_PLUGIN_BEGIN_NAMESPACE
 
 using namespace HERE_MAPS_NAMESPACE_PREFIX;
+using namespace TIZEN_MAPS_NAMESPACE_PREFIX;
 
 class HereMultiRevGeocode
 : public HereBase

@@ -98,7 +98,7 @@ here_error_e HereMultiRevGeocode::StartMultiReverse(maps_item_hashtable_h hPref)
 
 void HereMultiRevGeocode::OnMultiReverseReply(const MultiReverseReply& Reply)
 {
-	if (m_bCanceled) // ignore call back if it was cancelled.
+	if (m_bCanceled || !m_pCbFunc) // ignore call back
 	{
 		delete this;
 		return;
@@ -110,6 +110,7 @@ void HereMultiRevGeocode::OnMultiReverseReply(const MultiReverseReply& Reply)
 	maps_address_list_h address_list;
 	maps_address_list_create(&address_list);
 	maps_address_h pAddr = NULL;
+	String *additionalDataValue = NULL;
 
 	for (size_t i = 0; i < (size_t)nResults; i++)
 	{
@@ -135,17 +136,26 @@ void HereMultiRevGeocode::OnMultiReverseReply(const MultiReverseReply& Reply)
 				if(!tmpAddr.GetCity().empty())
 					maps_address_set_city(pAddr, tmpAddr.GetCity().c_str());
 
-				if(!tmpAddr.GetCounty().empty())
+				additionalDataValue = (String*)tmpAddr.GetAdditionalDataValue("CountyName");
+				if (additionalDataValue && !additionalDataValue->empty())
+					maps_address_set_county(pAddr, additionalDataValue->c_str());
+				else if (!tmpAddr.GetCounty().empty())
 					maps_address_set_county(pAddr, tmpAddr.GetCounty().c_str());
 
-				if(!tmpAddr.GetState().empty())
+				additionalDataValue = (String*)tmpAddr.GetAdditionalDataValue("StateName");
+				if (additionalDataValue && !additionalDataValue->empty())
+					maps_address_set_state(pAddr, additionalDataValue->c_str());
+				else if (!tmpAddr.GetState().empty())
 					maps_address_set_state(pAddr, tmpAddr.GetState().c_str());
 
-				if(!tmpAddr.GetCountry().empty())
+				additionalDataValue = (String*)tmpAddr.GetAdditionalDataValue("CountryName");
+				if (additionalDataValue && !additionalDataValue->empty())
+					maps_address_set_country(pAddr, additionalDataValue->c_str());
+				else if (!tmpAddr.GetCountry().empty())
 					maps_address_set_country(pAddr, tmpAddr.GetCountry().c_str());
 
-				if(!tmpAddr.GetCountryCode().empty())
-					maps_address_set_country_code(pAddr, tmpAddr.GetCountryCode().c_str());
+				if(!tmpAddr.GetCountry().empty())
+					maps_address_set_country_code(pAddr, tmpAddr.GetCountry().c_str());
 
 				if(!tmpAddr.GetPostalCode().empty())
 					maps_address_set_postal_code(pAddr, tmpAddr.GetPostalCode().c_str());
@@ -157,9 +167,13 @@ void HereMultiRevGeocode::OnMultiReverseReply(const MultiReverseReply& Reply)
 		maps_address_list_append(address_list, pAddr);
 	}
 
-	if (m_bCanceled)
+	if (m_bCanceled || !m_pCbFunc)
 	{
 		maps_address_list_destroy(address_list);
+	}
+	else if (nResults <= 0)
+	{
+		((maps_service_multi_reverse_geocode_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND, m_nReqId, 0, NULL, m_pUserData);
 	}
 	else
 	{
@@ -171,7 +185,7 @@ void HereMultiRevGeocode::OnMultiReverseReply(const MultiReverseReply& Reply)
 
 void HereMultiRevGeocode::OnMultiReverseFailure(const MultiReverseReply& Reply)
 {
-	if (!m_bCanceled)
+	if (!m_bCanceled && m_pCbFunc)
 		((maps_service_multi_reverse_geocode_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, NULL, m_pUserData);
 	delete this;
 }

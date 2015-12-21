@@ -42,7 +42,7 @@ here_error_e HereRoute::PrepareQuery()
 		return HERE_ERROR_PERMISSION_DENIED;
 
 	GeoCoordinates origCoord, destCoord;
-	m_pQuery = new GeoRouteQuery(origCoord, destCoord);
+	m_pQuery = new (std::nothrow) GeoRouteQuery(origCoord, destCoord);
 
 	if (!m_pQuery)
 		return HERE_ERROR_OUT_OF_MEMORY;
@@ -107,7 +107,7 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 		return HERE_ERROR_OUT_OF_MEMORY;
 
 	if (!hPref)
-		return HERE_ERROR_INVALID_PARAMETER;
+		return HERE_ERROR_NONE;
 
 /*
 	SegmentDetail aSegmentDetail;
@@ -196,7 +196,7 @@ here_error_e HereRoute::StartRoute(void)
 
 void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 {
-	if (m_bCanceled) // ignore call back if it was cancelled.
+	if (m_bCanceled || !m_pCbFunc) // ignore call back if it was cancelled.
 	{
 		delete this;
 		return;
@@ -211,7 +211,7 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 	if (nReplyNum == 0)
 	{
 		((maps_service_search_route_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND, m_nReqId,
-			0, 1, NULL, m_pUserData);
+			0, 0, NULL, m_pUserData);
 		delete this;
 		return;
 	}
@@ -307,8 +307,8 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 
 void HereRoute::OnRouteFailure(const GeoRouteReply& Reply)
 {
-	if (!m_bCanceled)
-		((maps_service_search_route_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 1, NULL, m_pUserData);
+	if (!m_bCanceled && m_pCbFunc)
+		((maps_service_search_route_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 0, NULL, m_pUserData);
 	delete this;
 }
 

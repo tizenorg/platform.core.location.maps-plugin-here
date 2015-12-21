@@ -23,10 +23,9 @@
 
 #include "geocoder/GeoCoderQueryBase.h"
 
-HERE_MAPS_BEGIN_NAMESPACE
+TIZEN_MAPS_BEGIN_NAMESPACE
 
 class MultiReverseReply;
-class GeoCoordinates;
 class MultiReverseQueryListener;
 
 /**
@@ -37,7 +36,7 @@ class MultiReverseQueryListener;
  *
  * @ingroup geocoding
  */
-class EXPORT_API MultiReverseQuery : public GeoCoderQueryBase
+class EXPORT_API MultiReverseQuery : public Here::Maps::GeoCoderQueryBase
 {
 public:
     /**
@@ -65,7 +64,7 @@ public:
      *
      * @param aMode A value indicating the reverse geocoding mode to use.
      */
-    MultiReverseQuery(const GeoCoordinates& rCoordinate, ReverseMode aMode);
+    MultiReverseQuery(const Here::Maps::GeoCoordinates& rCoordinate, ReverseMode aMode);
 
     /**
      * This method is a constructor that initializes the query with the location
@@ -80,7 +79,7 @@ public:
      * @param fRadius A float value indicating the radius (in meters) within
      *        which to search.
      */
-    MultiReverseQuery(const GeoCoordinates& rCoordinate, ReverseMode aMode, float fRadius);
+    MultiReverseQuery(const Here::Maps::GeoCoordinates& rCoordinate, ReverseMode aMode, float fRadius);
 
     /**
      * This method is the (virtual) destructor.
@@ -97,7 +96,7 @@ public:
      *
      * @param rRadius A value specifying the radius of the search area in meters.
      */
-    void SetProximity(const GeoCoordinates& rCoord, float fRadius = 0);
+    void SetProximity(const Here::Maps::GeoCoordinates& rCoord, float fRadius = 0);
 
     /**
      * This method detects whether coordinates/proximity (the center of search area
@@ -115,7 +114,12 @@ public:
      */
     void SetMode(ReverseMode aMode);
 
-	void SetGeocodeList(const GeoCoordinateList& rGeocodeList);
+    /**
+     * This method sets the get a list of locations to reverse-geocode.
+     *
+     * @param rGeocodeList A list of locations to reverse-geocode.
+     */
+    void SetGeocodeList(const Here::Maps::GeoCoordinateList& rGeocodeList);
     /**
      * This method attempts to establish a connection
      * with the server and then, if the connection has been established, it
@@ -128,7 +132,8 @@ public:
      *
      * @return A value representing the identifier of the issued request.
      */
-    RestItemHandle::RequestId Execute(MultiReverseQueryListener& rListener, Tizen::Maps::HereObject* pUserData = NULL) const;
+    Here::Maps::RestItemHandle::RequestId Execute(MultiReverseQueryListener& rListener,
+        Tizen::Maps::HereObject* pUserData = NULL) const;
 
     /**
      * This method returns the base URI to be used for all subsequent
@@ -154,7 +159,7 @@ private:
      */
     String CreateUri() const;
 
-#ifdef TIZEN_MIGRATION_TO_SUPPORT_POST_METHOD
+#ifdef TIZEN_SUPPORT_POST_METHOD
     /**
      * This method creates the URI for the request.
      *
@@ -170,6 +175,6 @@ private:
     MultiReverseQueryImpl* m_pImpl;
 };
 
-HERE_MAPS_END_NAMESPACE
+TIZEN_MAPS_END_NAMESPACE
 
 #endif
