@@ -41,7 +41,7 @@ here_error_e HereGeocode::PrepareQuery()
 	if (m_pQuery)
 		return HERE_ERROR_PERMISSION_DENIED;
 
-	m_pQuery = new GeoCoderQuery();
+	m_pQuery = new (std::nothrow) GeoCoderQuery();
 
 	if (!m_pQuery)
 		return HERE_ERROR_OUT_OF_MEMORY;
@@ -55,7 +55,7 @@ here_error_e HereGeocode::PreparePreference(maps_preference_h hPref)
 		return HERE_ERROR_OUT_OF_MEMORY;
 
 	if (!hPref)
-		return HERE_ERROR_INVALID_PARAMETER;
+		return HERE_ERROR_NONE;
 
 	int ret;
 	char *szLanguage = NULL;
@@ -218,7 +218,7 @@ here_error_e HereGeocode::StartGeocodeByStructuredAddress(const maps_address_h h
 
 void HereGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 {
-	if (m_bCanceled) // ignore call back if it was cancelled.
+	if (m_bCanceled || !m_pCbFunc) // ignore call back
 	{
 		delete this;
 		return;
@@ -232,7 +232,7 @@ void HereGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 	if (nResults == 0)
 	{
 		((maps_service_geocode_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND, m_nReqId,
-			0, 1, NULL, m_pUserData);
+			0, 0, NULL, m_pUserData);
 		delete this;
 		return;
 	}
@@ -254,7 +254,7 @@ void HereGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 		maps_error_e error = (maps_error_e)maps_coordinates_create(
 				     hereCoord.GetLatitude(), hereCoord.GetLongitude(), &mapsCoord);
 
-		if (m_bCanceled)
+		if (m_bCanceled || !m_pCbFunc)
 		{
 			if (mapsCoord) maps_coordinates_destroy(mapsCoord);
 			break;
@@ -275,8 +275,8 @@ void HereGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 
 void HereGeocode::OnGeoCoderFailure(const GeoCoderReply& Reply)
 {
-	if (!m_bCanceled)
-		((maps_service_geocode_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 1, NULL, m_pUserData);
+	if (!m_bCanceled && m_pCbFunc)
+		((maps_service_geocode_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 0, NULL, m_pUserData);
 	delete this;
 }
 

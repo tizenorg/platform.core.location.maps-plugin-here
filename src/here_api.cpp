@@ -23,14 +23,10 @@
 #include "here_route.h"
 #include <common/HereConfig.h>
 
-
 using namespace HERE_PLUGIN_NAMESPACE_PREFIX;
 
 int HerePluginInit(maps_plugin_h *hPlugin)
 {
-	if (!hPlugin)
-		return HERE_ERROR_INVALID_PARAMETER;
-
 	here_error_e error = HereManager::CheckAgreement();
 	if (error != HERE_ERROR_NONE)
 		return error;
@@ -47,9 +43,6 @@ int HerePluginInit(maps_plugin_h *hPlugin)
 
 int HerePluginShutdown(maps_plugin_h hPlugin)
 {
-	if (!hPlugin)
-		return HERE_ERROR_INVALID_PARAMETER;
-
 	if (HereManager::GetHandler())
 		HereManager::GetHandler()->Close();
 
@@ -135,6 +128,7 @@ int HerePluginGeocode(const char* szAddr,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pGeocode->PreparePreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error = pGeocode->StartGeocode(szAddr);
 	} while(0);
@@ -173,6 +167,7 @@ int HerePluginGeocodeByStructuredAddress(const maps_address_h hAddr,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pGeocode->PreparePreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error = pGeocode->StartGeocodeByStructuredAddress(hAddr);
 	} while(0);
@@ -214,6 +209,7 @@ int HerePluginGeocodeInsideArea(const char* szAddr, maps_area_h hArea,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pGeocode->PreparePreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error = pGeocode->StartGeocodeInsideArea(szAddr, hArea);
 	} while(0);
@@ -255,6 +251,7 @@ int HerePluginReverseGeocode(double dLatitude, double dLongitude,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pRevGeocode->PreparePreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error = pRevGeocode->PreparePosition(dLatitude, dLongitude);
 		if (error != HERE_ERROR_NONE) break;
@@ -338,6 +335,7 @@ int HerePluginSearchPlace(maps_coordinates_h hPos, int nDistance,
 		if (error != HERE_ERROR_NONE) break;
 
 		error =	pPlace->PrepareDiscoveryPreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error =	pPlace->PrepareDiscoveryFilter(hFilter);
 		if (error != HERE_ERROR_NONE) break;
@@ -382,6 +380,7 @@ int HerePluginSearchPlaceByArea(maps_area_h hArea,
 		if (error != HERE_ERROR_NONE) break;
 
 		error =	pPlace->PrepareDiscoveryPreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error =	pPlace->PrepareDiscoveryFilter(hFilter);
 		if (error != HERE_ERROR_NONE) break;
@@ -426,6 +425,7 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 		if (error != HERE_ERROR_NONE) break;
 
 		error =	pPlace->PrepareDiscoveryPreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error =	pPlace->PrepareDiscoveryFilter(hFilter);
 		if (error != HERE_ERROR_NONE) break;
@@ -467,6 +467,7 @@ int HerePluginSearchPlaceDetails(const char* szUrl,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pPlace->PreparePlaceDetailsPreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error = pPlace->StartPlaceDetails(szUrl);
 	} while(0);
@@ -509,6 +510,7 @@ int HerePluginSearchRoute(maps_coordinates_h hOrigin, maps_coordinates_h hDestin
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pRoute->PreparePreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error = pRoute->PrepareWaypoint(hOrigin, hDestination);
 		if (error != HERE_ERROR_NONE) break;
@@ -559,6 +561,7 @@ int HerePluginSearchRouteWaypoints(const maps_coordinates_h* hWaypointList, int 
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pRoute->PreparePreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
 
 		error = pRoute->StartRoute();
 	} while(0);

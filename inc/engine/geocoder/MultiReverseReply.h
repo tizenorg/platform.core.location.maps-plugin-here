@@ -21,11 +21,10 @@
 #include "common/HereMaps_global.h"
 #include "common/BaseReply.h"
 
-HERE_MAPS_BEGIN_NAMESPACE
+#include "geocoder/Result.h"
+#include "geocoder/MetaInfo.h"
 
-class Result;
-class MetaInfo;
-
+TIZEN_MAPS_BEGIN_NAMESPACE
 
 /**
  * This class encapsulates a reply to a geocoding query.
@@ -36,7 +35,7 @@ class MetaInfo;
  *
  * @ingroup geocoding
  */
-class EXPORT_API MultiReverseReply : public BaseReply
+class EXPORT_API MultiReverseReply : public Here::Maps::BaseReply
 {
 public:
 
@@ -65,14 +64,14 @@ public:
      *
      * @return A constant pointer to an instance of <code>Result</code>.
      */
-    const Result* GetResult(size_t idx) const;
+    const Here::Maps::Result* GetResult(size_t idx) const;
 
     /**
      * This method retrieves the reply meta information.
      *
      * @return A constant pointer to an instance of <code>MetaInfo</code>.
      */
-    const MetaInfo* GetMetaInfo() const;
+    const Here::Maps::MetaInfo* GetMetaInfo() const;
 
 private:
     HERE_MAPS_NO_COPY_NO_ASSIGN(MultiReverseReply);
@@ -84,6 +83,6 @@ private:
     MultiReverseReplyImpl* m_pImpl;
 };
 
-HERE_MAPS_END_NAMESPACE
+TIZEN_MAPS_END_NAMESPACE
 
 #endif /* MULTIREVERSEREPLY_H_ */
