@@ -30,6 +30,9 @@ HereBase::HereBase()
 	m_nRestReqId = 0;
 	m_bCanceled = 0;
 	m_nReqId = 0;
+
+	m_pCbFunc = NULL;
+	m_pUserData = NULL;
 }
 
 HereBase::~HereBase()

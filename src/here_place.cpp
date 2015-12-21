@@ -29,6 +29,7 @@ HerePlace::HerePlace(void *pCbFunc, void *pUserData, int nReqId)
 
 	m_nReplyCnt = 0;
 	m_nReplyIdx = 0;
+	m_bReplyFlushed = false;
 	m_szSortBy = NULL;
 	m_bPlaceDetailsInternal = false;
 }
@@ -59,7 +60,7 @@ here_error_e HerePlace::PrepareDiscoveryQuery()
 	if (m_pDiscoveryQuery)
 		return HERE_ERROR_PERMISSION_DENIED;
 
-	 m_pDiscoveryQuery = new DiscoveryQuery();
+	 m_pDiscoveryQuery = new (std::nothrow) DiscoveryQuery();
 
 	if (!m_pDiscoveryQuery)
 		return HERE_ERROR_OUT_OF_MEMORY;
@@ -279,7 +280,7 @@ here_error_e HerePlace::PreparePlaceDetailsQuery()
 	if (m_pPlaceDetailsQuery)
 		return HERE_ERROR_PERMISSION_DENIED;
 
-	m_pPlaceDetailsQuery = new PlaceDetailsQuery();
+	m_pPlaceDetailsQuery = new (std::nothrow) PlaceDetailsQuery();
 
 	if (!m_pPlaceDetailsQuery)
 		return HERE_ERROR_OUT_OF_MEMORY;
@@ -330,6 +331,7 @@ here_error_e HerePlace::StartPlaceDetailsInternal(const char *szUrl)
 
 	std::unique_ptr<PlaceDetailsQuery> pPlaceDetailsQuery (new (std::nothrow)PlaceDetailsQuery());
 
+	m_bPlaceDetailsInternal = true;
 	bool bExcuted = (int)(pPlaceDetailsQuery->Execute(*this, NULL, szUrl) > 0);
 
 	return (bExcuted ? HERE_ERROR_NONE : HERE_ERROR_INVALID_OPERATION);
@@ -337,12 +339,6 @@ here_error_e HerePlace::StartPlaceDetailsInternal(const char *szUrl)
 
 void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 {
-	if (m_bCanceled) /* ignore call back if it was cancelled. */
-	{
-		delete this;
-		return;
-	}
-
 	maps_place_h mapsPlace;
 	PlaceItemList herePlaceList = Reply.GetPlaceItems();
 	PlaceItemList::iterator herePlaceIt;
@@ -361,22 +357,14 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 	m_nReplyIdx = 0;
 	m_nReplyCnt = herePlaceList.size() + hereSearchList.size();
 
-	if (m_nReplyCnt == 0)
-	{
-		((maps_service_search_place_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND, m_nReqId,
-			0, 1, NULL, m_pUserData);
-		delete this;
-		return;
-	}
-
 	for (herePlaceIt = herePlaceList.begin();
-		herePlaceIt != herePlaceList.end() && !m_bCanceled;
+		herePlaceIt != herePlaceList.end();
 		herePlaceIt++)
 	{
-		isPending = false;
-
 		if ((error = maps_place_create(&mapsPlace)) == MAPS_ERROR_NONE)
 		{
+			isPending = false;
+
 			/* title, uri, id */
 			hereLinkObj = herePlaceIt->GetLinkObject();
 
@@ -469,21 +457,24 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 					{
 						m_PlaceList.push_back(mapsPlace);
 						isPending = true;
-						m_bPlaceDetailsInternal = true;
 						MAPS_LOGD("Add maps_place_h to the pending list. id=%s", hereLinkObj.GetId().data());
 					}
 				}
 			}
-		}
 
-		if (!isPending) {
-			m_nReplyIdx++;
-			m_PlaceList.push_back(mapsPlace);
+			if (!isPending) {
+				m_nReplyIdx++;
+				m_PlaceList.push_back(mapsPlace);
+			}
+		}
+		else
+		{
+			m_nReplyCnt--;
 		}
 	}
 
 	for (hereSearchIt = hereSearchList.begin();
-		hereSearchIt != hereSearchList.end() && !m_bCanceled;
+		hereSearchIt != hereSearchList.end();
 		hereSearchIt++)
 	{
 		error = maps_place_create(&mapsPlace);
@@ -519,16 +510,30 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 			/* type */
 
 			if (!is_valid)
+			{
+				m_nReplyCnt--;
 				error = MAPS_ERROR_NOT_FOUND;
+				maps_place_destroy(mapsPlace);
+				mapsPlace = NULL;
+			}
+			else
+			{
+				m_PlaceList.push_back(mapsPlace);
+				m_nReplyIdx++;
+			}
 		}
-
-		m_PlaceList.push_back(mapsPlace);
-		m_nReplyIdx++;
+		else
+		{
+			m_nReplyCnt--;
+		}
 	}
 
 
-	if (m_nReplyIdx == m_nReplyCnt)
+	if (!m_bReplyFlushed && (m_nReplyCnt == 0 || m_nReplyIdx == m_nReplyCnt))
 	{
+		if (m_nReplyCnt == 0)
+			error = MAPS_ERROR_NOT_FOUND;
+
 		__flushReplies(error);
 		delete this;
 	}
@@ -536,8 +541,10 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 
 void HerePlace::OnDiscoverFailure(const DiscoveryReply& Reply)
 {
-	if (++m_nReplyIdx == m_nReplyCnt)
+	if (!m_bReplyFlushed)
 	{
+		m_nReplyIdx = 0;
+		m_nReplyCnt = 0;
 		__flushReplies((maps_error_e)GetErrorCode(Reply));
 		delete this;
 	}
@@ -545,12 +552,6 @@ void HerePlace::OnDiscoverFailure(const DiscoveryReply& Reply)
 
 void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
 {
-	if (m_bCanceled) /* ignore call back if it was cancelled. */
-	{
-		delete this;
-		return;
-	}
-
 	if (m_nReplyCnt == 0)
 		m_nReplyCnt = 1;
 
@@ -633,19 +634,30 @@ void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
 			ProcessPlaceRatings(herePlace, mapsPlace);
 
 			ProcessPlaceRated(herePlace, mapsPlace);
+
+			if (!isPending)
+				m_PlaceList.push_back(mapsPlace);
+
+			m_nReplyIdx++;
 		}
 		else
 		{
+			m_nReplyCnt--;
 			error = MAPS_ERROR_NOT_FOUND;
+			maps_place_destroy(mapsPlace);
+			mapsPlace = NULL;
 		}
 	}
-
-	if (!isPending)
-		m_PlaceList.push_back(mapsPlace);
-
-
-	if (++m_nReplyIdx == m_nReplyCnt)
+	else
 	{
+		m_nReplyCnt--;
+	}
+
+	if (!m_bReplyFlushed && (m_nReplyCnt == 0 || m_nReplyIdx == m_nReplyCnt))
+	{
+		if (m_nReplyCnt == 0)
+			error = MAPS_ERROR_NOT_FOUND;
+
 		__flushReplies(error);
 		delete this;
 	}
@@ -653,10 +665,25 @@ void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
 
 void HerePlace::OnPlaceDetailsFailure(const PlaceDetailsReply& Reply)
 {
-	if (++m_nReplyIdx == m_nReplyCnt)
+	if (!m_bPlaceDetailsInternal)
 	{
-		__flushReplies(m_bPlaceDetailsInternal ? MAPS_ERROR_NONE : GetErrorCode(Reply));
-		delete this;
+		if (!m_bReplyFlushed)
+		{
+			m_nReplyIdx = 0;
+			m_nReplyCnt = 0;
+			__flushReplies(GetErrorCode(Reply));
+			delete this;
+		}
+	}
+	else
+	{
+		m_nReplyIdx++;
+		MAPS_LOGD("Internal error during updating detailed information for the place. (%d/%d)", m_nReplyIdx, m_nReplyCnt);
+		if (!m_bReplyFlushed && (m_nReplyIdx == m_nReplyCnt))
+		{
+			__flushReplies(MAPS_ERROR_NONE);
+			delete this;
+		}
 	}
 }
 
@@ -1175,21 +1202,35 @@ void HerePlace::ProcessPlaceRated(PlaceDetails herePlace, maps_place_h mapsPlace
 void HerePlace::__flushReplies(int error)
 {
 	maps_place_h mapsPlace;
+	bool bCallbackCanceled = false;
+	int nReplyIdx = 0;
 
-	m_nReplyIdx = 0;
+	if (m_bReplyFlushed) return;
+	m_bReplyFlushed = true;
+
 	__sortList(m_PlaceList);
 
-	while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty())
+	while ((nReplyIdx < m_nReplyCnt) ||
+		(error != MAPS_ERROR_NONE && nReplyIdx == 0 && m_nReplyCnt == 0) /* reply with only error */
+	)
 	{
-		mapsPlace = m_PlaceList.front();
-		m_PlaceList.pop_front();
-
-		/* callback function */
-		if (((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId,
-			m_nReplyIdx++, m_nReplyCnt, mapsPlace, m_pUserData) == FALSE)
+		mapsPlace = NULL;
+		if (!m_PlaceList.empty())
 		{
-			break;
+			mapsPlace = m_PlaceList.front();
+			m_PlaceList.pop_front();
 		}
+
+		if (m_bCanceled || bCallbackCanceled)
+		{
+			maps_place_destroy(mapsPlace);
+		}
+		else if (((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId,
+			nReplyIdx, m_nReplyCnt, mapsPlace, m_pUserData) == FALSE)
+		{
+			bCallbackCanceled = true;
+		}
+		nReplyIdx++;
 	}
 }
 
