@@ -41,7 +41,7 @@ here_error_e HereRevGeocode::PrepareQuery()
 	if (m_pQuery)
 		return HERE_ERROR_PERMISSION_DENIED;
 
-	m_pQuery = new ReverseGeoCoderQuery();
+	m_pQuery = new (std::nothrow) ReverseGeoCoderQuery();
 
 	if (!m_pQuery)
 		return HERE_ERROR_OUT_OF_MEMORY;
@@ -131,7 +131,7 @@ void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 	if (nShortestIdx < 0)
 	{
 		((maps_service_reverse_geocode_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND,
-			m_nReqId, 0, 1, NULL, m_pUserData);
+			m_nReqId, 0, 0, NULL, m_pUserData);
 		delete this;
 		return;
 	}
@@ -194,7 +194,7 @@ void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 void HereRevGeocode::OnGeoCoderFailure(const GeoCoderReply& Reply)
 {
 	if (!m_bCanceled)
-		((maps_service_reverse_geocode_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 1, NULL, m_pUserData);
+		((maps_service_reverse_geocode_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 0, NULL, m_pUserData);
 	delete this;
 }
 
