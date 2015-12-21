@@ -114,6 +114,7 @@ private:
 	PlaceDetailsQuery* m_pPlaceDetailsQuery;
 	int m_nReplyCnt;
 	int m_nReplyIdx;
+	bool m_bReplyFlushed;
 	char *m_szSortBy;
 	bool m_bPlaceDetailsInternal;
 

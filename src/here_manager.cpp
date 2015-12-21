@@ -69,9 +69,7 @@ bool HereManager::Create()
 	bool result = false;
 
 	if (!m_pHereManager)
-	{
-		m_pHereManager = new HereManager();
-	}
+		m_pHereManager = new (std::nothrow) HereManager();
 
 	pthread_mutex_lock(&g_mtxRef);
 	if (m_pHereManager)
@@ -82,7 +80,8 @@ bool HereManager::Create()
 	}
 	pthread_mutex_unlock(&g_mtxRef);
 
-	m_pHereManager->SetCredentials();
+	if (m_pHereManager)
+		m_pHereManager->SetCredentials();
 	return result;
 }
 
@@ -118,19 +117,19 @@ void* HereManager::CreateInstance(HereSvcType nHereSvc, void* pCbFunc,
 	switch(nHereSvc)
 	{
 	case HERE_SVC_GEOCODE:
-		pHere = (HereBase*)new HereGeocode(pCbFunc, pUserData, *nReqId);
+		pHere = (HereBase*)new (std::nothrow) HereGeocode(pCbFunc, pUserData, *nReqId);
 		break;
 
 	case HERE_SVC_REV_GEOCODE:
-		pHere = (HereBase*)new HereRevGeocode(pCbFunc, pUserData, *nReqId);
+		pHere = (HereBase*)new (std::nothrow) HereRevGeocode(pCbFunc, pUserData, *nReqId);
 		break;
 
 	case HERE_SVC_PLACE:
-		pHere = (HereBase*)new HerePlace(pCbFunc, pUserData, *nReqId);
+		pHere = (HereBase*)new (std::nothrow) HerePlace(pCbFunc, pUserData, *nReqId);
 		break;
 
 	case HERE_SVC_ROUTE:
-		pHere = (HereBase*)new HereRoute(pCbFunc, pUserData, *nReqId);
+		pHere = (HereBase*)new (std::nothrow) HereRoute(pCbFunc, pUserData, *nReqId);
 		break;
 
 	case HERE_SVC_MULTI_REV_GEOCODE:
@@ -142,7 +141,8 @@ void* HereManager::CreateInstance(HereSvcType nHereSvc, void* pCbFunc,
 	}
 
 	pthread_mutex_lock(&m_mtxHereList);
-	m_HereList.push_back(pHere);
+	if (pHere)
+		m_HereList.push_back(pHere);
 	pthread_mutex_unlock(&m_mtxHereList);
 
 	return pHere;

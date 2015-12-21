@@ -63,16 +63,31 @@ public:
     , m_pRestItem(pRestItem)
 #endif
     {
+    #ifdef TIZEN_MIGRATION
+        m_aRequestId = RestItemHandle::INVALID_RESTITEM;
+    #endif
     }
 
     RestEngineArgument(RestItemHandle::RequestId aRequestId)
     : m_aRequestId(aRequestId)
     {
+    #ifdef TIZEN_MIGRATION
+        m_pRestItem = NULL;
+    #ifdef TIZEN_SUPPORT_POST_METHOD
+        m_bPost = false;
+    #endif
+    #endif
     }
 
     RestEngineArgument(RestItem* pRestItem)
     : m_pRestItem(pRestItem)
     {
+    #ifdef TIZEN_MIGRATION
+        m_aRequestId = RestItemHandle::INVALID_RESTITEM;
+    #ifdef TIZEN_SUPPORT_POST_METHOD
+        m_bPost = false;
+    #endif
+    #endif
     }
 
     ~RestEngineArgument()
