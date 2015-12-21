@@ -1,7 +1,7 @@
 Name:       maps-plugin-here
 Summary:    Tizen HERE Maps Plug-in Library
-Version:    0.1.8
-Release:    1
+Version:    0.1.9
+Release:    2
 Group:      Location/Libraries
 License:    Apache-2.0 and HERE
 Source0:    %{name}-%{version}.tar.gz
@@ -53,7 +53,7 @@ Requires(postun): /sbin/ldconfig
 %endif
 
 %description
-This packages provides Plugin APIs capsulating HERE Maps Engine Library for Maps Service Library.
+This package provides Plugin APIs capsulating HERE Maps Engine Library for Maps Service Library.
 
 %prep
 %setup -q
@@ -95,7 +95,7 @@ Summary:    HereMaps UC popup
 Requires:   %{name} = %{version}-%{release}
 
 %description -n org.tizen.heremaps-uc
-HereMaps UC popup
+This package provides UI interface to get consents from users to the HERE platform Service.
 
 %files -n org.tizen.heremaps-uc
 %manifest heremaps-uc/org.tizen.heremaps-uc.manifest

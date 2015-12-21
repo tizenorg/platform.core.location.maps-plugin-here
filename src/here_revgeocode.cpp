@@ -41,7 +41,7 @@ here_error_e HereRevGeocode::PrepareQuery()
 	if (m_pQuery)
 		return HERE_ERROR_PERMISSION_DENIED;
 
-	m_pQuery = new ReverseGeoCoderQuery();
+	m_pQuery = new (std::nothrow) ReverseGeoCoderQuery();
 
 	if (!m_pQuery)
 		return HERE_ERROR_OUT_OF_MEMORY;
@@ -131,13 +131,14 @@ void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 	if (nShortestIdx < 0)
 	{
 		((maps_service_reverse_geocode_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND,
-			m_nReqId, 0, 1, NULL, m_pUserData);
+			m_nReqId, 0, 0, NULL, m_pUserData);
 		delete this;
 		return;
 	}
 
 	maps_address_h hAddr = NULL;
 	maps_error_e error = (maps_error_e)maps_address_create(&hAddr);
+	String *additionalDataValue = NULL;
 
 	if(error == MAPS_ERROR_NONE)
 	{
@@ -147,34 +148,43 @@ void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 		{
 			Address tmpAddr = (pResult->GetLocation()).GetAddress();
 
-			if(!tmpAddr.GetHouseNumber().empty())
+			if (!tmpAddr.GetHouseNumber().empty())
 				maps_address_set_building_number(hAddr, tmpAddr.GetHouseNumber().c_str());
 
-			if(!tmpAddr.GetStreet().empty())
+			if (!tmpAddr.GetStreet().empty())
 				maps_address_set_street(hAddr, tmpAddr.GetStreet().c_str());
 
-			if(!tmpAddr.GetDistrict().empty())
+			if (!tmpAddr.GetDistrict().empty())
 				maps_address_set_district(hAddr, tmpAddr.GetDistrict().c_str());
 
-			if(!tmpAddr.GetCity().empty())
+			if (!tmpAddr.GetCity().empty())
 				maps_address_set_city(hAddr, tmpAddr.GetCity().c_str());
 
-			if(!tmpAddr.GetCounty().empty())
+			additionalDataValue = (String*)tmpAddr.GetAdditionalDataValue("CountyName");
+			if (additionalDataValue && !additionalDataValue->empty())
+				maps_address_set_county(hAddr, additionalDataValue->c_str());
+			else if (!tmpAddr.GetCounty().empty())
 				maps_address_set_county(hAddr, tmpAddr.GetCounty().c_str());
 
-			if(!tmpAddr.GetState().empty())
+			additionalDataValue = (String*)tmpAddr.GetAdditionalDataValue("StateName");
+			if (additionalDataValue && !additionalDataValue->empty())
+				maps_address_set_state(hAddr, additionalDataValue->c_str());
+			else if (!tmpAddr.GetState().empty())
 				maps_address_set_state(hAddr, tmpAddr.GetState().c_str());
 
-			if(!tmpAddr.GetCountry().empty())
+			additionalDataValue = (String*)tmpAddr.GetAdditionalDataValue("CountryName");
+			if (additionalDataValue && !additionalDataValue->empty())
+				maps_address_set_country(hAddr, additionalDataValue->c_str());
+			else if (!tmpAddr.GetCountry().empty())
 				maps_address_set_country(hAddr, tmpAddr.GetCountry().c_str());
 
-			if(!tmpAddr.GetCountryCode().empty())
-				maps_address_set_country_code(hAddr, tmpAddr.GetCountryCode().c_str());
+			if (!tmpAddr.GetCountry().empty())
+				maps_address_set_country_code(hAddr, tmpAddr.GetCountry().c_str());
 
-			if(!tmpAddr.GetPostalCode().empty())
+			if (!tmpAddr.GetPostalCode().empty())
 				maps_address_set_postal_code(hAddr, tmpAddr.GetPostalCode().c_str());
 
-			if(!tmpAddr.GetLabel().empty())
+			if (!tmpAddr.GetLabel().empty())
 				maps_address_set_freetext(hAddr, tmpAddr.GetLabel().c_str());
 		}
 	}
@@ -194,7 +204,7 @@ void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 void HereRevGeocode::OnGeoCoderFailure(const GeoCoderReply& Reply)
 {
 	if (!m_bCanceled)
-		((maps_service_reverse_geocode_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 1, NULL, m_pUserData);
+		((maps_service_reverse_geocode_cb)m_pCbFunc)((maps_error_e)GetErrorCode(Reply), m_nReqId, 0, 0, NULL, m_pUserData);
 	delete this;
 }
 

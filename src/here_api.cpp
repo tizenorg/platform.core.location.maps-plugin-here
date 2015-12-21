@@ -23,7 +23,6 @@
 #include "here_route.h"
 #include <common/HereConfig.h>
 
-
 using namespace HERE_PLUGIN_NAMESPACE_PREFIX;
 
 int HerePluginInit(maps_plugin_h *hPlugin)
