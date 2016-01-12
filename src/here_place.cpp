@@ -200,7 +200,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 		return HERE_ERROR_OUT_OF_MEMORY;
 
 
-
 	typedef enum {
 		PLACE_CMD_TEXT,
 		PLACE_CMD_CENTER,
@@ -223,7 +222,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 	}
 	m_pDiscoveryQuery->SetSearchText(szSearchText);
 
-
 	/* Decide command type */
 	if (!szSearchText.empty())
 	{
@@ -237,7 +235,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 	{
 		cmdType = PLACE_CMD_AREA;
 	}
-
 
 	/* Get proximity with area */
 	if (cmdType == PLACE_CMD_TEXT || cmdType == PLACE_CMD_CENTER)
@@ -280,7 +277,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 		else
 			return HERE_ERROR_INVALID_PARAMETER;
 	}
-
 
 	/* Set properties */
 	if (cmdType == PLACE_CMD_TEXT)
