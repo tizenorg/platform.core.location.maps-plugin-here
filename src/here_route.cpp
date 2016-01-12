@@ -25,6 +25,8 @@ HereRoute::HereRoute(void *pCbFunc, void *pUserData, int nReqId)
 	m_pCbFunc = pCbFunc;
 	m_pUserData = pUserData;
 	m_nReqId = nReqId;
+
+	m_eDistanceUnit = MAPS_DISTANCE_UNIT_M;
 }
 
 HereRoute::~HereRoute()
@@ -169,6 +171,7 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 		case MAPS_DISTANCE_UNIT_KM: eMetric = GeoRouteQuery::DIST_metric;   break;
 		default:                    eMetric = GeoRouteQuery::DIST_imperial; break;
 		}
+		m_eDistanceUnit = eUnit;
 		m_pQuery->SetMetricSystem(eMetric);
 	}
 
@@ -227,7 +230,11 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 				maps_route_set_route_id(mapsRoute, (char*)hereRoute->GetRouteId().c_str());
 
 			/* distance */
-			maps_route_set_total_distance(mapsRoute, hereRoute->GetDistance());
+			maps_route_set_total_distance(mapsRoute,
+				HereUtils::ConvertDistance(hereRoute->GetDistance(), m_eDistanceUnit));
+
+			/* distance unit */
+			maps_route_set_distance_unit(mapsRoute, m_eDistanceUnit);
 
 			/* duration */
 			maps_route_set_total_duration(mapsRoute, hereRoute->GetTravelTime());
@@ -329,7 +336,8 @@ maps_error_e HereRoute::ProcessSegments(maps_route_h mapsRoute, const RouteSegme
 		if (maps_route_segment_create(&mapsSegm) != MAPS_ERROR_NONE) continue;
 
 		/* distance */
-		maps_route_segment_set_distance(mapsSegm, hereSegm->GetDistance());
+		maps_route_segment_set_distance(mapsSegm,
+			HereUtils::ConvertDistance(hereSegm->GetDistance(), m_eDistanceUnit));
 
 		/* tranvel time */
 		maps_route_segment_set_duration(mapsSegm, hereSegm->GetTravelTime());
@@ -403,7 +411,7 @@ maps_error_e HereRoute::ProcessManeuver(maps_route_segment_h mapsSegm, const Man
 
 		/* length */
 		maps_route_maneuver_set_distance_to_next_instruction(mapsManeuver,
-			hereMane->GetDistanceToNextInstruction());
+			HereUtils::ConvertDistance(hereMane->GetDistanceToNextInstruction(), m_eDistanceUnit));
 
 		/* travel time */
 		maps_route_maneuver_set_time_to_next_instruction(mapsManeuver,

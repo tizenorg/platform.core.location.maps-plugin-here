@@ -385,7 +385,7 @@ int HerePluginSearchPlaceByArea(maps_area_h hArea,
 		error =	pPlace->PrepareDiscoveryFilter(hFilter);
 		if (error != HERE_ERROR_NONE) break;
 
-		error = pPlace->StartDiscoveryPlaceByArea(hArea);
+		error = pPlace->StartDiscoveryPlace(hArea);
 	} while(0);
 
 	/* finishing task */
@@ -430,7 +430,7 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 		error =	pPlace->PrepareDiscoveryFilter(hFilter);
 		if (error != HERE_ERROR_NONE) break;
 
-		error = pPlace->StartDiscoveryPlaceByAddress(szAddr, hArea);
+		error = pPlace->StartDiscoveryPlace(hArea, szAddr);
 	} while(0);
 
 	/* finishing task */

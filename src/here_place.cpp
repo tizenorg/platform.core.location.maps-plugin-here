@@ -32,6 +32,7 @@ HerePlace::HerePlace(void *pCbFunc, void *pUserData, int nReqId)
 	m_bReplyFlushed = false;
 	m_szSortBy = NULL;
 	m_bPlaceDetailsInternal = false;
+	m_eDistanceUnit = MAPS_DISTANCE_UNIT_M;
 }
 
 HerePlace::~HerePlace()
@@ -88,6 +89,11 @@ here_error_e HerePlace::PrepareDiscoveryPreference(maps_preference_h hPref)
 	ret = maps_preference_get_max_results(hPref, &nMaxResults);
 	if (ret == MAPS_ERROR_NONE)
 		m_pDiscoveryQuery->SetMaxResults((size_t)nMaxResults);
+
+	maps_distance_unit_e eUnit;
+	ret = maps_preference_get_distance_unit(hPref, &eUnit);
+	if (ret == MAPS_ERROR_NONE)
+		m_eDistanceUnit = eUnit;
 
 	char *szSortBy;
 	ret = maps_preference_get(hPref, MAPS_PLACE_FILTER_SORT_BY, &szSortBy);
@@ -146,100 +152,40 @@ here_error_e HerePlace::PrepareDiscoveryFilter(maps_place_filter_h hFilter)
 
 here_error_e HerePlace::StartDiscoveryPlace(maps_coordinates_h hCoord, int nDistance)
 {
-	if (!m_pDiscoveryQuery)
-		return HERE_ERROR_OUT_OF_MEMORY;
-
-	if (!hCoord)
+	if (!hCoord || nDistance < 0)
 		return HERE_ERROR_INVALID_PARAMETER;
 
-
-	if (m_pDiscoveryQuery->GetSearchText().empty())
-	{
-		m_pDiscoveryQuery->SetType(DiscoveryQuery::QT_EXPLORE);
-
-		double dLat, dLon;
-		maps_coordinates_get_latitude(hCoord, &dLat);
-		maps_coordinates_get_longitude(hCoord, &dLon);
-		GeoCoordinates geoCoord(dLat, dLon);
-
-		if (nDistance > 0)
-		{
-			GeoBoundingCircle geoCircle(geoCoord, nDistance);
-			m_pDiscoveryQuery->SetArea(geoCircle);
-		}
-		else if (nDistance == 0)
-		{
-			m_pDiscoveryQuery->SetProximity(geoCoord);
-		}
-		else
-			return HERE_ERROR_INVALID_PARAMETER;
-
-		m_nRestReqId = m_pDiscoveryQuery->Execute(*this, NULL);
-
-		return (m_nRestReqId > 0 ? HERE_ERROR_NONE : HERE_ERROR_INVALID_OPERATION);
-	}
-	else
-	{
-		here_error_e error;
-		maps_area_h hArea = NULL;
-		maps_area_create_circle(hCoord, nDistance, &hArea);
-		error = StartDiscoveryPlaceByAddress(m_pDiscoveryQuery->GetSearchText().data(), hArea);
-		maps_area_destroy(hArea);
-		return error;
-	}
+	maps_area_h area = NULL;
+	maps_area_create_circle(hCoord, nDistance, &area);
+	here_error_e error = StartDiscoveryPlace(area);
+	maps_area_destroy(area);
+	return error;
 }
 
-here_error_e HerePlace::StartDiscoveryPlaceByArea(maps_area_h hArea)
+here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAddr)
 {
-	if (!m_pDiscoveryQuery)
-		return HERE_ERROR_OUT_OF_MEMORY;
-
 	if (!hArea)
 		return HERE_ERROR_INVALID_PARAMETER;
 
-
-	if (m_pDiscoveryQuery->GetSearchText().empty())
-	{
-		m_pDiscoveryQuery->SetType(DiscoveryQuery::QT_EXPLORE);
-
-		maps_area_s *pArea = (maps_area_s*)hArea;
-		if (pArea->type == MAPS_AREA_RECTANGLE)
-		{
-			GeoBoundingBox box(pArea->rect.top_left.longitude, pArea->rect.bottom_right.longitude,
-					   pArea->rect.bottom_right.latitude, pArea->rect.top_left.latitude);
-			m_pDiscoveryQuery->SetArea(box);
-		}
-		else if (pArea->type == MAPS_AREA_CIRCLE)
-		{
-			GeoCoordinates coord(pArea->circle.center.latitude, pArea->circle.center.longitude);
-			GeoBoundingCircle circle(coord, pArea->circle.radius);
-			m_pDiscoveryQuery->SetArea(circle);
-		}
-		else
-			return HERE_ERROR_INVALID_PARAMETER;
-
-
-		m_nRestReqId = m_pDiscoveryQuery->Execute(*this, NULL);
-
-		return (m_nRestReqId > 0 ? HERE_ERROR_NONE : HERE_ERROR_INVALID_OPERATION);
-	}
-	else
-	{
-		return StartDiscoveryPlaceByAddress(m_pDiscoveryQuery->GetSearchText().data(), hArea);
-	}
-}
-
-here_error_e HerePlace::StartDiscoveryPlaceByAddress(const char *szAddr, maps_area_h hArea)
-{
 	if (!m_pDiscoveryQuery)
 		return HERE_ERROR_OUT_OF_MEMORY;
 
-	if (!szAddr || (szAddr && strlen(szAddr) <= 0) || !hArea)
-		return HERE_ERROR_INVALID_PARAMETER;
 
 
-	m_pDiscoveryQuery->SetType(DiscoveryQuery::QT_SEARCH);
+	typedef enum {
+		PLACE_CMD_TEXT,
+		PLACE_CMD_CENTER,
+		PLACE_CMD_AREA,
+	} PlaceCmdType;
 
+	PlaceCmdType cmdType;
+	maps_area_s *pArea = (maps_area_s*)hArea;
+	GeoCoordinates geoCoord;
+	GeoBoundingArea *geoArea = NULL;
+	GeoBoundingBox geoBox;
+	GeoBoundingCircle geoCircle;
+
+	/* Merge search text with other search text being in preference */
 	String szSearchText = szAddr;
 	if (m_pDiscoveryQuery->GetSearchText().size() > 0 &&
 		szSearchText != m_pDiscoveryQuery->GetSearchText())
@@ -248,28 +194,84 @@ here_error_e HerePlace::StartDiscoveryPlaceByAddress(const char *szAddr, maps_ar
 	}
 	m_pDiscoveryQuery->SetSearchText(szSearchText);
 
-	maps_area_s *pArea = (maps_area_s*)hArea;
-	if (pArea->type == MAPS_AREA_RECTANGLE)
-	{
-		double dLat1 = pArea->rect.top_left.latitude;
-		double dLng1 = pArea->rect.top_left.longitude;
-		double dLat2 = pArea->rect.bottom_right.latitude;
-		double dLng2 = pArea->rect.bottom_right.longitude;
-		double dLat = (dLat1 + dLat2) / 2;
-		double dLng = (dLng1 + dLng2) / 2;
 
-		GeoCoordinates geoCoord(dLat, dLng);
-		m_pDiscoveryQuery->SetProximity(geoCoord);
-	}
-	else if(pArea->type == MAPS_AREA_CIRCLE)
+	/* Decide command type */
+	if (!szSearchText.empty())
 	{
-		double dLat = pArea->circle.center.latitude;
-		double dLng = pArea->circle.center.longitude;
-		GeoCoordinates geoCoord(dLat, dLng);
-		m_pDiscoveryQuery->SetProximity(geoCoord);
+		cmdType = PLACE_CMD_TEXT;
+	}
+	else if (pArea->type == MAPS_AREA_CIRCLE && pArea->circle.radius == 0)
+	{
+		cmdType = PLACE_CMD_CENTER;
+	}
+	else
+	{
+		cmdType = PLACE_CMD_AREA;
 	}
 
 
+	/* Get proximity with area */
+	if (cmdType == PLACE_CMD_TEXT || cmdType == PLACE_CMD_CENTER)
+	{
+		if (pArea->type == MAPS_AREA_RECTANGLE)
+		{
+			double dLat1 = pArea->rect.top_left.latitude;
+			double dLng1 = pArea->rect.top_left.longitude;
+			double dLat2 = pArea->rect.bottom_right.latitude;
+			double dLng2 = pArea->rect.bottom_right.longitude;
+			double dLat = (dLat1 + dLat2) / 2;
+			double dLng = (dLng1 + dLng2) / 2;
+
+			geoCoord.SetLatitude(dLat);
+			geoCoord.SetLongitude(dLng);
+		}
+		else if(pArea->type == MAPS_AREA_CIRCLE)
+		{
+			double dLat = pArea->circle.center.latitude;
+			double dLng = pArea->circle.center.longitude;
+
+			geoCoord.SetLatitude(dLat);
+			geoCoord.SetLongitude(dLng);
+		}
+		else
+			return HERE_ERROR_INVALID_PARAMETER;
+	}
+	else if (cmdType == PLACE_CMD_AREA)
+	{
+		if (pArea->type == MAPS_AREA_RECTANGLE)
+		{
+			HereUtils::Convert(hArea, geoBox);
+			geoArea = &geoBox;
+		}
+		else if (pArea->type == MAPS_AREA_CIRCLE)
+		{
+			HereUtils::Convert(hArea, geoCircle);
+			geoArea = &geoCircle;
+		}
+		else
+			return HERE_ERROR_INVALID_PARAMETER;
+	}
+
+
+	/* Set properties */
+	if (cmdType == PLACE_CMD_TEXT)
+	{
+		m_pDiscoveryQuery->SetType(DiscoveryQuery::QT_SEARCH);
+		m_pDiscoveryQuery->SetProximity(geoCoord);
+	}
+	else if (cmdType == PLACE_CMD_CENTER)
+	{
+		m_pDiscoveryQuery->SetType(DiscoveryQuery::QT_EXPLORE);
+		m_pDiscoveryQuery->SetProximity(geoCoord);
+	}
+	else
+	{
+		m_pDiscoveryQuery->SetType(DiscoveryQuery::QT_EXPLORE);
+		if (geoArea)
+			m_pDiscoveryQuery->SetArea(*geoArea);
+	}
+
+	/* Execute query */
 	m_nRestReqId = m_pDiscoveryQuery->Execute(*this, NULL);
 
 	return (m_nRestReqId > 0 ? HERE_ERROR_NONE : HERE_ERROR_INVALID_OPERATION);
@@ -303,22 +305,24 @@ here_error_e HerePlace::PreparePlaceDetailsPreference(maps_preference_h hPref)
 		m_pPlaceDetailsQuery->SetLanguage(szLanguage);
 	g_free(szLanguage);
 
+	maps_distance_unit_e eUnit;
+	ret = maps_preference_get_distance_unit(hPref, &eUnit);
+	if (ret == MAPS_ERROR_NONE)
+		m_eDistanceUnit = eUnit;
+
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HerePlace::StartPlaceDetails(const char *szPlaceId)
+here_error_e HerePlace::StartPlaceDetails(const char *szUrl)
 {
 	if (!m_pPlaceDetailsQuery)
 		return HERE_ERROR_OUT_OF_MEMORY;
 
-	if (!szPlaceId || (szPlaceId && strlen(szPlaceId) <= 0))
+	if (!szUrl || (szUrl && strlen(szUrl) <= 0))
 		return HERE_ERROR_INVALID_PARAMETER;
 
 
-	m_pPlaceDetailsQuery->SetPlaceId(szPlaceId);
-
-
-	m_nRestReqId = m_pPlaceDetailsQuery->Execute(*this, NULL);
+	m_nRestReqId = m_pPlaceDetailsQuery->Execute(*this, NULL, szUrl);
 
 	return (m_nRestReqId > 0 ? HERE_ERROR_NONE : HERE_ERROR_INVALID_OPERATION);
 }
@@ -445,7 +449,7 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 			}
 
 			/* distance */
-			maps_place_set_distance(mapsPlace, (int)herePlaceIt->GetDistance());
+			maps_place_set_distance(mapsPlace, HereUtils::ConvertDistance((int)herePlaceIt->GetDistance(), m_eDistanceUnit));
 
 			/* sponser */
 			/* herePlaceList.GetIsSponsored() */
@@ -905,7 +909,7 @@ void HerePlace::ProcessPlaceCategory(PlaceDetails herePlace, maps_place_h mapsPl
 }
 
 void HerePlace::ProcessPlaceImage(PlaceDetails herePlace, maps_place_h mapsPlace)
-{ 
+{
 	ImageContentList hereImageList = herePlace.GetImageContent();
 	ImageContentList::iterator hereImage;
 	maps_item_list_h mapsImageList;

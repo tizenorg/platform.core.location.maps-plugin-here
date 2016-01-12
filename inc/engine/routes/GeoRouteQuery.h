@@ -119,8 +119,8 @@ public:
      * This enumeration defines identifiers for route MetricSystem specifiers.
      */
     enum MetricSystem {
-        DIST_imperial = 0x0000,      ///< Indicates that MetricSystem is miles
-        DIST_metric = 0x0001         ///< Indicates that MetricSystem is m & km
+        DIST_metric = 0x0000,        ///< Indicates that MetricSystem is m & km
+        DIST_imperial = 0x0001       ///< Indicates that MetricSystem is miles
     };
 #endif
 

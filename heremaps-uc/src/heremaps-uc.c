@@ -60,6 +60,43 @@ static void win_del(void *data, Evas_Object * obj, void *event)
 	elm_exit();
 }
 
+static void read_file(heremaps_uc_app_data *ad)
+{
+	LS_FUNC_ENTER
+	FILE *fp = fopen(UC_FILE, "r");
+	char buf[15] = {};
+	char *data = NULL, *save_token = NULL;
+	app_control_h reply;
+	int ret = 0;
+
+	if (fp == NULL)
+		LS_LOGE("UC_FILE open fail");
+	else {
+		ret = fread(buf, 15, 1, fp);
+		fclose(fp);
+
+		if (ret > 0)
+		{
+			data = strtok_r(buf, "=", &save_token);
+			data = strtok_r(NULL, "=", &save_token);
+		}
+		else
+			LS_LOGE("UC_FILE read fail");
+	}
+
+	app_control_create(&reply);
+	if (data == NULL)
+		app_control_add_extra_data(reply, "result", "No");
+	else if ((strcmp(data, "Yes") == 0) || (strcmp(data, "No") == 0))
+		app_control_add_extra_data(reply, "result", data);
+	else
+		app_control_add_extra_data(reply, "result", "No");
+	ret = app_control_reply_to_launch_request(reply, ad->app_control, APP_CONTROL_RESULT_SUCCEEDED);
+	if (ret != APP_CONTROL_ERROR_NONE)
+		LS_LOGE("app_control_reply_to_launch_request fail. err=%d", ret);
+	app_control_destroy(reply);
+}
+
 static void save_file(char *data, heremaps_uc_app_data *ad)
 {
 	FILE *fp = fopen(UC_FILE, "w+");
@@ -67,12 +104,20 @@ static void save_file(char *data, heremaps_uc_app_data *ad)
 	app_control_h reply;
 	int ret = 0;
 
-	snprintf(buf, sizeof(buf)-1, "Agree=%s", data);
-	fwrite(buf, strlen(buf), 1, fp);
-
-	fclose(fp);
-
 	app_control_create(&reply);
+
+	if (fp == NULL) {
+		LS_LOGE("UC_FILE open fail");
+		app_control_add_extra_data(reply, "result", "No");
+	} else {
+		snprintf(buf, sizeof(buf)-1, "Agree=%s", data);
+		fwrite(buf, strlen(buf), 1, fp);
+		fclose(fp);
+		LS_LOGE("result of save_file() is %s", data);
+
+		app_control_add_extra_data(reply, "result", strdup(data));
+	}
+
 	ret = app_control_reply_to_launch_request(reply, ad->app_control, APP_CONTROL_RESULT_SUCCEEDED);
 	if (ret != APP_CONTROL_ERROR_NONE)
 		LS_LOGE("app_control_reply_to_launch_request fail. err=%d", ret);
@@ -96,6 +141,15 @@ static void agree_btn_cb(void *data, Evas_Object * obj, void *event)
 
 	save_file("Yes", ad);
 
+	elm_exit();
+}
+
+static void back_btn_cb(void *data, Evas_Object * obj, void *event)
+{
+	LS_FUNC_ENTER
+	heremaps_uc_app_data *ad = (heremaps_uc_app_data *) data;
+
+	read_file(ad);
 	elm_exit();
 }
 
@@ -126,7 +180,7 @@ static Evas_Object *create_popup(Evas_Object *layout, heremaps_uc_app_data *ad)
 	/* popup */
 	popup = elm_popup_add(layout);
 	elm_popup_align_set(popup, ELM_NOTIFY_ALIGN_FILL, 1.0);
-	eext_object_event_callback_add(popup, EEXT_CALLBACK_BACK, win_del, layout);
+	eext_object_event_callback_add(popup, EEXT_CALLBACK_BACK, back_btn_cb, ad);
 	evas_object_size_hint_weight_set(popup, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
 
 	elm_object_part_text_set(popup, "title,text", P_("IDS_POSITIONING_CONSENT_TITLE"));
@@ -181,20 +235,29 @@ static void _app_control_cb(app_control_h app_control, void *user_data)
 
 	gboolean ret = FALSE;
 	heremaps_uc_app_data *ad = (heremaps_uc_app_data *) user_data;
+	char *action = NULL;
 	char *data = NULL;
 	LS_RETURN_IF_FAILED(ad);
-
-	app_control_get_extra_data(app_control, "value", &data);
-	LS_LOGE("DATA = %s", data);
 
 	ret = app_control_clone(&(ad->app_control), app_control);
 	if (ret == FALSE)
 		LS_LOGE("app_control_clone. err=%d", ret);
 
-	if (data != NULL) {
-		if ((strcmp(data, "Yes") == 0) || (strcmp(data, "No") == 0)) {
-			save_file(data, ad);
+	app_control_get_extra_data(app_control, "action", &action);
+	if (action != NULL) {
+		if (strcmp(action, "Get") == 0) {
+			read_file(ad);
 			elm_exit();
+		} else if (strcmp(action, "Set") == 0) {
+			app_control_get_extra_data(app_control, "value", &data);
+			LS_LOGE("DATA = %s", data);
+
+			 if (data != NULL) {
+				if ((strcmp(data, "Yes") == 0) || (strcmp(data, "No") == 0)) {
+					save_file(data, ad);
+					elm_exit();
+				}
+			}
 		}
 	}
 
