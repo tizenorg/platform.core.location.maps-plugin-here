@@ -57,9 +57,7 @@ int HerePluginSetProviderKey(const char* szKey)
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
-	here_error_e error = HereManager::GetHandler()->SetCredentials(szKey);
-
-	return error;
+	return HereManager::GetHandler()->SetCredentials(szKey);
 }
 
 int HerePluginGetProviderKey(char** szKey)
@@ -70,9 +68,7 @@ int HerePluginGetProviderKey(char** szKey)
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
-	here_error_e error = HereManager::GetHandler()->GetCredentials(szKey);
-
-	return error;
+	return HereManager::GetHandler()->GetCredentials(szKey);
 }
 
 int HerePluginSetPreference(maps_preference_h hPref)
@@ -83,9 +79,7 @@ int HerePluginSetPreference(maps_preference_h hPref)
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
-	here_error_e error = HereManager::GetHandler()->SetPreference(hPref);
-
-	return error;
+	return HereManager::GetHandler()->SetPreference(hPref);
 }
 
 int HerePluginGetPreference(maps_preference_h *hPref)
@@ -96,9 +90,7 @@ int HerePluginGetPreference(maps_preference_h *hPref)
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
-	here_error_e error = HereManager::GetHandler()->GetPreference(hPref);
-
-	return error;
+	return HereManager::GetHandler()->GetPreference(hPref);
 }
 
 int HerePluginGeocode(const char* szAddr,
@@ -385,7 +377,7 @@ int HerePluginSearchPlaceByArea(maps_area_h hArea,
 		error =	pPlace->PrepareDiscoveryFilter(hFilter);
 		if (error != HERE_ERROR_NONE) break;
 
-		error = pPlace->StartDiscoveryPlaceByArea(hArea);
+		error = pPlace->StartDiscoveryPlace(hArea);
 	} while(0);
 
 	/* finishing task */
@@ -430,7 +422,7 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 		error =	pPlace->PrepareDiscoveryFilter(hFilter);
 		if (error != HERE_ERROR_NONE) break;
 
-		error = pPlace->StartDiscoveryPlaceByAddress(szAddr, hArea);
+		error = pPlace->StartDiscoveryPlace(hArea, szAddr);
 	} while(0);
 
 	/* finishing task */

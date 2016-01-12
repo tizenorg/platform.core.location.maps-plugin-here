@@ -74,13 +74,12 @@ public:
 	here_error_e PrepareDiscoveryFilter(maps_place_filter_h hFilter);
 
 	here_error_e StartDiscoveryPlace(maps_coordinates_h hCoord, int nDistance);
-	here_error_e StartDiscoveryPlaceByArea(maps_area_h hArea);
-	here_error_e StartDiscoveryPlaceByAddress(const char *szAddr, maps_area_h hArea);
+	here_error_e StartDiscoveryPlace(maps_area_h hArea, const char *szAddr = "");
 
 	here_error_e PreparePlaceDetailsQuery();
 	here_error_e PreparePlaceDetailsPreference(maps_preference_h hPref);
-	
-	here_error_e StartPlaceDetails(const char* szPlaceId);
+
+	here_error_e StartPlaceDetails(const char* szUrl);
 	here_error_e StartPlaceDetailsInternal(const char* szUrl);
 
 	virtual void OnDiscoverReply(const DiscoveryReply &Reply);
@@ -117,6 +116,7 @@ private:
 	bool m_bReplyFlushed;
 	char *m_szSortBy;
 	bool m_bPlaceDetailsInternal;
+	maps_distance_unit_e m_eDistanceUnit;
 
 	PlaceList m_PlaceList;
 
