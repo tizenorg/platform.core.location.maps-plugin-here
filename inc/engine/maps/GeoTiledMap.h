@@ -77,6 +77,11 @@ public:
         MT_Terrain_Day,                 ///< Indicates a terrain day map.
         MT_Hybrid_Day,                  ///< Indicates a hybrid day map        
                                         ///  (satellite, with roads and labels).
+#ifdef TIZEN_MIGRATION
+        MT_Normal_Day_Public_Transit,   ///< Indicates a normal (public transit)
+                                        ///  day map.
+        MT_Traffic,                     ///< Indicates a traffic map.
+#endif
         MT_Last_Entry_Undefined         ///< Indicates that the map type is not
                                         ///  defined. 
     };
@@ -121,7 +126,11 @@ public:
      * 
      * @param zoomLevel A value indicating the new zoom level.
      */
+    #ifdef TIZEN_MIGRATION
+    void SetZoomLevel(double zoomLevel, bool bUpdate=true);
+    #else
     void SetZoomLevel(double zoomLevel);
+    #endif
     
     /**
      * This method retrieves the map zoom level.
@@ -314,11 +323,7 @@ public:
      * @param slot A function object to be called when the map has
      *        been updated. 
      */
-#ifdef TIZEN_MIGRATION
-     void SetUpdateMapSignal(UpdateMapSignalFunctor slot, void *data);
-#else
      void SetUpdateMapSignal(UpdateMapSignalFunctor slot);
-#endif
 
      /**
       * This method sets the map type.
@@ -402,6 +407,13 @@ public:
     void SetEvasGlApi(Evas_GL_API *__glapi);
 #endif
 
+#ifdef TIZEN_SUPPORT_TILE_FILE_CACHE
+    /**
+     * This method invalidates (clears) the file cache for tiles.
+     */
+    void ClearTileFileCache();
+#endif
+
 private:
     bool HandleTileReady(int level, int x, int y, unsigned int uLevelProvider);
     bool DrawLogo(UInt uWidth, UInt uHeight, UInt aMapX = 0, UInt aMapY = 0);
@@ -414,6 +426,9 @@ private:
     int GetDisplayDPI() const;
     void ClearMarkers();
     void SetRootPixmap(DrawableBitmapPtr rootPixmap);
+    #ifdef TIZEN_MIGRATION
+    void ExtendLimitOfCachedTiles();
+    #endif
 
 private:
     friend class GeoMapObject;

@@ -58,6 +58,10 @@ private:
 
     void OnReplySuccess(BaseReply& rReply);
 
+    #ifdef TIZEN_MIGRATION
+    void OnFailure(const BaseReply& rReply);
+    #endif
+
 };
 
 HERE_MAPS_END_NAMESPACE
