@@ -270,6 +270,12 @@ public:
      */
     void AbortLoading();
 
+#ifdef TIZEN_SUPPORT_LIMIT_RETRYING_FETCHING_TILES
+    int GetTryCount();
+
+    int SetTryCount(int cnt);
+#endif
+
 private:
     HERE_MAPS_NO_COPY_NO_ASSIGN(GeoTile);
 

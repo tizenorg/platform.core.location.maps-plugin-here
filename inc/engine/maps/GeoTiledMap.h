@@ -77,6 +77,34 @@ public:
         MT_Terrain_Day,                 ///< Indicates a terrain day map.
         MT_Hybrid_Day,                  ///< Indicates a hybrid day map        
                                         ///  (satellite, with roads and labels).
+#ifdef TIZEN_MIGRATION
+	MT_Normal_Day_Grey,
+	MT_Normal_Day_Transit,
+	MT_Normal_Night_Transit,
+	MT_Normal_Traffic_Day,
+	MT_Normal_Traffic_Night,
+	MT_Normal_Day_Custom,
+	MT_Normal_Night,
+	MT_Normal_Night_Grey,
+	MT_Pedestrian_Day,
+	MT_Pedestrian_Day_Mobile,
+	MT_Pedestrian_Night,
+	MT_Pedestrian_Night_Mobile,
+	MT_Carnav_Day_Grey,
+	MT_Normal_Day_Mobile,
+	MT_Normal_Day_Grey_Mobile,
+	MT_Normal_Day_Transit_Mobile,
+	MT_Normal_Night_Transit_Mobile,
+	MT_Normal_Night_Mobile,
+	MT_Normal_Night_Grey_Mobile,
+	MT_Reduced_Day,
+	MT_Reduced_Night,
+	MT_Hybrid_Day_Transit,
+	MT_Hybrid_Grey_Day,
+	MT_Hybrid_Traffic_Day,
+	MT_Hybrid_Day_Mobile,
+	MT_Terrain_Day_Mobile,
+#endif
         MT_Last_Entry_Undefined         ///< Indicates that the map type is not
                                         ///  defined. 
     };
@@ -121,7 +149,11 @@ public:
      * 
      * @param zoomLevel A value indicating the new zoom level.
      */
+    #ifdef TIZEN_MIGRATION
+    void SetZoomLevel(double zoomLevel, bool bUpdate=true);
+    #else
     void SetZoomLevel(double zoomLevel);
+    #endif
     
     /**
      * This method retrieves the map zoom level.
@@ -314,11 +346,7 @@ public:
      * @param slot A function object to be called when the map has
      *        been updated. 
      */
-#ifdef TIZEN_MIGRATION
-     void SetUpdateMapSignal(UpdateMapSignalFunctor slot, void *data);
-#else
      void SetUpdateMapSignal(UpdateMapSignalFunctor slot);
-#endif
 
      /**
       * This method sets the map type.
@@ -402,6 +430,13 @@ public:
     void SetEvasGlApi(Evas_GL_API *__glapi);
 #endif
 
+#ifdef TIZEN_SUPPORT_TILE_FILE_CACHE
+    /**
+     * This method invalidates (clears) the file cache for tiles.
+     */
+    void ClearTileFileCache();
+#endif
+
 private:
     bool HandleTileReady(int level, int x, int y, unsigned int uLevelProvider);
     bool DrawLogo(UInt uWidth, UInt uHeight, UInt aMapX = 0, UInt aMapY = 0);
@@ -414,6 +449,9 @@ private:
     int GetDisplayDPI() const;
     void ClearMarkers();
     void SetRootPixmap(DrawableBitmapPtr rootPixmap);
+    #ifdef TIZEN_MIGRATION
+    void ExtendLimitOfCachedTiles();
+    #endif
 
 private:
     friend class GeoMapObject;

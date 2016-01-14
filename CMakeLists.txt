@@ -6,7 +6,19 @@ SET(CMAKE_INSTALL_PREFIX /usr)
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
 
 # Dependencies
-SET(dependents "glib-2.0 gmodule-2.0 libxml-2.0 dlog capi-network-connection capi-appfw-app-manager capi-maps-service capi-appfw-application")
+SET(dependents 
+	glib-2.0
+	gmodule-2.0
+	libxml-2.0
+	dlog
+	capi-maps-service
+	capi-network-connection
+	capi-appfw-app-manager
+	capi-appfw-application
+	evas
+	ecore-evas
+	elementary
+	)
 
 INCLUDE(FindPkgConfig)
 pkg_check_modules(pkgs REQUIRED ${dependents})
@@ -58,6 +70,8 @@ SET(SRCS
 	src/here_multirevgeocode.cpp
 	src/here_route.cpp
 	src/here_utils.cpp
+	src/here_view.cpp
+	src/here_view_objects.cpp
 )
 
 ADD_LIBRARY(${pkg_name} SHARED ${SRCS})

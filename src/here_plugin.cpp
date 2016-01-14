@@ -261,5 +261,113 @@ EXPORT_API int maps_plugin_cancel_request(int request_id)
 	return ConvertToMapsError(ret);
 }
 
+/* Mapping */
+EXPORT_API int maps_plugin_set_map_view(const map_view_h view)
+{
+	int ret = HerePluginSetMapView(view);
+
+	MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_render_map(const maps_coordinates_h coordinates,
+					const double zoom_factor,
+					const double rotation_angle,
+					maps_plugin_render_map_cb callback,
+					void* user_data,
+					int* request_id)
+
+{
+	int ret = HerePluginRenderMap(coordinates, zoom_factor, rotation_angle,
+					callback, user_data, request_id);
+
+	if (ret != HERE_ERROR_NONE)
+		MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_render_map_area(const maps_area_h area,
+					const double zoom_factor,
+					const double rotation_angle,
+					maps_plugin_render_map_cb callback,
+					void* user_data,
+					int* request_id)
+{
+	int ret = HerePluginRenderMapArea(area, zoom_factor, rotation_angle,
+					callback, user_data, request_id);
+
+	if (ret != HERE_ERROR_NONE)
+		MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_move_center(const int delta_x, const int delta_y,
+					maps_plugin_render_map_cb callback,
+					void* user_data,
+					int* request_id)
+{
+	int ret = HerePluginMoveCenter(delta_x, delta_y,
+					callback, user_data, request_id);
+
+	if (ret != HERE_ERROR_NONE)
+		MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_draw_map(Evas* canvas, const int x, const int y,
+				    const int width, const int height)
+{
+	int ret = HerePluginDrawMap(canvas, x, y, width, height);
+
+	if (ret != HERE_ERROR_NONE)
+		MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_get_center(maps_coordinates_h *center)
+{
+	int ret = HerePluginGetCenter(center);
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_screen_to_geography(const int x, const int y,
+					       maps_coordinates_h *mapsCoord)
+{
+	int ret = HerePluginScreenToGeography(x, y, mapsCoord);
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_geography_to_screen(const maps_coordinates_h mapsCoord,
+					       int* x, int* y)
+{
+	int ret = HerePluginGeographyToScreen(mapsCoord, x, y);
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_get_min_zoom_level(int *min_zoom_level)
+{
+	int ret = HerePluginGetMinZoomLevel(min_zoom_level);
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_get_max_zoom_level(int *max_zoom_level)
+{
+	int ret = HerePluginGetMaxZoomLevel(max_zoom_level);
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_on_object(const map_object_h object,
+			       const map_object_operation_e operation)
+{
+	int ret = HerePluginOnViewObject(object, operation);
+	return ConvertToMapsError(ret);
+}
+
+
 } // end of extern "C"
 

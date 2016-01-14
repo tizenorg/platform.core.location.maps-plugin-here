@@ -59,6 +59,7 @@ private:
     int bytes_per_pixel;
     BitmapPixelFormat pixel_format;
     unsigned char* buffer;
+    pthread_mutex_t mutex;
 
     void BitBlt(int xDest, int yDest, unsigned char *pSrcBuffer, int xSour, int ySour, int wSour, int hSour, int nPitch, unsigned long opacity = 255);
 };

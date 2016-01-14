@@ -135,6 +135,10 @@ public:
 
 #ifdef TIZEN_MIGRATION
     void FireImpl(void* pArgs);
+#ifdef TIZEN_MIGRATION_RESTENGINE_FIREIMPL_THREAD
+    static void *FireImplThreadFunc(void *pArgs);
+    static void FireImplThreadCleanUp(void *pArgs);
+#endif
 #endif
 
 private:
@@ -209,6 +213,9 @@ private:
     //classes allowed to access this internal instance
     friend class RestItem;
     friend class QueryListener;
+#ifdef TIZEN_SUPPORT_TILE_FILE_CACHE
+    friend class TileFetcherQuery;
+#endif
 
     //members
     class RestEngineImpl;

@@ -72,15 +72,13 @@ static void read_file(heremaps_uc_app_data *ad)
 	if (fp == NULL)
 		LS_LOGE("UC_FILE open fail");
 	else {
-		ret = fread(buf, 15, 1, fp);
+		ret = fread(buf, 1, 15, fp);
 		fclose(fp);
 
-		if (ret > 0)
-		{
+		if (ret > 0) {
 			data = strtok_r(buf, "=", &save_token);
 			data = strtok_r(NULL, "=", &save_token);
-		}
-		else
+		} else
 			LS_LOGE("UC_FILE read fail");
 	}
 
@@ -140,7 +138,6 @@ static void agree_btn_cb(void *data, Evas_Object * obj, void *event)
 	heremaps_uc_app_data *ad = (heremaps_uc_app_data *) data;
 
 	save_file("Yes", ad);
-
 	elm_exit();
 }
 
@@ -336,9 +333,8 @@ int main(int argc, char *argv[])
 	ret = APP_ERROR_NONE;
 	ret = ui_app_main(argc, argv, &event_callback, &ad);
 
-	if (ret != APP_ERROR_NONE) {
+	if (ret != APP_ERROR_NONE)
 		LS_LOGE("ui_app_main() is failed. err=%d", ret);
-	}
 
 	return ret;
 

@@ -25,6 +25,8 @@
 #define TIZEN_CUSTOMIZATION
 
 /* sub-features */
+#define TIZEN_SUPPORT_LIMIT_RETRYING_FETCHING_TILES	/* limit the number of retrying when failed fetching tiles */
+#define TIZEN_SUPPORT_TILE_FILE_CACHE
 #define TIZEN_SUPPORT_POST_METHOD
 #define TIZEN_SUPPORT_CRYPTO_LOCK			/* mutex locking system for SSL */
 

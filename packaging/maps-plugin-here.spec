@@ -32,6 +32,9 @@ BuildRequires: pkgconfig(json-c)
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(cairo)
 BuildRequires: boost-devel
+BuildRequires: capi-maps-service-devel
+BuildRequires: elementary-devel
+BuildRequires: pkgconfig(ecore-evas)
 #
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig

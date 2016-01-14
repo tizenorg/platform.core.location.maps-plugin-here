@@ -26,6 +26,7 @@
 #include "here_route.h"
 #include "here_utils.h"
 #include <common/HereConfig.h>
+#include "here_view.h"
 #include <app.h>
 #include <iostream>
 #include <fstream>
@@ -112,28 +113,32 @@ void* HereManager::CreateInstance(HereSvcType nHereSvc, void* pCbFunc,
 {
 	HereBase *pHere = NULL;
 
-	*nReqId = m_nNextReqId++;
+	int reqId = m_nNextReqId++;
+	if (nReqId) *nReqId = reqId;
 
 	switch(nHereSvc)
 	{
 	case HERE_SVC_GEOCODE:
-		pHere = (HereBase*)new (std::nothrow) HereGeocode(pCbFunc, pUserData, *nReqId);
+		pHere = (HereBase*)new (std::nothrow) HereGeocode(pCbFunc, pUserData, reqId);
 		break;
 
 	case HERE_SVC_REV_GEOCODE:
-		pHere = (HereBase*)new (std::nothrow) HereRevGeocode(pCbFunc, pUserData, *nReqId);
+		pHere = (HereBase*)new (std::nothrow) HereRevGeocode(pCbFunc, pUserData, reqId);
 		break;
 
 	case HERE_SVC_PLACE:
-		pHere = (HereBase*)new (std::nothrow) HerePlace(pCbFunc, pUserData, *nReqId);
+		pHere = (HereBase*)new (std::nothrow) HerePlace(pCbFunc, pUserData, reqId);
 		break;
 
 	case HERE_SVC_ROUTE:
-		pHere = (HereBase*)new (std::nothrow) HereRoute(pCbFunc, pUserData, *nReqId);
+		pHere = (HereBase*)new (std::nothrow) HereRoute(pCbFunc, pUserData, reqId);
 		break;
 
 	case HERE_SVC_MULTI_REV_GEOCODE:
 		pHere = (HereBase*)new (std::nothrow) HereMultiRevGeocode(pCbFunc, pUserData, *nReqId);
+
+	case HERE_SVC_VIEW:
+		pHere = (HereBase*)new (std::nothrow) HereView(pCbFunc, pUserData, reqId);
 		break;
 
 	default:
