@@ -131,13 +131,16 @@ here_error_e HerePlace::PrepareDiscoveryFilter(maps_place_filter_h hFilter)
 
 		ret = maps_place_category_get_id(mapsCate, &szId);
 		if (ret == MAPS_ERROR_NONE && szId && *szId)
-		{
 			hereCate.SetCategoryId(CategoryId(szId));
-			hereCateList.push_back(hereCate);
-			m_pDiscoveryQuery->SetCategoriesFilter(hereCateList);
+		else if (hereCate.GetTitle().size() > 0)
+		{
+			hereCate.SetCategoryId(CategoryId(hereCate.GetTitle()));
+			hereCate.SetTitle("");
 		}
 		g_free(szId);
 
+		hereCateList.push_back(hereCate);
+		m_pDiscoveryQuery->SetCategoriesFilter(hereCateList);
 		maps_place_category_destroy(mapsCate);
 	}
 
@@ -146,6 +149,17 @@ here_error_e HerePlace::PrepareDiscoveryFilter(maps_place_filter_h hFilter)
 	if (ret == MAPS_ERROR_NONE && szName && *szName)
 		m_pDiscoveryQuery->SetSearchText(szName);
 	g_free(szName);
+
+	char *szKeyword = NULL;
+	ret = maps_place_filter_get_keyword(hFilter, &szKeyword);
+	if (ret == MAPS_ERROR_NONE && szKeyword && *szKeyword)
+	{
+		String szSearchText = m_pDiscoveryQuery->GetSearchText();
+		if (szSearchText.size() > 0) szSearchText += " ";
+		szSearchText += szKeyword;
+		m_pDiscoveryQuery->SetSearchText(szSearchText);
+	}
+	g_free(szKeyword);
 
 	return HERE_ERROR_NONE;
 }
@@ -185,12 +199,13 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 	GeoBoundingBox geoBox;
 	GeoBoundingCircle geoCircle;
 
+
 	/* Merge search text with other search text being in preference */
-	String szSearchText = szAddr;
-	if (m_pDiscoveryQuery->GetSearchText().size() > 0 &&
-		szSearchText != m_pDiscoveryQuery->GetSearchText())
+	String szSearchText = (szAddr ? szAddr : "");
+	if (m_pDiscoveryQuery->GetSearchText().size() > 0)
 	{
-		szSearchText += " " + m_pDiscoveryQuery->GetSearchText();
+		if (szSearchText.size() > 0) szSearchText += " ";
+		szSearchText += m_pDiscoveryQuery->GetSearchText();
 	}
 	m_pDiscoveryQuery->SetSearchText(szSearchText);
 
