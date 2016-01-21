@@ -70,7 +70,7 @@ public:
 		HERE_SVC_MULTI_REV_GEOCODE
 	};
 
-	void* CreateInstance(HereSvcType nHereSvc, void* pCbFunc, void* pUserData, int *nReqId);
+	void* CreateInstance(HereSvcType nHereSvc, void* pCbFunc = NULL, void* pUserData = NULL, int *nReqId = NULL);
 	here_error_e CloseInstance(int nReqId);
 	here_error_e CancelInstance(int nReqId);
 	here_error_e SetCredentials(const char* provider_key);

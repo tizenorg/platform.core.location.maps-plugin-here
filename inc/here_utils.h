@@ -40,6 +40,8 @@
 #include <routes/GeoRouteQuery.h>
 #include <routes/Maneuver.h>
 #include <common/GeoCoordinates.h>
+#include <common/GeoBoundingBox.h>
+#include <common/GeoBoundingCircle.h>
 
 #define HERE_PLUGIN_BEGIN_NAMESPACE  namespace Here { namespace PlugIn {
 #define HERE_PLUGIN_END_NAMESPACE    }}
@@ -128,10 +130,13 @@ public:
 	static maps_route_turn_type_e Convert(Maneuver::InstructionDirection nVal);
 	static GeoBoundingBox& Convert(maps_area_h hArea, GeoBoundingBox& Box);
 	static maps_area_h& Convert(GeoBoundingBox Box, maps_area_h& hArea);
+	static GeoBoundingCircle& Convert(maps_area_h hArea, GeoBoundingCircle& circle);
 	static void Convert(String strUtf8, WString& strUtf16);
 	static void Convert(WString strUtf16, String& strUtf8);
 	static GeoBoundingBox& Convert(const char *src, GeoBoundingBox &box);
 	static maps_error_e ConvertHttpCodeToMapsError(int nVal);
+	static const double ConvertDistance(const double originValue, maps_distance_unit_e destUnit);
+	static const double ConvertDistance(const double originValue, maps_distance_unit_e originUnit, maps_distance_unit_e destUnit);
 
 	static bool IsValid(GeoCoordinates geoCoord);
 	static bool IsValid(maps_coordinates_s geoCoord);

@@ -62,9 +62,11 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 	maps_item_hashtable_h hPref, maps_place_filter_h hFilter, maps_service_search_place_cb pCbFunc,
 	void * pUserData, int *nReqId);
 
+int HerePluginSearchPlaceList(maps_area_h hArea, maps_item_hashtable_h hPref,
+	maps_place_filter_h hFilter, maps_service_search_place_list_cb pCbFunc, void * pUserData, int *nReqId);
+
 int HerePluginSearchPlaceDetails(const char* szUrl,
-	maps_item_hashtable_h hPref, maps_service_search_place_cb pCbFunc,
-	void * pUserData, int *nReqId);
+	maps_service_get_place_details_cb pCbFunc, void * pUserData, int *nReqId);
 
 int HerePluginSearchRoute(maps_coordinates_h hOrigin, maps_coordinates_h hDestination,
 	maps_item_hashtable_h hPref, maps_service_search_route_cb pCbFunc,
