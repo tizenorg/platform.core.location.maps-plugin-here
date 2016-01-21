@@ -107,6 +107,7 @@ EXPORT_API int maps_plugin_is_service_supported(maps_service_e service, bool *su
 		case MAPS_SERVICE_SEARCH_ROUTE_WAYPOINTS:
 		case MAPS_SERVICE_CANCEL_REQUEST:
 		case MAPS_SERVICE_MULTI_REVERSE_GEOCODE:
+		case MAPS_SERVICE_SEARCH_PLACE_LIST:
 			*supported = TRUE;
 			return MAPS_ERROR_NONE;
 		default:
@@ -224,6 +225,26 @@ EXPORT_API int maps_plugin_search_place_by_address(const char* address, const ma
 	void* user_data, int* request_id)
 {
 	int ret = HerePluginSearchPlaceByAddress(address, boundary, preference, filter, callback, user_data, request_id);
+
+	MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_search_place_list(const maps_area_h boundary, const maps_place_filter_h filter,
+	maps_preference_h preference, maps_service_search_place_list_cb callback, void* user_data, int* request_id)
+{
+	int ret = HerePluginSearchPlaceList(boundary, preference, filter, callback, user_data, request_id);
+
+	MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_get_place_details(const char* url,
+	maps_service_get_place_details_cb callback, void* user_data, int* request_id)
+{
+	int ret = HerePluginSearchPlaceDetails(url, callback, user_data, request_id);
 
 	MAPS_LOGD("here_error_e = %d", ret);
 

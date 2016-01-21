@@ -297,6 +297,20 @@ maps_area_h& HereUtils::Convert(GeoBoundingBox Box, maps_area_h& hArea)
 	return hArea;
 }
 
+GeoBoundingCircle& HereUtils::Convert(maps_area_h hArea, GeoBoundingCircle& circle)
+{
+	maps_area_s* area_s = (maps_area_s*)hArea;
+
+	if (!area_s || area_s->type != MAPS_AREA_CIRCLE) return circle;
+
+	GeoCoordinates hereCoord(area_s->circle.center.latitude, area_s->circle.center.longitude);
+
+	circle.SetCenter(hereCoord);
+	circle.SetRadius(area_s->circle.radius);
+
+	return circle;
+}
+
 void HereUtils::Convert(String strUtf8, WString& strUtf16)
 {
 	strUtf16.assign(strUtf8.begin(), strUtf8.end());
@@ -355,5 +369,15 @@ bool HereUtils::IsValid(maps_area_s hArea)
 		return false;
 }
 
+const double HereUtils::ConvertDistance(const double originValue, maps_distance_unit_e destUnit)
+{
+	return ConvertDistance(originValue, MAPS_DISTANCE_UNIT_M, destUnit);
+}
+
+const double HereUtils::ConvertDistance(const double originValue, maps_distance_unit_e originUnit, maps_distance_unit_e destUnit)
+{
+	double meterConstant[MAPS_DISTANCE_UNIT_YD+1] = { 1.0, 0.001, 3.2808399, 1.0936133 };
+	return originValue / meterConstant[originUnit] * meterConstant[destUnit];
+}
 
 HERE_PLUGIN_END_NAMESPACE
