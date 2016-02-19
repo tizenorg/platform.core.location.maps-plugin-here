@@ -21,8 +21,6 @@
 
 #include "heremaps-uc-common.h"
 
-#define UC_FILE "/opt/usr/apps/org.tizen.heremaps-uc/shared/data/heremaps_uc.xml"
-
 static Evas_Object *create_conformant(Evas_Object * parent)
 {
 	LS_FUNC_ENTER
@@ -60,62 +58,54 @@ static void win_del(void *data, Evas_Object * obj, void *event)
 	elm_exit();
 }
 
-static void read_file(heremaps_uc_app_data *ad)
+static void read_vconf(heremaps_uc_app_data *ad)
 {
 	LS_FUNC_ENTER
-	FILE *fp = fopen(UC_FILE, "r");
-	char buf[15] = {};
-	char *data = NULL, *save_token = NULL;
 	app_control_h reply;
+	int enabled = 0;
 	int ret = 0;
 
-	if (fp == NULL)
-		LS_LOGE("UC_FILE open fail");
-	else {
-		ret = fread(buf, 15, 1, fp);
-		fclose(fp);
-
-		if (ret > 0)
-		{
-			data = strtok_r(buf, "=", &save_token);
-			data = strtok_r(NULL, "=", &save_token);
-		}
-		else
-			LS_LOGE("UC_FILE read fail");
-	}
+	ret = vconf_get_int(VCONFKEY_LOCATION_HEREMAPS_CONSENT, &enabled);
+	if (ret != 0)
+		LS_LOGE("Fail to get vconf value");
 
 	app_control_create(&reply);
-	if (data == NULL)
+	if (enabled == 0)
 		app_control_add_extra_data(reply, "result", "No");
-	else if ((strcmp(data, "Yes") == 0) || (strcmp(data, "No") == 0))
-		app_control_add_extra_data(reply, "result", data);
 	else
-		app_control_add_extra_data(reply, "result", "No");
+		app_control_add_extra_data(reply, "result", "Yes");
 	ret = app_control_reply_to_launch_request(reply, ad->app_control, APP_CONTROL_RESULT_SUCCEEDED);
 	if (ret != APP_CONTROL_ERROR_NONE)
 		LS_LOGE("app_control_reply_to_launch_request fail. err=%d", ret);
 	app_control_destroy(reply);
 }
 
-static void save_file(char *data, heremaps_uc_app_data *ad)
+static void save_vconf(int value, heremaps_uc_app_data *ad)
 {
-	FILE *fp = fopen(UC_FILE, "w+");
-	char buf[15] = {};
 	app_control_h reply;
+	int enabled = 0;
 	int ret = 0;
 
+	ret = vconf_get_int(VCONFKEY_LOCATION_HEREMAPS_CONSENT, &enabled);
+	if (ret != 0)
+		LS_LOGE("Fail to get vconf value");
+	else if (enabled != value) {
+		ret = vconf_set_int(VCONFKEY_LOCATION_HEREMAPS_CONSENT, value);
+		if (ret != 0)
+			LS_LOGE("Fail to get vconf value");
+	}
+
 	app_control_create(&reply);
-
-	if (fp == NULL) {
-		LS_LOGE("UC_FILE open fail");
+	if (ret != 0)
 		app_control_add_extra_data(reply, "result", "No");
-	} else {
-		snprintf(buf, sizeof(buf)-1, "Agree=%s", data);
-		fwrite(buf, strlen(buf), 1, fp);
-		fclose(fp);
-		LS_LOGE("result of save_file() is %s", data);
-
-		app_control_add_extra_data(reply, "result", strdup(data));
+	else {
+		if (value == 1) {
+			LS_LOGE("Vconf value of HereMaps is true");
+			app_control_add_extra_data(reply, "result", "Yes");
+		} else {
+			LS_LOGE("Vconf value of HereMaps is false");
+			app_control_add_extra_data(reply, "result", "No");
+		}
 	}
 
 	ret = app_control_reply_to_launch_request(reply, ad->app_control, APP_CONTROL_RESULT_SUCCEEDED);
@@ -129,7 +119,7 @@ static void disagree_btn_cb(void *data, Evas_Object * obj, void *event)
 	LS_FUNC_ENTER
 	heremaps_uc_app_data *ad = (heremaps_uc_app_data *) data;
 
-	save_file("No", ad);
+	save_vconf(0, ad);
 
 	elm_exit();
 }
@@ -139,7 +129,7 @@ static void agree_btn_cb(void *data, Evas_Object * obj, void *event)
 	LS_FUNC_ENTER
 	heremaps_uc_app_data *ad = (heremaps_uc_app_data *) data;
 
-	save_file("Yes", ad);
+	save_vconf(1, ad);
 
 	elm_exit();
 }
@@ -149,7 +139,7 @@ static void back_btn_cb(void *data, Evas_Object * obj, void *event)
 	LS_FUNC_ENTER
 	heremaps_uc_app_data *ad = (heremaps_uc_app_data *) data;
 
-	read_file(ad);
+	read_vconf(ad);
 	elm_exit();
 }
 
@@ -174,6 +164,7 @@ static Evas_Object *create_win(const char *name)
 
 static Evas_Object *create_popup(Evas_Object *layout, heremaps_uc_app_data *ad)
 {
+	LS_FUNC_ENTER
 	Evas_Object *popup;
 	Evas_Object *disagree_btn, *agree_btn;
 
@@ -201,7 +192,7 @@ static Evas_Object *create_popup(Evas_Object *layout, heremaps_uc_app_data *ad)
 	evas_object_smart_callback_add(agree_btn, "clicked", agree_btn_cb, ad);
 
 	evas_object_show(popup);
-
+	LS_FUNC_EXIT
 	return popup;
 }
 
@@ -217,7 +208,6 @@ static void _app_terminate_cb(void *user_data)
 	LS_FUNC_ENTER
 }
 
-/*
 static void _app_pause_cb(void *user_data)
 {
 	LS_FUNC_ENTER
@@ -227,7 +217,6 @@ static void _app_resume_cb(void *user_data)
 {
 	LS_FUNC_ENTER
 }
-*/
 
 static void _app_control_cb(app_control_h app_control, void *user_data)
 {
@@ -246,17 +235,18 @@ static void _app_control_cb(app_control_h app_control, void *user_data)
 	app_control_get_extra_data(app_control, "action", &action);
 	if (action != NULL) {
 		if (strcmp(action, "Get") == 0) {
-			read_file(ad);
+			read_vconf(ad);
 			elm_exit();
 		} else if (strcmp(action, "Set") == 0) {
 			app_control_get_extra_data(app_control, "value", &data);
 			LS_LOGE("DATA = %s", data);
 
 			 if (data != NULL) {
-				if ((strcmp(data, "Yes") == 0) || (strcmp(data, "No") == 0)) {
-					save_file(data, ad);
-					elm_exit();
-				}
+				if (strcmp(data, "Yes") == 0)
+					save_vconf(1, ad);
+				else
+					save_vconf(0, ad);
+				elm_exit();
 			}
 		}
 	}
@@ -326,11 +316,13 @@ int main(int argc, char *argv[])
 	event_callback.create = _app_create_cb;
 	event_callback.terminate = _app_terminate_cb;
 	event_callback.app_control = _app_control_cb;
+	event_callback.pause = _app_pause_cb;
+	event_callback.resume = _app_resume_cb;
 
 	ui_app_add_event_handler(&handlers[APP_EVENT_LOW_MEMORY], APP_EVENT_LOW_MEMORY, NULL, NULL);
 	ui_app_add_event_handler(&handlers[APP_EVENT_LOW_BATTERY], APP_EVENT_LOW_BATTERY, NULL, NULL);
 	ui_app_add_event_handler(&handlers[APP_EVENT_DEVICE_ORIENTATION_CHANGED], APP_EVENT_DEVICE_ORIENTATION_CHANGED, NULL, NULL);
-	ui_app_add_event_handler(&handlers[APP_EVENT_LANGUAGE_CHANGED], APP_EVENT_LANGUAGE_CHANGED,	_app_language_changed_cb, NULL);
+	ui_app_add_event_handler(&handlers[APP_EVENT_LANGUAGE_CHANGED], APP_EVENT_LANGUAGE_CHANGED, _app_language_changed_cb, NULL);
 	ui_app_add_event_handler(&handlers[APP_EVENT_REGION_FORMAT_CHANGED], APP_EVENT_REGION_FORMAT_CHANGED, NULL, NULL);
 
 	ret = APP_ERROR_NONE;
