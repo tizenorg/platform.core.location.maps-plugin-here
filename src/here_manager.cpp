@@ -30,6 +30,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vconf.h>
+#include <vconf-internal-location-keys.h>
 
 using namespace HERE_PLUGIN_NAMESPACE_PREFIX;
 using namespace TIZEN_MAPS_NAMESPACE_PREFIX;
@@ -522,24 +524,23 @@ here_error_e HereManager::CheckAgreement()
 
 bool HereManager::GetAgreement(void)
 {
-	std::ifstream file (UC_FILE);
-	bool isAgree = false;
-	std::string line;
-	std::string value;
+	int enabled = 0;
+	int ret = 0;
 
-	if (file.is_open()) {
-		getline(file, line);
-		value = line.substr(6);
-		if (value.compare("Yes") == 0)
-			isAgree = true;
-		else
-			MAPS_LOGD("UC was set No");
-		file.close();
-	} else {
-		MAPS_LOGD("UC file open fail. %s (%d)", strerror(errno), errno);
+	ret = vconf_get_int(VCONFKEY_LOCATION_HEREMAPS_CONSENT, &enabled);
+
+	if (ret != 0) {
+		MAPS_LOGD("Fail to get vconf value");
+		return false;
 	}
 
-	return isAgree;
+	if (enabled == 0) {
+		MAPS_LOGD("Vconf value of HereMaps is false");
+		return false;
+	}
+
+	MAPS_LOGD("Vconf value of HereMaps is true");
+	return true;
 }
 
 HERE_PLUGIN_END_NAMESPACE

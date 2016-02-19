@@ -39,8 +39,6 @@
 #include <common/ApplicationContext.h>
 #include <common/HereConfig.h>
 
-#define UC_FILE "/opt/usr/apps/org.tizen.heremaps-uc/shared/data/heremaps_uc.xml"
-
 HERE_PLUGIN_BEGIN_NAMESPACE
 
 class HereManager;
