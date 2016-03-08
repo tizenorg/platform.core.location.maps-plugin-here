@@ -536,9 +536,10 @@ bool HereManager::GetAgreement(void)
 			MAPS_LOGD("UC was set No");
 		file.close();
 	} else {
-		char buff[256];
-		strerror_r(errno, buff, sizeof(buff));
-		MAPS_LOGD("UC file open fail. %s (%d)", buff, errno);
+		char buff[256], *p;
+		p = strerror_r(errno, buff, sizeof(buff));
+		if (p)
+			MAPS_LOGD("UC file open fail. %s (%d)", p, errno);
 	}
 
 	return isAgree;
