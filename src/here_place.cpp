@@ -1273,10 +1273,10 @@ void HerePlace::__flushReplies(int error)
 	}
 	else if (m_bReplyWithList)
 	{
-		int error = maps_item_list_create(&place_list);
+		int error = maps_place_list_create(&place_list);
 		if (error != MAPS_ERROR_NONE)
 		{
-			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, NULL, m_pUserData);
+			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, 0, NULL, m_pUserData);
 			return;
 		}
 
@@ -1288,7 +1288,7 @@ void HerePlace::__flushReplies(int error)
 			maps_item_list_append(place_list, mapsPlace, maps_place_clone);
 		}
 
-		((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, place_list, m_pUserData);
+		((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, m_nReplyCnt, place_list, m_pUserData);
 	}
 	else
 	{

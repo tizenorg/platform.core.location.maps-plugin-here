@@ -119,8 +119,8 @@ public:
      * This enumeration defines identifiers for route MetricSystem specifiers.
      */
     enum MetricSystem {
-        DIST_imperial = 0x0000,      ///< Indicates that MetricSystem is miles
-        DIST_metric = 0x0001         ///< Indicates that MetricSystem is m & km
+        DIST_metric = 0x0000,        ///< Indicates that MetricSystem is m & km
+        DIST_imperial = 0x0001       ///< Indicates that MetricSystem is miles
     };
 #endif
 
@@ -340,6 +340,23 @@ public:
      *        the given query.
      */
     GeoBoundingBox GetViewBounds(void);
+
+    /**
+     * This method sets a value that indicates the maximum number of alternative routes
+     * results to be retrieved in response to the query.
+     *
+     * @param uAlternatives An integer indicating the maximum number of results to
+     *        be retrieved.
+     */
+    void SetAlternatives(size_t uAlternatives);
+
+    /**
+     * This method retrieves a value that indicates the maximum number of alternative routes
+     * results to be retrieved in response to the query.
+     *
+     * @return An integer indicating the maximum number of results to be retrieved.
+     */
+    size_t GetAlternatives(void) const;
 #endif
 
     /**
