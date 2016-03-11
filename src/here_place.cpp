@@ -200,7 +200,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 		return HERE_ERROR_OUT_OF_MEMORY;
 
 
-
 	typedef enum {
 		PLACE_CMD_TEXT,
 		PLACE_CMD_CENTER,
@@ -223,7 +222,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 	}
 	m_pDiscoveryQuery->SetSearchText(szSearchText);
 
-
 	/* Decide command type */
 	if (!szSearchText.empty())
 	{
@@ -237,7 +235,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 	{
 		cmdType = PLACE_CMD_AREA;
 	}
-
 
 	/* Get proximity with area */
 	if (cmdType == PLACE_CMD_TEXT || cmdType == PLACE_CMD_CENTER)
@@ -280,7 +277,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 		else
 			return HERE_ERROR_INVALID_PARAMETER;
 	}
-
 
 	/* Set properties */
 	if (cmdType == PLACE_CMD_TEXT)
@@ -1266,8 +1262,8 @@ void HerePlace::__flushReplies(int error)
 			return;
 		}
 
-			mapsPlace = m_PlaceList.front();
-			m_PlaceList.pop_front();
+		mapsPlace = m_PlaceList.front();
+		m_PlaceList.pop_front();
 
 		((maps_service_get_place_details_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, mapsPlace, m_pUserData);
 	}
@@ -1276,7 +1272,7 @@ void HerePlace::__flushReplies(int error)
 		int error = maps_item_list_create(&place_list);
 		if (error != MAPS_ERROR_NONE)
 		{
-			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, NULL, m_pUserData);
+			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, 0, m_nReqId, NULL, m_pUserData);
 			return;
 		}
 
@@ -1288,7 +1284,7 @@ void HerePlace::__flushReplies(int error)
 			maps_item_list_append(place_list, mapsPlace, maps_place_clone);
 		}
 
-		((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, place_list, m_pUserData);
+		((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, maps_item_list_items(place_list), m_nReqId, place_list, m_pUserData);
 	}
 	else
 	{
