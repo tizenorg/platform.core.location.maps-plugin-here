@@ -1,9 +1,7 @@
 /*
- * heremaps-uc
- *
  * Copyright (c) 2000 - 2011 Samsung Electronics Co., Ltd. All rights reserved.
  *
- * Contact: Jongmun Woo <jongmun.woo@samsung.com>, Young-Ae Kang <youngae.kang@samsung.com>
+ * Contact: Jongmun Woo <jongmun.woo@samsung.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +19,8 @@
 
 
 
-#ifndef HEREMAPS_UC_COMMON_H_
-#define HEREMAPS_UC_COMMON_H_
+#ifndef UC_LAUNCHER_COMMON_H_
+#define UC_LAUNCHER_COMMON_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,33 +29,27 @@ extern "C" {
 #include <app.h>
 #include <dlog.h>
 #include <glib.h>
-#include <vconf.h>
-#include <vconf-internal-location-keys.h>
 #ifndef Eina_Bool
 #include <stdbool.h>
 #endif
-#include <Elementary.h>
-#include <Elementary.h>
 #include <libintl.h>
 #include <stdio.h>
-#include <string.h>
-#include <efl_extension.h>
 #include <system_info.h>
 
-#if !defined(HEREMAPS_UC_PKG)
-#define HEREMAPS_UC_PKG "org.tizen.heremaps-uc"
+#if !defined(UC_LAUNCHER_PKG)
+#define UC_LAUNCHER_PKG "heremaps-uc-launcher"
 #endif
 
-#define DOMAIN_NAME HEREMAPS_UC_PKG
+#define DOMAIN_NAME UC_LAUNCHER_PKG
 
-#define TAG_HEREMAPS_UC "HEREMAPS_UC"
-#define HEREMAPS_UC_DLOG_DEBUG
+#define TAG_UC_LAUNCHER "UC_LAUNCHER"
+#define UC_LAUNCHER_DLOG_DEBUG
 
-#ifdef HEREMAPS_UC_DLOG_DEBUG        /**< if debug mode, show filename & line number */
+#ifdef UC_LAUNCHER_DLOG_DEBUG        /**< if debug mode, show filename & line number */
 
 #ifdef LOG_TAG
 #undef LOG_TAG
-#define LOG_TAG TAG_HEREMAPS_UC
+#define LOG_TAG TAG_UC_LAUNCHER
 #endif
 
 #define LS_LOGD(fmt,args...)  LOGD(fmt, ##args)
@@ -65,11 +57,11 @@ extern "C" {
 #define LS_LOGI(fmt,args...)  LOGI(fmt, ##args)
 #define LS_LOGE(fmt,args...)  LOGE(fmt, ##args)
 
-#elif HEREMAPS_UC_DLOG_RELEASE      /* if release mode */
+#elif UC_LAUNCHER_DLOG_RELEASE      /* if release mode */
 
 #ifdef LOG_TAG
 #undef LOG_TAG
-#define LOG_TAG TAG_HEREMAPS_UC
+#define LOG_TAG TAG_UC_LAUNCHER
 #endif
 
 #define LS_LOGD(fmt,args...)  LOGD(fmt, ##args)
@@ -83,65 +75,18 @@ extern "C" {
 #define LS_LOGE(...)  g_error(__VA_ARGS__)
 #endif
 
-#define P_(s)			dgettext(HEREMAPS_UC_PKG, s)
+#define P_(s)			dgettext(UC_LAUNCHER_PKG, s)
 #define S_(s)			dgettext("sys_string", s)
 #define dgettext_noop(s)	(s)
 #define N_(s)			dgettext_noop(s)
 
-#define KEY_ENABLED	1
-#define KEY_DISABLED 0
-
 #define LS_FUNC_ENTER 	LS_LOGD("(%s) ENTER", __FUNCTION__);
 #define LS_FUNC_EXIT 	LS_LOGD("(%s) EXIT", __FUNCTION__);
 
-#define SAFE_STRDUP(src) (src) ? strdup(src) : NULL
 
-#define LS_MEM_FREE(ptr)	\
-	do { \
-		if (ptr != NULL) {	\
-			free((void *)ptr);	\
-			ptr = NULL;	\
-		}	\
-	} while (0)
-
-
-#define LS_MEM_NEW(ptr, num_elements, type)	 \
-	do { \
-		if ((int)(num_elements) <= 0) { \
-			ptr = NULL; \
-		} else { \
-			ptr = (type *) calloc(num_elements, sizeof(type)); \
-		} \
-	} while (0)
-
-
-#define LS_RETURN_IF_FAILED(point) do { \
-		if (point == NULL) { \
-			LS_LOGE("critical error : LS_RETURN_IF_FAILED"); \
-			return; \
-		} \
-	} while (0)
-
-#define LS_RETURN_VAL_IF_FAILED(point, val) do { \
-		if (point == NULL) { \
-			LS_LOGE("critical error : NAVI_RETURN_VAL_IS_FAILED"); \
-			return val; \
-		} \
-	} while (0)
-
-typedef struct appdata
-{
-	app_control_h app_control;
-
-	Evas_Object *win_main;
-	Evas_Object *conformant;
-	Evas_Object *layout_main;
-
-	Evas_Object *popup;
-} heremaps_uc_app_data;
 
 #ifdef __cplusplus
 }
 #endif /*__cplusplus */
 
-#endif /* HEREMAPS_UC_COMMON_H_ */
+#endif /* UC_LAUNCHER_COMMON_H_ */

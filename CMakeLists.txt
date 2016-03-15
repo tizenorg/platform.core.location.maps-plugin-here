@@ -4,9 +4,10 @@ PROJECT(${pkg_name} C CXX)
 
 SET(CMAKE_INSTALL_PREFIX /usr)
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
+SET(LIBDIR ${LIBDIR})
 
 # Dependencies
-SET(dependents "glib-2.0 gmodule-2.0 libxml-2.0 dlog capi-network-connection capi-appfw-app-manager capi-maps-service capi-appfw-application")
+SET(dependents "glib-2.0 gmodule-2.0 libxml-2.0 dlog capi-network-connection capi-appfw-app-manager capi-maps-service capi-appfw-application vconf")
 
 INCLUDE(FindPkgConfig)
 pkg_check_modules(pkgs REQUIRED ${dependents})
@@ -35,6 +36,9 @@ SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--as-needed -Wl,--rpath=${LIBDIR}")
 SET(INC_DIR
 	inc
 	inc/engine
+
+	# UC-DBus
+	heremaps-uc-dbus/include
 )
 
 INCLUDE_DIRECTORIES(
@@ -58,6 +62,9 @@ SET(SRCS
 	src/here_multirevgeocode.cpp
 	src/here_route.cpp
 	src/here_utils.cpp
+
+	# UC-DBus
+	src/heremaps-uc-dbus.c
 )
 
 ADD_LIBRARY(${pkg_name} SHARED ${SRCS})
@@ -82,3 +89,4 @@ INSTALL(FILES lib/${ARCH}/libheremaps-engine.so DESTINATION lib)
 #ENDIF("${BINTYPE}" STREQUAL "eng")
 
 ADD_SUBDIRECTORY(heremaps-uc)
+ADD_SUBDIRECTORY(heremaps-uc-launcher)
