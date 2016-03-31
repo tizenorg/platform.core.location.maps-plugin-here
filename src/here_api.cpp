@@ -27,6 +27,9 @@ using namespace HERE_PLUGIN_NAMESPACE_PREFIX;
 
 int HerePluginInit(maps_plugin_h *hPlugin)
 {
+	if (!hPlugin)
+		return HERE_ERROR_INVALID_PARAMETER;
+
 	here_error_e error = HereManager::CheckAgreement();
 	if (error != HERE_ERROR_NONE)
 		return error;
@@ -43,6 +46,9 @@ int HerePluginInit(maps_plugin_h *hPlugin)
 
 int HerePluginShutdown(maps_plugin_h hPlugin)
 {
+	if (!hPlugin)
+		return HERE_ERROR_INVALID_PARAMETER;
+
 	if (HereManager::GetHandler())
 		HereManager::GetHandler()->Close();
 
@@ -101,6 +107,9 @@ int HerePluginGeocode(const char* szAddr,
 	if (!szAddr || (szAddr && *szAddr == '\0') || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -139,6 +148,9 @@ int HerePluginGeocodeByStructuredAddress(const maps_address_h hAddr,
 	/* checking parmaters */
 	if (!hAddr || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -182,6 +194,9 @@ int HerePluginGeocodeInsideArea(const char* szAddr, maps_area_h hArea,
 	if (!hArea || !HereUtils::IsValid(*(maps_area_s*)hArea))
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -223,6 +238,9 @@ int HerePluginReverseGeocode(double dLatitude, double dLongitude,
 
 	if (!pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -266,6 +284,9 @@ int HerePluginMultiReverseGeocode(const maps_coordinates_list_h hGeocodeList,
 	if (!hGeocodeList || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -307,6 +328,9 @@ int HerePluginSearchPlace(maps_coordinates_h hPos, int nDistance,
 
 	if (!hFilter || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -353,6 +377,9 @@ int HerePluginSearchPlaceByArea(maps_area_h hArea,
 	if (!hFilter || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -398,6 +425,9 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 	if (!hArea || !HereUtils::IsValid(*(maps_area_s*)hArea))
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -442,6 +472,9 @@ int HerePluginSearchPlaceList(maps_area_h hArea, maps_item_hashtable_h hPref,
 	if (!hArea || !HereUtils::IsValid(*(maps_area_s*)hArea))
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -483,6 +516,9 @@ int HerePluginSearchPlaceDetails(const char* szUrl,
 	if (!szUrl || (szUrl && *szUrl == '\0') || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -522,6 +558,9 @@ int HerePluginSearchRoute(maps_coordinates_h hOrigin, maps_coordinates_h hDestin
 	if (!HereUtils::IsValid(*(maps_coordinates_s*)hOrigin) ||
 		!HereUtils::IsValid(*(maps_coordinates_s*)hDestination))
 		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -570,6 +609,9 @@ int HerePluginSearchRouteWaypoints(const maps_coordinates_h* hWaypointList, int 
 		if (!HereUtils::IsValid(*(maps_coordinates_s*)hWaypointList[i]))
 			return HERE_ERROR_INVALID_PARAMETER;
 	}
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
