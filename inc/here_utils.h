@@ -129,7 +129,7 @@ public:
 	static GeoRouteQuery::FeatureType Convert(maps_route_feature_e nVal);
 	static GeoRouteQuery::FeatureWeight Convert(maps_route_feature_weight_e nVal);
 	static Maneuver::InstructionDirection Convert(maps_route_turn_type_e nVal);
-	static GeoTiledMap::MapType Convert(map_view_type_e nVal);
+	static GeoTiledMap::MapType Convert(map_type_e nMapType, bool bBuildings, bool bTraffic, bool bPublicTransit);
 	static maps_route_turn_type_e Convert(Maneuver::InstructionDirection nVal);
 	static GeoBoundingBox& Convert(maps_area_h hArea, GeoBoundingBox& Box);
 	static maps_area_h& Convert(GeoBoundingBox Box, maps_area_h& hArea);

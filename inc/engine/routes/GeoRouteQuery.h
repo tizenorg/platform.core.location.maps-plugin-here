@@ -340,6 +340,23 @@ public:
      *        the given query.
      */
     GeoBoundingBox GetViewBounds(void);
+
+    /**
+     * This method sets a value that indicates the maximum number of alternative routes
+     * results to be retrieved in response to the query.
+     *
+     * @param uAlternatives An integer indicating the maximum number of results to
+     *        be retrieved.
+     */
+    void SetAlternatives(size_t uAlternatives);
+
+    /**
+     * This method retrieves a value that indicates the maximum number of alternative routes
+     * results to be retrieved in response to the query.
+     *
+     * @return An integer indicating the maximum number of results to be retrieved.
+     */
+    size_t GetAlternatives(void) const;
 #endif
 
     /**

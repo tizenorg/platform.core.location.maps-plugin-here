@@ -34,6 +34,15 @@ EXPORT_API int maps_plugin_init(maps_plugin_h *plugin)
 	return ConvertToMapsError(ret);
 }
 
+EXPORT_API int maps_plugin_init_module(maps_plugin_h *plugin, const char *module)
+{
+	int ret = HerePluginInit(plugin, module);
+
+	MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
 EXPORT_API int maps_plugin_shutdown(maps_plugin_h plugin)
 {
 	int ret = HerePluginShutdown(plugin);
@@ -107,6 +116,8 @@ EXPORT_API int maps_plugin_is_service_supported(maps_service_e service, bool *su
 		case MAPS_SERVICE_SEARCH_ROUTE_WAYPOINTS:
 		case MAPS_SERVICE_CANCEL_REQUEST:
 		case MAPS_SERVICE_MULTI_REVERSE_GEOCODE:
+		case MAPS_SERVICE_SEARCH_PLACE_LIST:
+		case MAPS_SERVICE_SEARCH_GET_PLACE_DETAILS:
 			*supported = TRUE;
 			return MAPS_ERROR_NONE;
 		default:
@@ -230,6 +241,26 @@ EXPORT_API int maps_plugin_search_place_by_address(const char* address, const ma
 	return ConvertToMapsError(ret);
 }
 
+EXPORT_API int maps_plugin_search_place_list(const maps_area_h boundary, const maps_place_filter_h filter,
+	maps_preference_h preference, maps_service_search_place_list_cb callback, void* user_data, int* request_id)
+{
+	int ret = HerePluginSearchPlaceList(boundary, preference, filter, callback, user_data, request_id);
+
+	MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_get_place_details(const char* url,
+	maps_service_get_place_details_cb callback, void* user_data, int* request_id)
+{
+	int ret = HerePluginSearchPlaceDetails(url, callback, user_data, request_id);
+
+	MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
 EXPORT_API int maps_plugin_search_route(const maps_coordinates_h origin, const maps_coordinates_h destination,
 	maps_preference_h preference, maps_service_search_route_cb callback,
 	void* user_data, int* request_id)
@@ -262,9 +293,9 @@ EXPORT_API int maps_plugin_cancel_request(int request_id)
 }
 
 /* Mapping */
-EXPORT_API int maps_plugin_set_map_view(const map_view_h view)
+EXPORT_API int maps_plugin_set_map_view(const map_view_h view, maps_plugin_map_view_ready_cb pCbFunc)
 {
-	int ret = HerePluginSetMapView(view);
+	int ret = HerePluginSetMapView(view, pCbFunc);
 
 	MAPS_LOGD("here_error_e = %d", ret);
 
@@ -365,6 +396,10 @@ EXPORT_API int maps_plugin_on_object(const map_object_h object,
 			       const map_object_operation_e operation)
 {
 	int ret = HerePluginOnViewObject(object, operation);
+
+	if (ret != HERE_ERROR_NONE)
+		MAPS_LOGD("here_error_e = %d", ret);
+
 	return ConvertToMapsError(ret);
 }
 

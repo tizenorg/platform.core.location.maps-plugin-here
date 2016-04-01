@@ -184,6 +184,15 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 		g_free(szViewBounds);
 	}
 
+	bool is_alternatives_enabled = false;
+	if (maps_preference_get_route_alternatives_enabled(hPref, &is_alternatives_enabled) == MAPS_ERROR_NONE)
+	{
+		if (is_alternatives_enabled)
+		{
+			m_pQuery->SetAlternatives(2);
+		}
+	}
+
 	return HERE_ERROR_NONE;
 }
 

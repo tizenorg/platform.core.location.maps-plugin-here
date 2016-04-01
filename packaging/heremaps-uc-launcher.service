@@ -1,0 +1,10 @@
+[Unit]
+Description=HereMaps-UC Launcher daemon
+Requires=heremaps-uc-launcher.service
+
+[Service]
+EnvironmentFile=/run/tizen-system-env
+Type=dbus
+BusName=org.tizen.lbs.Providers.HereMapsUCLauncher
+ExecStart=/usr/bin/heremaps-uc-launcher
+MemoryLimit=10M

@@ -1,3 +1,8 @@
+[Version]   maps-plugin-here_0.2.0
+[Date]      11 Feb 2016
+[Title]     Added new APIs for z-ordering and resizing.
+[Developer] Seechan Kim <cbible.kim@samsung.com>
+
 [Version]   maps-plugin-here_0.1.9
 [Date]      21 Dec 2015
 [Title]     Fixed that some requests failed to be sent are not replied to the maps-service.
