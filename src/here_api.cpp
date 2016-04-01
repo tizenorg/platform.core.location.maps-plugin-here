@@ -21,13 +21,16 @@
 #include "here_multirevgeocode.h"
 #include "here_place.h"
 #include "here_route.h"
-#include <common/HereConfig.h>
 #include "here_view.h"
+#include <common/HereConfig.h>
 
 using namespace HERE_PLUGIN_NAMESPACE_PREFIX;
 
-int HerePluginInit(maps_plugin_h *hPlugin)
+int HerePluginInit(maps_plugin_h *hPlugin, const char *module)
 {
+	if (!hPlugin)
+		return HERE_ERROR_INVALID_PARAMETER;
+
 	here_error_e error = HereManager::CheckAgreement();
 	if (error != HERE_ERROR_NONE)
 		return error;
@@ -44,6 +47,9 @@ int HerePluginInit(maps_plugin_h *hPlugin)
 
 int HerePluginShutdown(maps_plugin_h hPlugin)
 {
+	if (!hPlugin)
+		return HERE_ERROR_INVALID_PARAMETER;
+
 	if (HereManager::GetHandler())
 		HereManager::GetHandler()->Close();
 
@@ -102,6 +108,9 @@ int HerePluginGeocode(const char* szAddr,
 	if (!szAddr || (szAddr && *szAddr == '\0') || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -140,6 +149,9 @@ int HerePluginGeocodeByStructuredAddress(const maps_address_h hAddr,
 	/* checking parmaters */
 	if (!hAddr || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -183,6 +195,9 @@ int HerePluginGeocodeInsideArea(const char* szAddr, maps_area_h hArea,
 	if (!hArea || !HereUtils::IsValid(*(maps_area_s*)hArea))
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -224,6 +239,9 @@ int HerePluginReverseGeocode(double dLatitude, double dLongitude,
 
 	if (!pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -267,6 +285,9 @@ int HerePluginMultiReverseGeocode(const maps_coordinates_list_h hGeocodeList,
 	if (!hGeocodeList || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -308,6 +329,9 @@ int HerePluginSearchPlace(maps_coordinates_h hPos, int nDistance,
 
 	if (!hFilter || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -354,6 +378,9 @@ int HerePluginSearchPlaceByArea(maps_area_h hArea,
 	if (!hFilter || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -399,6 +426,9 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 	if (!hArea || !HereUtils::IsValid(*(maps_area_s*)hArea))
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -433,13 +463,62 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 	return error;
 }
 
+int HerePluginSearchPlaceList(maps_area_h hArea, maps_item_hashtable_h hPref,
+	maps_place_filter_h hFilter, maps_service_search_place_list_cb pCbFunc, void *pUserData, int *nReqId)
+{
+	/* checking parmaters */
+	if (!hFilter || !pCbFunc || !nReqId)
+		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (!hArea || !HereUtils::IsValid(*(maps_area_s*)hArea))
+		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
+	if (!HereManager::GetHandler())
+		return HERE_ERROR_INVALID_OPERATION;
+
+	/* creating instance */
+	HerePlace *pPlace =
+		(HerePlace*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_PLACE,
+		(void*)pCbFunc, pUserData, nReqId));
+
+	if(!pPlace)
+		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
+
+	/* sending request */
+	here_error_e error = HERE_ERROR_NONE;
+
+	do {
+		error = pPlace->PrepareDiscoveryQuery();
+		if (error != HERE_ERROR_NONE) break;
+
+		error = pPlace->PrepareDiscoveryPreference(hPref);
+		if (error != HERE_ERROR_NONE) break;
+
+		error = pPlace->PrepareDiscoveryFilter(hFilter);
+		if (error != HERE_ERROR_NONE) break;
+
+		error = pPlace->StartDiscoveryPlaceList(hArea);
+	} while(0);
+
+	/* finishing task */
+	if(error != HERE_ERROR_NONE)
+		pPlace->TerminateService();
+
+	return error;
+}
+
 int HerePluginSearchPlaceDetails(const char* szUrl,
-	maps_item_hashtable_h hPref, maps_service_search_place_cb pCbFunc,
-	void *pUserData, int *nReqId)
+	maps_service_get_place_details_cb pCbFunc, void *pUserData, int *nReqId)
 {
 	/* checking parmaters */
 	if (!szUrl || (szUrl && *szUrl == '\0') || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -457,9 +536,6 @@ int HerePluginSearchPlaceDetails(const char* szUrl,
 
 	do {
 		error = pPlace->PreparePlaceDetailsQuery();
-		if (error != HERE_ERROR_NONE) break;
-
-		error = pPlace->PreparePlaceDetailsPreference(hPref);
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pPlace->StartPlaceDetails(szUrl);
@@ -483,6 +559,9 @@ int HerePluginSearchRoute(maps_coordinates_h hOrigin, maps_coordinates_h hDestin
 	if (!HereUtils::IsValid(*(maps_coordinates_s*)hOrigin) ||
 		!HereUtils::IsValid(*(maps_coordinates_s*)hDestination))
 		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
 
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -532,6 +611,9 @@ int HerePluginSearchRouteWaypoints(const maps_coordinates_h* hWaypointList, int 
 			return HERE_ERROR_INVALID_PARAMETER;
 	}
 
+	if (HereManager::CheckAgreement() != HERE_ERROR_NONE)
+		return HERE_ERROR_PERMISSION_DENIED;
+
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
 
@@ -577,7 +659,7 @@ int HerePluginCancelRequest(int nReqId)
 	return (HereManager::GetHandler()->CancelInstance(nReqId));
 }
 
-int HerePluginSetMapView(const map_view_h hView)
+int HerePluginSetMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
 {
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -593,7 +675,7 @@ int HerePluginSetMapView(const map_view_h hView)
 	here_error_e error = HERE_ERROR_NONE;
 
 	if (hView)
-		error = pView->Init(hView);
+		error = pView->Init(hView, pCbFunc);
 	else
 		error = pView->Close();
 
@@ -671,6 +753,44 @@ int HerePluginMoveCenter(const int delta_x, const int delta_y,
 	return error;
 }
 
+int HerePluginSetScalebar(bool enable)
+{
+	if (!HereManager::GetHandler())
+		return HERE_ERROR_INVALID_OPERATION;
+
+	HereView *pView =
+		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
+
+	if(!pView)
+		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
+
+	/* sending request */
+	here_error_e error = pView->SetScalebar(enable);
+	delete pView;
+
+	return error;
+}
+
+int HerePluginGetScalebar(bool *enabled)
+{
+	if (!enabled)
+		return HERE_ERROR_INVALID_PARAMETER;
+
+	if (!HereManager::GetHandler())
+		return HERE_ERROR_INVALID_OPERATION;
+
+	HereView *pView =
+		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
+
+	if(!pView)
+		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
+
+	here_error_e error = pView->GetScalebar(enabled);
+	delete pView;
+
+	return error;
+}
+
 int HerePluginDrawMap(Evas* pCanvas, const int x, const int y,
 	const int nWidth, const int nHeight)
 {
@@ -715,7 +835,7 @@ int HerePluginScreenToGeography(const int x, const int y, maps_coordinates_h *ma
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* sending request */
-	here_error_e error = pView->ScreenToGeography(x, y, mapsCoord);
+	here_error_e error = pView->ScreenToGeolocation(x, y, mapsCoord);
 	delete pView;
 
 	return error;
@@ -737,7 +857,7 @@ int HerePluginGeographyToScreen(const maps_coordinates_h mapsCoord, int *x, int 
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* sending request */
-	here_error_e error = pView->GeographyToScreen(mapsCoord, x, y);
+	here_error_e error = pView->GeolocationToScreen(mapsCoord, x, y);
 	delete pView;
 
 	return error;
@@ -753,8 +873,8 @@ int HerePluginGetMaxZoomLevel(int *nMaxZoomLevel)
 	return HereView::GetMaxZoomLevel(nMaxZoomLevel);
 }
 
-int HerePluginOnViewObject(const map_object_h object,
-			   const map_object_operation_e operation)
+int HerePluginOnViewObject(const maps_view_object_h object,
+			   const maps_view_object_operation_e operation)
 {
 	return HereView::OnViewObject(object, operation);
 }

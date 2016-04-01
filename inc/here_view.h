@@ -26,7 +26,7 @@
 
 //maps-service header
 #include <maps_service.h>
-#include <map_view.h>
+#include <maps_view.h>
 
 //map engine header
 #include <maps/GeoTiledMap.h>
@@ -58,15 +58,16 @@ typedef struct _GLData
 	int x, y, w, h;
 	double lat, lng, zoom, angle;
 
-	map_view_h hView;
+	maps_view_h hView;
 
 	// to remove // UpdatedObjects updatedObjects;
 	HereViewObjects visualObjects;
 	PendingObjects pendingObjects;
 	Ecore_Idler *idler;
 	bool redraw;
-} GLData;
 
+	maps_plugin_map_view_ready_cb readyCb;
+} GLData;
 
 class HereView
 : public HereBase
@@ -75,34 +76,37 @@ public:
 	HereView(void *pCbFunc, void *pUserData, int nReqId);
 	~HereView();
 
-	here_error_e Init(map_view_h hView);
+	here_error_e Init(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc);
 	static here_error_e Close();
-	here_error_e RenderMap(const maps_coordinates_h mapsCoord, const double dZoom, const double dAngle);
-	here_error_e RenderMapByArea(const maps_area_h hArea, const double dZoom, const double dAngle);
-	static here_error_e DrawMap(Evas* pCanvas, const int x, const int y, const int nWidth, const int nHeight);
-	here_error_e MoveCenter(const int delta_x, const int delta_y);
+	here_error_e RenderMap(const maps_coordinates_h mapsCoord, double dZoom, double dAngle);
+	here_error_e RenderMapByArea(const maps_area_h hArea, double dZoom, double dAngle);
+	static here_error_e DrawMap(Evas* pCanvas, int x, int y, int nWidth, int nHeight);
+	here_error_e MoveCenter(int delta_x, int delta_y);
+	here_error_e SetScalebar(bool enable);
+	here_error_e GetScalebar(bool *enabled);
 	here_error_e GetCenter(maps_coordinates_h *center);
-	here_error_e ScreenToGeography(const int x, const int y, maps_coordinates_h *mapsCoord);
-	here_error_e GeographyToScreen(const maps_coordinates_h mapsCoord, int *x, int *y);
+	here_error_e ScreenToGeolocation(int x, int y, maps_coordinates_h *mapsCoord);
+	here_error_e GeolocationToScreen(const maps_coordinates_h mapsCoord, int *x, int *y);
 
 	static here_error_e GetMinZoomLevel(int *nMinZoomLevel);
 	static here_error_e GetMaxZoomLevel(int *nMaxZoomLevel);
-	static here_error_e OnViewObject(const map_object_h object, const map_object_operation_e operation);
+	static here_error_e OnViewObject(const maps_view_object_h object, maps_view_object_operation_e operation);
 
-	here_error_e AddObject(map_object_h obj);
 	static void RenderingCb(void *data);
-	static bool foreachObject(int index, int total, map_object_h object, void *user_data);
+	static bool foreachObject(int index, int total, maps_view_object_h object, void *user_data);
 	static GLData* GetImplHandler();
 
 private:
 
 	here_error_e InitOpenGL(GLData *gld);
 	here_error_e InitOpenGLSurface(GLData *gld);
-	here_error_e InitMap(GLData *gld);
+	here_error_e InitMap(GLData *gld, maps_plugin_map_view_ready_cb pCbFunc);
+	static void __readyCb();
 	static Eina_Bool __idlerCb(void *data);
 	static void __renderingCb(void *data);
 	static void __pixelGetCb(void *data, Evas_Object *obj);
-	static void __processViewObject(const map_object_h object, const map_object_operation_e operation);
+	static void __processViewObject(const maps_view_object_h object, maps_view_object_operation_e operation);
+	void __setMapType();
 
 	static GLData *m_pImpl;
 

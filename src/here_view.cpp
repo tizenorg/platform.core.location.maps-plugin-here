@@ -42,7 +42,7 @@ GLData* HereView::GetImplHandler()
 	return m_pImpl;
 }
 
-here_error_e HereView::Init(map_view_h hView)
+here_error_e HereView::Init(maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
 {
 	if (!hView)
 		return HERE_ERROR_INVALID_PARAMETER;
@@ -58,16 +58,17 @@ here_error_e HereView::Init(map_view_h hView)
 			return HERE_ERROR_INVALID_PARAMETER;
 
 		m_pImpl->idler = ecore_idler_add(__idlerCb, (void*)m_pImpl);
+		m_pImpl->readyCb = NULL;
 	}
 
 	here_error_e error = HERE_ERROR_NONE;
 	int error2 = MAPS_ERROR_NONE;
 
 	do {
-		error2 = map_view_get_port(hView, &m_pImpl->img);
+		error2 = maps_view_get_viewport(hView, &m_pImpl->img);
 		if (error2 != MAPS_ERROR_NONE) break;
 
-		error2 = map_view_get_geometry(hView, &m_pImpl->x, &m_pImpl->y, &m_pImpl->w, &m_pImpl->h);
+		error2 = maps_view_get_screen_location(hView, &m_pImpl->x, &m_pImpl->y, &m_pImpl->w, &m_pImpl->h);
 		if (error2 != MAPS_ERROR_NONE) break;
 
 		m_pImpl->hView = hView;
@@ -78,7 +79,7 @@ here_error_e HereView::Init(map_view_h hView)
 		error = InitOpenGLSurface(m_pImpl);
 		if (error != HERE_ERROR_NONE) break;
 
-		error = InitMap(m_pImpl);
+		error = InitMap(m_pImpl, pCbFunc);
 	} while(0);
 
 	if (error == HERE_ERROR_NONE && error2 != MAPS_ERROR_NONE)
@@ -175,7 +176,7 @@ here_error_e HereView::InitOpenGLSurface(GLData *gld)
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::InitMap(GLData *gld)
+here_error_e HereView::InitMap(GLData *gld, maps_plugin_map_view_ready_cb pCbFunc)
 {
 	if (!gld)
 		return HERE_ERROR_INVALID_PARAMETER;
@@ -184,6 +185,10 @@ here_error_e HereView::InitMap(GLData *gld)
 
 	if (!gld->map)
 		return HERE_ERROR_OUT_OF_MEMORY;
+
+	gld->readyCb = pCbFunc;
+
+	gld->map->SetReadyMapSignal((GeoTiledMap::ReadyMapSignalFunctor)__readyCb);
 
 	gld->map->SetEvasGlApi(gld->api);
 
@@ -263,6 +268,12 @@ here_error_e HereView::Close()
 	return HERE_ERROR_NONE;
 }
 
+void HereView::__readyCb()
+{
+	if (m_pImpl->readyCb)
+		m_pImpl->readyCb(m_pImpl->hView);
+}
+
 void HereView::__pixelGetCb(void *data, Evas_Object *obj)
 {
 	if (!m_pImpl || !m_pImpl->map) return;
@@ -278,31 +289,50 @@ void HereView::__renderingCb(void *data)
 	evas_object_image_pixels_dirty_set((Evas_Object*)data, EINA_TRUE);
 }
 
-here_error_e HereView::RenderMap(const maps_coordinates_h mapsCoord,
-	const double dZoom, const double dAngle)
+void HereView::__setMapType()
 {
+	/* When the theme is changed, clear cache */
+	maps_view_type_e map_type;
+	maps_view_get_type(m_pImpl->hView, &map_type);
+
+	bool buildings_enabled = false;
+	maps_view_get_buildings_enabled(m_pImpl->hView, &buildings_enabled);
+
+	bool traffic_enabled = false;
+	maps_view_get_traffic_enabled(m_pImpl->hView, &traffic_enabled);
+
+	bool public_transit_enabled = false;
+	maps_view_get_public_transit_enabled(m_pImpl->hView, &public_transit_enabled);
+
+	GeoTiledMap::MapType hereMapType = HereUtils::Convert(map_type, buildings_enabled,
+						traffic_enabled, public_transit_enabled);
+
+	if (hereMapType != m_pImpl->map->GetMapType())
+	{
+		MAPS_LOGD("Clear cache, because map type is changed.");
+		m_pImpl->map->ClearCache();
+#ifdef TIZEN_SUPPORT_TILE_FILE_CACHE
+		m_pImpl->map->ClearTileFileCache();
+#endif
+		m_pImpl->map->SetMapType(hereMapType);
+	}
+}
+
+here_error_e HereView::RenderMap(const maps_coordinates_h mapsCoord, double dZoom, double dAngle)
+{
+
 	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map || !m_pImpl->api)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	if (!mapsCoord)
 		return HERE_ERROR_INVALID_PARAMETER;
 
-#ifdef TIZEN_SUPPORT_TILE_FILE_CACHE
-	/* When the theme is changed, clear cache */
-	map_view_type_e map_type;
-	map_view_get_type(m_pImpl->hView, &map_type);
-	if (m_pImpl->map->GetMapType() != HereUtils::Convert(map_type))
-	{
-		MAPS_LOGD("Clear cache, because map type is changed.");
-		m_pImpl->map->ClearCache();
-		m_pImpl->map->ClearTileFileCache();
-		m_pImpl->map->SetMapType(HereUtils::Convert(map_type));
-	}
-#endif
+	/* set map type */
+	__setMapType();
 
 	/* resize window */
 	int x, y, w, h;
-	map_view_get_geometry(m_pImpl->hView, &x, &y, &w, &h);
+	maps_view_get_screen_location(m_pImpl->hView, &x, &y, &w, &h);
 	m_pImpl->w = MAX(m_pImpl->w, 1);
 	m_pImpl->h = MAX(m_pImpl->h, 1);
 
@@ -330,7 +360,10 @@ here_error_e HereView::RenderMap(const maps_coordinates_h mapsCoord,
 	}
 
 	/* angle */
-	m_pImpl->angle = dAngle;
+	if (m_pImpl->angle != dAngle) {
+		m_pImpl->angle = dAngle;
+		m_pImpl->map->SetAngle(dAngle);
+	}
 
 	/* center */
 	double lat, lng;
@@ -345,7 +378,7 @@ here_error_e HereView::RenderMap(const maps_coordinates_h mapsCoord,
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::RenderMapByArea(const maps_area_h hArea, const double dZoom, const double dAngle)
+here_error_e HereView::RenderMapByArea(const maps_area_h hArea, double dZoom, double dAngle)
 {
 	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map || !m_pImpl->map->GetRootPixmap() || !m_pImpl->api)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
@@ -356,7 +389,7 @@ here_error_e HereView::RenderMapByArea(const maps_area_h hArea, const double dZo
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::MoveCenter(const int delta_x, const int delta_y)
+here_error_e HereView::MoveCenter(int delta_x, int delta_y)
 {
 	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map || !m_pImpl->map->GetRootPixmap() || !m_pImpl->api)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
@@ -369,7 +402,26 @@ here_error_e HereView::MoveCenter(const int delta_x, const int delta_y)
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::DrawMap(Evas* pCanvas, const int x, const int y, const int nWidth, const int nHeight)
+here_error_e HereView::SetScalebar(bool enable)
+{
+	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map)
+		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
+
+	m_pImpl->map->SetScalebar(enable);
+
+	return HERE_ERROR_NONE;
+}
+
+here_error_e HereView::GetScalebar(bool *enabled)
+{
+	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map || !enabled)
+		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
+
+	*enabled = m_pImpl->map->GetScalebar();
+	return HERE_ERROR_NONE;
+}
+
+here_error_e HereView::DrawMap(Evas* pCanvas, int x, int y, int nWidth, int nHeight)
 {
 	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map || !m_pImpl->map->GetRootPixmap() || !m_pImpl->api)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
@@ -419,6 +471,7 @@ here_error_e HereView::DrawMap(Evas* pCanvas, const int x, const int y, const in
 	}
 
 	g_free(srcimg_data);
+
 	return HERE_ERROR_NONE;
 }
 
@@ -442,7 +495,7 @@ here_error_e HereView::GetCenter(maps_coordinates_h *center)
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::ScreenToGeography(const int x, const int y, maps_coordinates_h *mapsCoord)
+here_error_e HereView::ScreenToGeolocation(int x, int y, maps_coordinates_h *mapsCoord)
 {
 	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
@@ -475,7 +528,7 @@ here_error_e HereView::ScreenToGeography(const int x, const int y, maps_coordina
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::GeographyToScreen(const maps_coordinates_h mapsCoord, int *x, int *y)
+here_error_e HereView::GeolocationToScreen(const maps_coordinates_h mapsCoord, int *x, int *y)
 {
 	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
@@ -500,6 +553,9 @@ here_error_e HereView::GetMinZoomLevel(int *nMinZoomLevel)
 	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
+	if (!nMinZoomLevel)
+		return HERE_ERROR_INVALID_PARAMETER;
+
 	*nMinZoomLevel = (int)m_pImpl->map->GetMinimumZoomLevel();
 
 	return HERE_ERROR_NONE;
@@ -510,17 +566,20 @@ here_error_e HereView::GetMaxZoomLevel(int *nMaxZoomLevel)
 	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
+	if (!nMaxZoomLevel)
+		return HERE_ERROR_INVALID_PARAMETER;
+
 	*nMaxZoomLevel = (int)m_pImpl->map->GetMaximumZoomLevel();
+
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::OnViewObject(const map_object_h object,
-				const map_object_operation_e operation)
+here_error_e HereView::OnViewObject(const maps_view_object_h object, maps_view_object_operation_e operation)
 {
 	if (!m_pImpl || !m_pImpl->isInitialized || !m_pImpl->map)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
-	if (!object || operation < MAP_OBJECT_ADD || operation > MAP_OBJECT_REMOVE_ALL)
+	if (!object || operation < MAPS_VIEW_OBJECT_ADD || operation > MAPS_VIEW_OBJECT_REMOVE)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (m_pImpl->map->GetRootPixmap())
@@ -541,8 +600,8 @@ Eina_Bool HereView::__idlerCb(void *data)
 	{
 		PendingObject pending = pImpl->pendingObjects.front();
 		pImpl->pendingObjects.pop_front();
-		map_object_h object = pending.first;
-		map_object_operation_e operation = pending.second;
+		maps_view_object_h object = pending.first;
+		maps_view_object_operation_e operation = pending.second;
 
 		__processViewObject(object, operation);
 	}
@@ -550,32 +609,30 @@ Eina_Bool HereView::__idlerCb(void *data)
 	return true;
 }
 
-void HereView::__processViewObject(const map_object_h object,
-				const map_object_operation_e operation)
+void HereView::__processViewObject(const maps_view_object_h object, maps_view_object_operation_e operation)
 {
-	map_object_type_e type = MAP_OBJECT_UNKNOWN;
-	map_object_get_type(object, &type);
+	maps_view_object_type_e type;
+	maps_view_object_get_type(object, &type);
 
-	if (type < MAP_OBJECT_GROUP || type > MAP_OBJECT_UNKNOWN) return;
-	if (operation < MAP_OBJECT_ADD || operation > MAP_OBJECT_REMOVE_ALL) return;
+	if (type < MAPS_VIEW_OBJECT_POLYLINE || type > MAPS_VIEW_OBJECT_MARKER) return;
+	if (operation < MAPS_VIEW_OBJECT_ADD || operation > MAPS_VIEW_OBJECT_REMOVE) return;
 
-	const char *oper_str[20] = { "ADD", "SET_VISIBLE", "MOVE", "CHANGE", "REMOVE", "REMOVEALL"};
-	const char *type_str[20] = { "GROUP", "POLYLINE", "POLYGON", "MARKER", "ROUTE", "UNKNOWN"};
+	const char *oper_str[20] = { "ADD", "SET_VISIBLE", "MOVE", "CHANGE", "REMOVE"};
+	const char *type_str[20] = { "POLYLINE", "POLYGON", "MARKER", "ROUTE", "UNKNOWN"};
 
 	MAPS_LOGD("type=%s, operation=%s, object=%p",
-		(type >= MAP_OBJECT_GROUP && type <= MAP_OBJECT_UNKNOWN) ? type_str[type] : "?",
-		(operation >= MAP_OBJECT_ADD && operation <= MAP_OBJECT_REMOVE_ALL) ? oper_str[operation] : "?",
+		(type >= MAPS_VIEW_OBJECT_POLYLINE && type <= MAPS_VIEW_OBJECT_MARKER) ? type_str[type] : "?",
+		(operation >= MAPS_VIEW_OBJECT_ADD && operation <= MAPS_VIEW_OBJECT_REMOVE) ? oper_str[operation] : "?",
 		object);
 
 	switch(operation)
 	{
-	case MAP_OBJECT_ADD:         m_pImpl->visualObjects.add(object); break;
-	case MAP_OBJECT_SET_VISIBLE: m_pImpl->visualObjects.setVisible(object); break;
-	case MAP_OBJECT_MOVE:        m_pImpl->visualObjects.move(object); break;
-	case MAP_OBJECT_CHANGE:      m_pImpl->visualObjects.update(object); break;
-	case MAP_OBJECT_REMOVE:      m_pImpl->visualObjects.remove(object); break;
-	case MAP_OBJECT_REMOVE_ALL:  m_pImpl->visualObjects.removeAll(); break;
-	default:                          break;
+	case MAPS_VIEW_OBJECT_ADD:			m_pImpl->visualObjects.add(object); break;
+	case MAPS_VIEW_OBJECT_SET_VISIBLE:	m_pImpl->visualObjects.setVisible(object); break;
+	case MAPS_VIEW_OBJECT_MOVE:			m_pImpl->visualObjects.move(object); break;
+	case MAPS_VIEW_OBJECT_CHANGE:			m_pImpl->visualObjects.update(object); break;
+	case MAPS_VIEW_OBJECT_REMOVE:			m_pImpl->visualObjects.remove(object); break;
+	default:			break;
 	}
 }
 

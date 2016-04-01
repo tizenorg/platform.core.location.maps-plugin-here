@@ -31,7 +31,9 @@ HerePlace::HerePlace(void *pCbFunc, void *pUserData, int nReqId)
 	m_nReplyIdx = 0;
 	m_bReplyFlushed = false;
 	m_szSortBy = NULL;
+	m_bPlaceDetails = false;
 	m_bPlaceDetailsInternal = false;
+	m_bReplyWithList = false;
 	m_eDistanceUnit = MAPS_DISTANCE_UNIT_M;
 }
 
@@ -161,6 +163,19 @@ here_error_e HerePlace::PrepareDiscoveryFilter(maps_place_filter_h hFilter)
 	}
 	g_free(szKeyword);
 
+	char *szAddress = NULL;
+	ret = maps_place_filter_get_place_address(hFilter, &szAddress);
+	if (ret == MAPS_ERROR_NONE && szAddress && *szAddress)
+	{
+		String szSearchText = szAddress;
+		if (m_pDiscoveryQuery->GetSearchText().size() > 0)
+		{
+			szSearchText += " " + m_pDiscoveryQuery->GetSearchText();
+		}
+		m_pDiscoveryQuery->SetSearchText(szSearchText);
+	}
+	g_free(szAddress);
+
 	return HERE_ERROR_NONE;
 }
 
@@ -186,7 +201,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 		return HERE_ERROR_OUT_OF_MEMORY;
 
 
-
 	typedef enum {
 		PLACE_CMD_TEXT,
 		PLACE_CMD_CENTER,
@@ -200,7 +214,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 	GeoBoundingBox geoBox;
 	GeoBoundingCircle geoCircle;
 
-
 	/* Merge search text with other search text being in preference */
 	String szSearchText = (szAddr ? szAddr : "");
 	if (m_pDiscoveryQuery->GetSearchText().size() > 0)
@@ -209,7 +222,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 		szSearchText += m_pDiscoveryQuery->GetSearchText();
 	}
 	m_pDiscoveryQuery->SetSearchText(szSearchText);
-
 
 	/* Decide command type */
 	if (!szSearchText.empty())
@@ -224,7 +236,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 	{
 		cmdType = PLACE_CMD_AREA;
 	}
-
 
 	/* Get proximity with area */
 	if (cmdType == PLACE_CMD_TEXT || cmdType == PLACE_CMD_CENTER)
@@ -268,7 +279,6 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 			return HERE_ERROR_INVALID_PARAMETER;
 	}
 
-
 	/* Set properties */
 	if (cmdType == PLACE_CMD_TEXT)
 	{
@@ -291,6 +301,12 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 	m_nRestReqId = m_pDiscoveryQuery->Execute(*this, NULL);
 
 	return (m_nRestReqId > 0 ? HERE_ERROR_NONE : HERE_ERROR_INVALID_OPERATION);
+}
+
+here_error_e HerePlace::StartDiscoveryPlaceList(maps_area_h hArea)
+{
+	m_bReplyWithList = true;
+	return StartDiscoveryPlace(hArea);
 }
 
 here_error_e HerePlace::PreparePlaceDetailsQuery()
@@ -337,6 +353,7 @@ here_error_e HerePlace::StartPlaceDetails(const char *szUrl)
 	if (!szUrl || (szUrl && strlen(szUrl) <= 0))
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	m_bPlaceDetails = true;
 
 	m_nRestReqId = m_pPlaceDetailsQuery->Execute(*this, NULL, szUrl);
 
@@ -347,7 +364,6 @@ here_error_e HerePlace::StartPlaceDetailsInternal(const char *szUrl)
 {
 	if (!szUrl || (szUrl && strlen(szUrl) <= 0))
 		return HERE_ERROR_INVALID_PARAMETER;
-
 
 	std::unique_ptr<PlaceDetailsQuery> pPlaceDetailsQuery (new (std::nothrow)PlaceDetailsQuery());
 
@@ -474,7 +490,7 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 			/* vicinity */
 
 			/* If needed PlaceDetails information, postpone to send a reply */
-			if(__sending_place_details_query_automatically)
+			if(__sending_place_details_query_automatically && !m_bReplyWithList)
 			{
 				hereLinkObj = herePlaceIt->GetLinkObject();
 				if (!hereLinkObj.GetHref().empty() && !hereLinkObj.GetId().empty())
@@ -1235,36 +1251,72 @@ void HerePlace::ProcessPlaceRated(PlaceDetails herePlace, maps_place_h mapsPlace
 void HerePlace::__flushReplies(int error)
 {
 	maps_place_h mapsPlace;
-	bool bCallbackCanceled = false;
-	int nReplyIdx = 0;
+	maps_item_list_h placeList = NULL;
 
-	if (m_bReplyFlushed || m_bCanceled || !m_pCbFunc) return;
-	m_bReplyFlushed = true;
-
+	m_nReplyIdx = 0;
 	__sortList(m_PlaceList);
 
-	while ((nReplyIdx < m_nReplyCnt) ||
-		(error != MAPS_ERROR_NONE && nReplyIdx == 0 && m_nReplyCnt == 0) /* reply with only error */
-	)
+	if (m_bPlaceDetails)
 	{
-		mapsPlace = NULL;
-		if (!m_PlaceList.empty())
+		if (error != MAPS_ERROR_NONE)
+		{
+			((maps_service_get_place_details_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, NULL, m_pUserData);
+			return;
+		}
+
+		mapsPlace = m_PlaceList.front();
+		m_PlaceList.pop_front();
+
+		((maps_service_get_place_details_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, mapsPlace, m_pUserData);
+	}
+	else if (m_bReplyWithList)
+	{
+		if (error == MAPS_ERROR_NONE)
+			error = maps_place_list_create(&placeList);
+
+		if (error != MAPS_ERROR_NONE)
+		{
+			if (placeList)
+				maps_place_list_destroy(placeList);
+			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, 0, NULL, m_pUserData);
+			return;
+		}
+
+		while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty())
 		{
 			mapsPlace = m_PlaceList.front();
 			m_PlaceList.pop_front();
+
+			maps_item_list_append(placeList, mapsPlace, maps_place_clone);
 		}
 
-		if (m_bCanceled || bCallbackCanceled)
-		{
-			maps_place_destroy(mapsPlace);
-		}
-		else if (((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId,
-			nReplyIdx, m_nReplyCnt, mapsPlace, m_pUserData) == FALSE)
-		{
-			bCallbackCanceled = true;
-		}
-		nReplyIdx++;
+		if (!m_bCanceled)
+			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, maps_item_list_items(placeList), placeList, m_pUserData);
+		else
+			maps_place_list_destroy(placeList);
 	}
+	else
+	{
+		if (error != MAPS_ERROR_NONE)
+		{
+			((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, 0, 0, NULL, m_pUserData);
+			return;
+		}
+
+		while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty())
+		{
+			mapsPlace = m_PlaceList.front();
+			m_PlaceList.pop_front();
+
+			/* callback function */
+			if (((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId,
+				m_nReplyIdx++, m_nReplyCnt, mapsPlace, m_pUserData) == FALSE)
+			{
+				break;
+			}
+		}
+	}
+	m_bReplyFlushed = true;
 }
 
 bool HerePlace::__compareWithTitle(const maps_place_h &item1, const maps_place_h &item2)

@@ -78,32 +78,32 @@ public:
         MT_Hybrid_Day,                  ///< Indicates a hybrid day map        
                                         ///  (satellite, with roads and labels).
 #ifdef TIZEN_MIGRATION
-	MT_Normal_Day_Grey,
-	MT_Normal_Day_Transit,
-	MT_Normal_Night_Transit,
-	MT_Normal_Traffic_Day,
-	MT_Normal_Traffic_Night,
-	MT_Normal_Day_Custom,
-	MT_Normal_Night,
-	MT_Normal_Night_Grey,
-	MT_Pedestrian_Day,
-	MT_Pedestrian_Day_Mobile,
-	MT_Pedestrian_Night,
-	MT_Pedestrian_Night_Mobile,
-	MT_Carnav_Day_Grey,
-	MT_Normal_Day_Mobile,
-	MT_Normal_Day_Grey_Mobile,
-	MT_Normal_Day_Transit_Mobile,
-	MT_Normal_Night_Transit_Mobile,
-	MT_Normal_Night_Mobile,
-	MT_Normal_Night_Grey_Mobile,
-	MT_Reduced_Day,
-	MT_Reduced_Night,
-	MT_Hybrid_Day_Transit,
-	MT_Hybrid_Grey_Day,
-	MT_Hybrid_Traffic_Day,
-	MT_Hybrid_Day_Mobile,
-	MT_Terrain_Day_Mobile,
+        MT_Normal_Day_Grey,
+        MT_Normal_Day_Transit,
+        MT_Normal_Night_Transit,
+        MT_Normal_Traffic_Day,
+        MT_Normal_Traffic_Night,
+        MT_Normal_Day_Custom,
+        MT_Normal_Night,
+        MT_Normal_Night_Grey,
+        MT_Pedestrian_Day,
+        MT_Pedestrian_Day_Mobile,
+        MT_Pedestrian_Night,
+        MT_Pedestrian_Night_Mobile,
+        MT_Carnav_Day_Grey,
+        MT_Normal_Day_Mobile,
+        MT_Normal_Day_Grey_Mobile,
+        MT_Normal_Day_Transit_Mobile,
+        MT_Normal_Night_Transit_Mobile,
+        MT_Normal_Night_Mobile,
+        MT_Normal_Night_Grey_Mobile,
+        MT_Reduced_Day,
+        MT_Reduced_Night,
+        MT_Hybrid_Day_Transit,
+        MT_Hybrid_Grey_Day,
+        MT_Hybrid_Traffic_Day,
+        MT_Hybrid_Day_Mobile,
+        MT_Terrain_Day_Mobile,
 #endif
         MT_Last_Entry_Undefined         ///< Indicates that the map type is not
                                         ///  defined. 
@@ -216,6 +216,13 @@ public:
      * markers. 
      */
     void InvalidateMapObjects();
+
+#ifdef TIZEN_SUPPORT_OPTIMIZATION_OF_REDRAWING
+    /**
+     * This method invalidates (discards) all the map markers. 
+     */
+    void InvalidateMapMarkers();
+#endif
 
     /**
      * This method invalidates (clears) the cache.
@@ -428,6 +435,51 @@ public:
      * @param __glapi A pointer to a structure of the Evas GL API object. 
      */
     void SetEvasGlApi(Evas_GL_API *__glapi);
+
+    /**
+     * This typedef defines a function object as a type. The function object can
+     * be called when the map has been ready after initialized. A function object of
+     * this type returns <code>void</code> and receives no arguments.
+     */
+    typedef void(*ReadyMapSignalFunctor)(void);
+
+    /**
+     * This method sets a callback to be invoked when the map has
+     * been ready after initialization.
+     * 
+     * @param slot A function object to be called when the map has
+     *        been ready after initialization.
+     */
+    void SetReadyMapSignal(ReadyMapSignalFunctor callback);
+
+    /**
+     * This method sets the angle of the map.
+     *
+     * @param angle The angle of the map [-360~360].
+     */
+    void SetAngle(double angle);
+
+    /**
+     * This method retrieves the angle of the map.
+     *
+     * @return A value indicating the angle of the map.
+     */
+    double GetAngle();
+
+    /**
+     * This method sets a Boolean value indicating if the scale bar is enabled or not.
+     *
+     * @param enable <code>true</code> if the given status is enabled,
+     *        otherwise <code>false</code>.
+     */
+    void SetScalebar(bool enable);
+
+    /**
+     * This method retrieves a Boolean value indicating if the scale bar is enabled or not.
+     *
+     * @return <code>true</code> if the scale bar is enabled, otherwise <code>false</code>.
+     */
+    bool GetScalebar() const;
 #endif
 
 #ifdef TIZEN_SUPPORT_TILE_FILE_CACHE
@@ -449,9 +501,10 @@ private:
     int GetDisplayDPI() const;
     void ClearMarkers();
     void SetRootPixmap(DrawableBitmapPtr rootPixmap);
-    #ifdef TIZEN_MIGRATION
+#ifdef TIZEN_MIGRATION
     void ExtendLimitOfCachedTiles();
-    #endif
+    bool DrawScalebar(UInt uWidth, UInt uHeight, UInt aMapX = 0, UInt aMapY = 0);
+#endif
 
 private:
     friend class GeoMapObject;

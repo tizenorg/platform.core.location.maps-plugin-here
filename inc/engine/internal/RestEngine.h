@@ -135,10 +135,6 @@ public:
 
 #ifdef TIZEN_MIGRATION
     void FireImpl(void* pArgs);
-#ifdef TIZEN_MIGRATION_RESTENGINE_FIREIMPL_THREAD
-    static void *FireImplThreadFunc(void *pArgs);
-    static void FireImplThreadCleanUp(void *pArgs);
-#endif
 #endif
 
 private:
