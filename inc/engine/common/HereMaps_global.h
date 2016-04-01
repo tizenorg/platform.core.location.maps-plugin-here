@@ -29,6 +29,7 @@
 #define TIZEN_SUPPORT_TILE_FILE_CACHE
 #define TIZEN_SUPPORT_POST_METHOD
 #define TIZEN_SUPPORT_CRYPTO_LOCK			/* mutex locking system for SSL */
+#define TIZEN_SUPPORT_OPTIMIZATION_OF_REDRAWING
 
 /* configuration */
 #define TIZEN_CFG_CURL_TIMEOUT		20	/* seconds */
@@ -82,7 +83,6 @@ typedef unsigned char byte;
 #define HERE_MAPS_LOG_DBG_INFO(fmt,args...)  LOGD(fmt, ##args);
 #define HERE_MAPS_LOG_ERROR(fmt,args...)     LOGE(fmt, ##args);
 #define HERE_MAPS_LOG_WARNING(fmt,args...)   LOGW(fmt, ##args);
-#define HERE_MAPS_SECLOG(fmt,args...)  SECURE_LOGD(fmt, ##args)
 
 #define HERE_MAPS_RETURN_RESULT(cond,ret,fmt,args...)\
         if (!cond) {\
