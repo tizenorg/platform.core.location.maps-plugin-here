@@ -108,6 +108,7 @@ EXPORT_API int maps_plugin_is_service_supported(maps_service_e service, bool *su
 		case MAPS_SERVICE_CANCEL_REQUEST:
 		case MAPS_SERVICE_MULTI_REVERSE_GEOCODE:
 		case MAPS_SERVICE_SEARCH_PLACE_LIST:
+		case MAPS_SERVICE_SEARCH_GET_PLACE_DETAILS:
 			*supported = TRUE;
 			return MAPS_ERROR_NONE;
 		default:
