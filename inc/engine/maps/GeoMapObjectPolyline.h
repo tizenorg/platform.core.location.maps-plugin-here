@@ -25,6 +25,7 @@
 
 #ifdef TIZEN_MIGRATION
 #include "graphic/Color.h"
+#include "graphic/Canvas.h"
 #else
 namespace Tizen { namespace Graphics { class Color; } }
 #endif
@@ -159,6 +160,41 @@ public:
      *        stroke thickness has changed.
      */
     void SetStrokeThicknessChangedNotifier(StrokeThicknessChangedFunctor strokeThicknessChanged);
+
+#ifdef TIZEN_CUSTOMIZATION
+    /**
+     * This method retrieves a value indicating the polyline stroke type in
+     * pixels.
+     * 
+     * @return A value indicating the stroke thickness in pixels.
+     */
+    Tizen::Maps::Canvas::LineStyleType GetStrokeType() const;
+    
+    /**
+     * This method sets a value indicating the polyline stroke type in
+     * pixels.
+     * 
+     * @strokeThickness A value indicating the stroke thickness in pixels.
+     */
+    void SetStrokeType(Tizen::Maps::Canvas::LineStyleType type);
+
+    /**
+     * This typedef defines a function object as a type. The function object can
+     * be called when the polyline stroke type has changed. A function
+     * object of this type returns <code>void</code> and receives a constant
+     * reference to a <code>GeoMapObject</code> as an argument.
+     */
+    typedef std::tr1::function<void (const GeoMapObject&)> StrokeTypeChangedFunctor;
+
+    /**
+     * This method sets a callback to be invoked when the polyline stroke
+     * type has changed.
+     * 
+     * @param strokeTypeChanged A function object to be called when the polyline
+     *        stroke type has changed.
+     */
+    void SetStrokeTypeChangedNotifier(StrokeTypeChangedFunctor strokeTypeChanged);
+#endif
 
     /**
      * This method retrieves the bounding box of the polyline.
