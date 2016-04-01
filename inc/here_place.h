@@ -73,7 +73,7 @@ public:
 	here_error_e PrepareDiscoveryPreference(maps_preference_h hPref);
 	here_error_e PrepareDiscoveryFilter(maps_place_filter_h hFilter);
 
-	here_error_e StartDiscoveryPlace(maps_coordinates_h hCoord, int nDistance);
+	here_error_e StartDiscoveryPlace(maps_coordinates_h hCoord, const int nDistance);
 	here_error_e StartDiscoveryPlace(maps_area_h hArea, const char *szAddr = "");
 	here_error_e StartDiscoveryPlaceList(maps_area_h hArea);
 

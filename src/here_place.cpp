@@ -184,8 +184,9 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_coordinates_h hCoord, int nDist
 	if (!hCoord || nDistance < 0)
 		return HERE_ERROR_INVALID_PARAMETER;
 
+	int meters = (int)(HereUtils::ConvertDistance(nDistance, m_eDistanceUnit, MAPS_DISTANCE_UNIT_M) + 0.5);
 	maps_area_h area = NULL;
-	maps_area_create_circle(hCoord, nDistance, &area);
+	maps_area_create_circle(hCoord, meters, &area);
 	here_error_e error = StartDiscoveryPlace(area);
 	maps_area_destroy(area);
 	return error;
@@ -480,7 +481,8 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 			}
 
 			/* distance */
-			maps_place_set_distance(mapsPlace, HereUtils::ConvertDistance((int)herePlaceIt->GetDistance(), m_eDistanceUnit));
+			maps_place_set_distance(mapsPlace,
+				HereUtils::ConvertDistance((int)herePlaceIt->GetDistance(), m_eDistanceUnit) + 0.5);
 
 			/* sponser */
 			/* herePlaceList.GetIsSponsored() */
@@ -1249,7 +1251,7 @@ void HerePlace::ProcessPlaceRated(PlaceDetails herePlace, maps_place_h mapsPlace
 void HerePlace::__flushReplies(int error)
 {
 	maps_place_h mapsPlace;
-	maps_item_list_h place_list;
+	maps_item_list_h placeList = NULL;
 
 	m_nReplyIdx = 0;
 	__sortList(m_PlaceList);
@@ -1269,9 +1271,13 @@ void HerePlace::__flushReplies(int error)
 	}
 	else if (m_bReplyWithList)
 	{
-		int error = maps_place_list_create(&place_list);
+		if (error == MAPS_ERROR_NONE)
+			error = maps_place_list_create(&placeList);
+
 		if (error != MAPS_ERROR_NONE)
 		{
+			if (placeList)
+				maps_place_list_destroy(placeList);
 			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, 0, NULL, m_pUserData);
 			return;
 		}
@@ -1281,13 +1287,22 @@ void HerePlace::__flushReplies(int error)
 			mapsPlace = m_PlaceList.front();
 			m_PlaceList.pop_front();
 
-			maps_item_list_append(place_list, mapsPlace, maps_place_clone);
+			maps_item_list_append(placeList, mapsPlace, maps_place_clone);
 		}
 
-		((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, maps_item_list_items(place_list), place_list, m_pUserData);
+		if (!m_bCanceled)
+			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, maps_item_list_items(placeList), placeList, m_pUserData);
+		else
+			maps_place_list_destroy(placeList);
 	}
 	else
 	{
+		if (error != MAPS_ERROR_NONE)
+		{
+			((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, 0, 0, NULL, m_pUserData);
+			return;
+		}
+
 		while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty())
 		{
 			mapsPlace = m_PlaceList.front();

@@ -82,45 +82,45 @@ public:
                 unsigned int width,
                 unsigned int height);
 
-    /** 
+    /**
      * This method renders a square, using the rectangle and texture specified
-     * by the caller. 
-     * 
+     * by the caller.
+     *
      * @param aRect A constant reference to the rectangle to render.
-     * 
+     *
      * @param rTexture A constant reference to the texture object to apply.
-     * 
+     *
      * @param sx0 A value providing the x coordinate of the top left corner of
-     *        the rectangle in the tile grid. 
-     * 
+     *        the rectangle in the tile grid.
+     *
      * @param sy0 A value providing the y coordinate of the top left corner of
      *        the rectangle in the tile grid.
-     * 
+     *
      * @param sx1 A value providing the x coordinate of the bottom right corner of
      *        the rectangle in the tile grid.
-     * 
+     *
      * @param sy1 A value providing the y coordinate of the bottom right corner of
      *        the rectangle in the tile grid.
      */
     bool RenderQuad(const Tizen::Maps::FloatRectangle& aRect, const GlTexture& rTexture, float sx0=0.f, float sy0=1.f, float sx1=1.f, float sy1=0.f);
 
-    /** 
+    /**
      * This method renders a square, using the rectangle and texture specified
-     * by the caller. 
-     * 
+     * by the caller.
+     *
      * @param aRect A constant reference to the rectangle to render.
-     * 
+     *
      * @param uTexture A value of the id of the texture object to apply.
-     * 
+     *
      * @param sx0 A value providing the x coordinate of the top left corner of
-     *        the rectangle in the tile grid. 
-     * 
+     *        the rectangle in the tile grid.
+     *
      * @param sy0 A value providing the y coordinate of the top left corner of
      *        the rectangle in the tile grid.
-     * 
+     *
      * @param sx1 A value providing the x coordinate of the bottom right corner of
      *        the rectangle in the tile grid.
-     * 
+     *
      * @param sy1 A value providing the y coordinate of the bottom right corner of
      *        the rectangle in the tile grid.
      */

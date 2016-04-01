@@ -7,7 +7,20 @@ SET(PREFIX ${CMAKE_INSTALL_PREFIX})
 SET(LIBDIR ${LIBDIR})
 
 # Dependencies
-SET(dependents "glib-2.0 gmodule-2.0 libxml-2.0 dlog capi-network-connection capi-appfw-app-manager capi-maps-service capi-appfw-application vconf")
+SET(dependents 
+	glib-2.0
+	gmodule-2.0
+	libxml-2.0
+	dlog
+	capi-maps-service
+	capi-network-connection
+	capi-appfw-app-manager
+	capi-appfw-application
+	evas
+	ecore-evas
+	elementary
+	vconf
+	)
 
 INCLUDE(FindPkgConfig)
 pkg_check_modules(pkgs REQUIRED ${dependents})
