@@ -96,7 +96,11 @@ private:
 
 	bool __getCachePath(char *path, int size);
 
-	bool __getFilePath(int hash, char *path, int size);
+	bool __getFilePath(const int hash, char *path, int size);
+
+	bool __getFilePath(const char *fname, char *path, int size);
+
+	int __parseHash(const char *fname);
 
 	static gboolean __fireTimer(gpointer data);
 

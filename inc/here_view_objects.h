@@ -26,6 +26,7 @@
 //maps-service header
 #include <maps_service.h>
 #include <map_view.h>
+#include <map_object_plugin.h>
 
 //map engine header
 #include <maps/GeoTiledMap.h>
@@ -75,6 +76,12 @@ private:
 	static bool __foreachForRemovingGroupObjects(int index, int total, map_object_h object, void *user_data);
 	static bool __foreachForUpdatingGroupObjects(int index, int total, map_object_h object, void *user_data);
 	static bool __foreachForSettingVisibleGroupObjects(int index, int total, map_object_h object, void *user_data);
+
+	bool __resizeMarker(map_object_h hMarker, const int originWidth, const int originHeight,
+						int *newWidth, int *newHeight, unsigned char **buffer);
+	bool __resizeBitmap(unsigned char **curBmp, int curWidth, int curHeight, int newWidth, int newHeight);
+
+	void __invalidate(map_object_h hObj = NULL);
 
 	VisualObjects __currentObjects;
 	GeoTiledMap *__map;

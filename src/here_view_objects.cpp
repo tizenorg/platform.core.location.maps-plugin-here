@@ -52,6 +52,7 @@ here_error_e HereViewObjects::add(map_object_h hObj)
 	if (__currentObjects.find(hObj) == __currentObjects.end())
 		error = __add(hObj);
 
+	if (error == HERE_ERROR_NONE) __invalidate(hObj);
 	return error;
 }
 
@@ -62,17 +63,11 @@ here_error_e HereViewObjects::__add(map_object_h hObj)
 
 	here_error_e error = HERE_ERROR_NONE;
 	GeoMapObject *hereObject = NULL;
-	map_object_type_e type = MAP_OBJECT_UNKNOWN;
+	map_object_type_e type;
 	map_object_get_type(hObj, &type);
 
 	switch(type)
 	{
-	case MAP_OBJECT_GROUP:
-	{
-		int err = map_object_group_foreach_object(hObj, __foreachForAddingGroupObjects, this);
-		error = (here_error_e)ConvertToHereError(err);
-		break;
-	}
 	case MAP_OBJECT_MARKER:
 		hereObject = new (std::nothrow) GeoMapObjectMarker;
 		error = __updateMarker(hObj, (GeoMapObjectMarker*)hereObject);
@@ -143,22 +138,8 @@ here_error_e HereViewObjects::__add(map_object_h hObj)
 
 here_error_e HereViewObjects::remove(map_object_h hObj)
 {
-	if (!hObj) return HERE_ERROR_INVALID_PARAMETER;
-
-	here_error_e error = HERE_ERROR_NOT_FOUND;
-	map_object_type_e type = MAP_OBJECT_UNKNOWN;
-	map_object_get_type(hObj, &type);
-
-	if (type == MAP_OBJECT_GROUP)
-	{
-		int err = map_object_group_foreach_object(hObj, __foreachForRemovingGroupObjects, this);
-		error = (here_error_e)ConvertToHereError(err);
-	}
-	else
-	{
-		error = __remove(hObj);
-	}
-
+	here_error_e error = __remove(hObj);
+	if (error == HERE_ERROR_NONE) __invalidate(hObj);
 	return error;
 }
 
@@ -178,6 +159,7 @@ here_error_e HereViewObjects::__remove(map_object_h hObj)
 		error = HERE_ERROR_NONE;
  	}
 	pthread_mutex_unlock(&__mutex);
+
 	return error;
 }
 
@@ -187,6 +169,8 @@ here_error_e HereViewObjects::removeAll()
 	__currentObjects.clear();
 	__map->ClearMapObjects();
 	pthread_mutex_unlock(&__mutex);
+	__invalidate();
+
 	return HERE_ERROR_NONE;
 }
 
@@ -208,10 +192,12 @@ here_error_e HereViewObjects::update(map_object_h hObj)
 	if (!hObj) return HERE_ERROR_INVALID_PARAMETER;
 
 	here_error_e error = HERE_ERROR_NOT_FOUND;
+
 	VisualObjects::iterator it = __currentObjects.find(hObj);
 	if (it != __currentObjects.end())
 		error = __update(hObj, (GeoMapObject*)(it->second));
 
+	if (error == HERE_ERROR_NONE) __invalidate(hObj);
 	return error;
 }
 
@@ -222,17 +208,11 @@ here_error_e HereViewObjects::__update(map_object_h hObj, GeoMapObject *hereObje
 	here_error_e error = HERE_ERROR_UNKNOWN;
 
 	do {
-		map_object_type_e type = MAP_OBJECT_UNKNOWN;
+		map_object_type_e type;
 		map_object_get_type(hObj, &type);
 
 		switch(type)
 		{
-		case MAP_OBJECT_GROUP:
-		{
-			int err = map_object_group_foreach_object(hObj, __foreachForUpdatingGroupObjects, this);
-			error = (here_error_e)ConvertToHereError(err);
-			break;
-		}
 		case MAP_OBJECT_MARKER:
 			error = __updateMarker(hObj, (GeoMapObjectMarker*)hereObject);
 			break;
@@ -280,7 +260,7 @@ here_error_e HereViewObjects::__updateMarker(map_object_h hMarker, GeoMapObjectM
 	do {
  		/* image */
 		error = map_object_marker_get_type(hMarker, &type);
-		if (error != MAPS_ERROR_NONE || type >= MAP_MARKER_NONE) break;
+		if (error != MAPS_ERROR_NONE || type < MAP_MARKER_PIN || type > MAP_MARKER_STICKER) break;
 
 		error = map_object_marker_get_image_file(hMarker, &szPath);
 		if (error != MAPS_ERROR_NONE || !szPath) break;
@@ -315,6 +295,17 @@ here_error_e HereViewObjects::__updateMarker(map_object_h hMarker, GeoMapObjectM
 		}
 		memcpy(dst, src, nSize);
 
+		/* resize the marker image */
+		int nw = 0, nh = 0;
+		if (__resizeMarker(hMarker, w, h, &nw, &nh, &dst))
+		{
+			w = nw;
+			h = nh;
+			nSize = w * h * 4;
+			map_object_marker_set_size(hMarker, w, h);
+		}
+
+		/* convert RGBA to BGRA for GL */
 		_Util::ConvertRGBA2BGRA(dst, (unsigned)w, (unsigned)h);
 
 		Bitmap bmp;
@@ -337,10 +328,14 @@ here_error_e HereViewObjects::__updateMarker(map_object_h hMarker, GeoMapObjectM
 
 		hereMarker->SetPosition(GeoCoordinates(lat, lng));
 
-
 		/* origin */
 		Tizen::Maps::FloatPoint fpntOrigin(0.5, 1);
 		hereMarker->SetMarkerOrigin(fpntOrigin);
+
+		/* z-order */
+		int z_order = 0;
+		map_object_marker_get_z_order(hMarker, &z_order);
+		hereMarker->SetZorder(z_order);
 	} while(0);
 
 	if (img) evas_object_del(img);
@@ -459,27 +454,18 @@ here_error_e HereViewObjects::__setVisible(map_object_h hObj, bool bVisible)
 	if (!hObj) return HERE_ERROR_INVALID_PARAMETER;
 
 	here_error_e error = HERE_ERROR_NOT_FOUND;
-	map_object_type_e type = MAP_OBJECT_UNKNOWN;
-	map_object_get_type(hObj, &type);
 
-	if (type == MAP_OBJECT_GROUP)
+	VisualObjects::iterator it;
+	for (it = __currentObjects.begin(); it != __currentObjects.end(); it++)
 	{
-		int err = map_object_group_foreach_object(hObj, __foreachForSettingVisibleGroupObjects, this);
-		error = (here_error_e)ConvertToHereError(err);
-	}
-	else
-	{
-		VisualObjects::iterator it;
-		for (it = __currentObjects.begin(); it != __currentObjects.end(); it++)
+		if (it->first == hObj)
 		{
-			if (it->first == hObj)
-			{
-		 		((GeoMapObject*)it->second)->SetVisible(bVisible);
-				error = HERE_ERROR_NONE;
-			}
-	 	}
+	 		((GeoMapObject*)it->second)->SetVisible(bVisible);
+			error = HERE_ERROR_NONE;
+		}
 	}
 
+	if (error == HERE_ERROR_NONE) __invalidate(hObj);
 	return error;
 }
 
@@ -490,10 +476,8 @@ bool HereViewObjects::__foreachForCoordinates(int index, maps_coordinates_h poin
 
 	if (!HereUtils::IsValid(*(maps_coordinates_s*)point))
 	{
-		maps_coordinates_destroy(point);
 		return false;
 	}
-
 
 	int error;
 	double lat = 0.0, lng = 0.0;
@@ -505,9 +489,6 @@ bool HereViewObjects::__foreachForCoordinates(int index, maps_coordinates_h poin
 		error = maps_coordinates_get_longitude(point, &lng);
 		if (error != MAPS_ERROR_NONE) break;
 	} while(0);
-
-	maps_coordinates_destroy(point);
-	if (error != MAPS_ERROR_NONE) return false;
 
 	MAPS_LOGD("[%d] %f,%f", index+1, lat, lng);
 
@@ -550,6 +531,67 @@ bool HereViewObjects::__foreachForSettingVisibleGroupObjects(int index, int tota
 	HereViewObjects *hereViewObjects = (HereViewObjects*)user_data;
 	here_error_e error = hereViewObjects->setVisible(object);
 	return (error == HERE_ERROR_NONE);
+}
+
+bool HereViewObjects::__resizeMarker(map_object_h hMarker,
+					const int originWidth, const int originHeight,
+					int *newWidth, int *newHeight, unsigned char **bitmap)
+{
+	if (!hMarker || !newWidth || !newHeight || !bitmap || !*bitmap)
+		return false;
+
+	int resizedWidth = 0, resizedHeight = 0;
+	map_object_marker_get_size(hMarker, &resizedWidth, &resizedHeight);
+
+	if (__resizeBitmap(bitmap, originWidth, originHeight, resizedWidth, resizedHeight))
+	{
+		*newWidth = resizedWidth;
+		*newHeight = resizedHeight;
+		return true;
+	}
+	return false;
+}
+
+bool HereViewObjects::__resizeBitmap(unsigned char **curBmp, int curWidth, int curHeight, int newWidth, int newHeight)
+{
+	if (!curBmp || curWidth <= 0 || curHeight <= 0 || newWidth <= 0 || newHeight <= 0) return false;
+	if (curWidth == newWidth && curHeight == newHeight) return false;
+
+	unsigned char* newBmp = new unsigned char[newWidth * newHeight * 4];
+
+	double scaleWidth =  (double)newWidth / (double)curWidth;
+	double scaleHeight = (double)newHeight / (double)curHeight;
+
+	int newPixel, curPixel;
+
+	for(int y = 0; y < newHeight; y++)
+	{
+	    for(int x = 0; x < newWidth; x++)
+	    {
+	        newPixel = (y * (newWidth *4)) + (x * 4);
+	        curPixel = (((int)(y / scaleHeight) * (curWidth * 4)) + ((int)(x / scaleWidth) * 4));
+
+	        newBmp[newPixel    ] =  (*curBmp)[curPixel    ];
+	        newBmp[newPixel + 1] =  (*curBmp)[curPixel + 1];
+	        newBmp[newPixel + 2] =  (*curBmp)[curPixel + 2];
+	        newBmp[newPixel + 3] =  (*curBmp)[curPixel + 3];
+	    }
+	}
+
+	delete [] *curBmp;
+	*curBmp = newBmp;
+	return true;
+}
+
+void HereViewObjects::__invalidate(map_object_h hObj)
+{
+	map_object_type_e type;
+	map_object_get_type(hObj, &type);
+
+	if (!hObj || type != MAP_OBJECT_MARKER)
+		__map->InvalidateMapObjects();
+	else
+		__map->InvalidateMapMarkers();
 }
 
 HERE_PLUGIN_END_NAMESPACE

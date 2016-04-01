@@ -32,6 +32,7 @@ extern "C" {
 #include <dlog.h>
 #include <glib.h>
 #include <vconf.h>
+#include <vconf-internal-location-keys.h>
 #ifndef Eina_Bool
 #include <stdbool.h>
 #endif

@@ -41,7 +41,7 @@ here_error_e HereMultiRevGeocode::PrepareQuery()
 	if (m_pQuery)
 		return HERE_ERROR_PERMISSION_DENIED;
 
-	m_pQuery = new MultiReverseQuery();
+	m_pQuery = new (std::nothrow) MultiReverseQuery();
 
 	if (!m_pQuery)
 		return HERE_ERROR_OUT_OF_MEMORY;
