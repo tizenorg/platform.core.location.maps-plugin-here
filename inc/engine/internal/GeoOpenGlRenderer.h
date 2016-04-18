@@ -25,6 +25,7 @@
 #ifdef TIZEN_MIGRATION
 #include "graphic/FloatRectangle.h"
 #include "graphic/Color.h"
+#include "internal/DoublePoint3.h"
 #else
 #include <FGraphics.h>
 #endif
@@ -81,6 +82,30 @@ public:
     bool Render(const std::vector<GeoProjectionNode*>& nodes,
                 unsigned int width,
                 unsigned int height);
+
+#ifdef TIZEN_MIGRATION
+    /**
+     * This method renders a square, using the rectangle and texture specified
+     * by the caller.
+     *
+     * @param aRect A constant reference to the double points to render.
+     *
+     * @param uTexture A value of the id of the texture object to apply.
+     *
+     * @param sx0 A value providing the x coordinate of the top left corner of
+     *        the rectangle in the tile grid.
+     *
+     * @param sy0 A value providing the y coordinate of the top left corner of
+     *        the rectangle in the tile grid.
+     *
+     * @param sx1 A value providing the x coordinate of the bottom right corner of
+     *        the rectangle in the tile grid.
+     *
+     * @param sy1 A value providing the y coordinate of the bottom right corner of
+     *        the rectangle in the tile grid.
+     */
+    bool RenderQuad(const std::vector<DoublePoint3>& aRect, unsigned int uTextureId,  float sx0=0.f, float sy0=1.f, float sx1=1.f, float sy1=0.f);
+#endif
 
     /**
      * This method renders a square, using the rectangle and texture specified

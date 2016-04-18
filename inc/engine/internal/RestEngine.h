@@ -209,6 +209,9 @@ private:
     //classes allowed to access this internal instance
     friend class RestItem;
     friend class QueryListener;
+#ifdef TIZEN_SUPPORT_TILE_FILE_CACHE
+    friend class TileFetcherQuery;
+#endif
 
     //members
     class RestEngineImpl;

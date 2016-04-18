@@ -153,6 +153,22 @@ public:
      */
     virtual bool IsValid() const;
 
+#ifdef TIZEN_MIGRATION
+    /**
+     * This method retrieves the marker z-order.
+     *
+     * @return A value indicating z-order to the bitmap.
+     */
+    int GetZorder() const;
+
+    /**
+     * This method sets the marker z-order.
+     *
+     * @param nZorder A constant value of z-order.
+     */
+    void SetZorder(int nZorder);
+#endif
+
 private:
     HERE_MAPS_NO_COPY_NO_ASSIGN(GeoMapObjectMarker);
 

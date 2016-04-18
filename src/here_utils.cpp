@@ -224,6 +224,27 @@ Maneuver::InstructionDirection HereUtils::Convert(maps_route_turn_type_e nVal)
 	return Maneuver::ID_NoDirection;
 }
 
+GeoTiledMap::MapType HereUtils::Convert(maps_view_type_e nMapType, bool bBuildings, bool bTraffic, bool bPublicTransit)
+{
+	switch (nMapType)
+	{
+		case MAPS_VIEW_TYPE_NORMAL:
+			if (bPublicTransit)	return GeoTiledMap::MT_Normal_Day_Transit;
+			if (bTraffic)		return GeoTiledMap::MT_Normal_Traffic_Day;
+			return GeoTiledMap::MT_Normal_Day;
+		case MAPS_VIEW_TYPE_SATELLITE:
+			return GeoTiledMap::MT_Satellite_Day;
+		case MAPS_VIEW_TYPE_TERRAIN:
+			return GeoTiledMap::MT_Terrain_Day;
+		case MAPS_VIEW_TYPE_HYBRID:
+			if (bPublicTransit)	return GeoTiledMap::MT_Hybrid_Day_Transit;
+			if (bTraffic)		return GeoTiledMap::MT_Hybrid_Traffic_Day;
+			return GeoTiledMap::MT_Hybrid_Day;
+		default: break;
+	}
+	return GeoTiledMap::MT_Normal_Day;
+}
+
 maps_error_e HereUtils::ConvertHttpCodeToMapsError(int nVal)
 {
 	switch (nVal)
