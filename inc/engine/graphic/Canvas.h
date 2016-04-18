@@ -30,6 +30,12 @@ TIZEN_MAPS_BEGIN_NAMESPACE
 class Canvas : public Object
 {
 public:
+	typedef enum
+	{
+		LINESTYLE_SOLID,
+		LINESTYLE_DOTTED,
+		LINESTYLE_MAX,
+	} LineStyleType;
 
 	typedef std::vector<FloatPoint*> tPoint;
 	Canvas(void);
@@ -38,12 +44,14 @@ public:
 	result FillPolygon(const Color& color, const tPoint& points);
 	result DrawPolyline(const tPoint& points);
 	result SetLineWidth(int width);
+	result SetLineStyle(LineStyleType lineStyle);
 	void SetForegroundColor(const Color& fgColor);
 protected:
 	void* _pNativeGfxEngine;
 private:
 	unsigned long __ComposeColor(unsigned long color32, int opacity);
 	void __SetColor(cairo_t* pCairo, unsigned long composedColor);
+	void __SetLineStyle(cairo_t* pCairo, LineStyleType lineStyle);
 
 	unsigned long* __pBuffer;
 	unsigned long __fgColor;
@@ -51,6 +59,7 @@ private:
 	cairo_operator_t __cairo_operator;
 	Color __fgColorNative;
 	int __fgOpacity;
+	LineStyleType __lineStyle;
 };
 
 TIZEN_MAPS_END_NAMESPACE

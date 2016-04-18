@@ -89,6 +89,9 @@ protected:
     Tizen::Maps::Dimension& GetScreenSize();
     GeoCoordinates& GetGeoCenter();
     double& GetLevel();
+#ifdef TIZEN_MIGRATION
+public:
+#endif
     double& GetHeading();
 
 private:

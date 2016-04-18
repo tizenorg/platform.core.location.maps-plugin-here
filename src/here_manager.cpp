@@ -25,7 +25,9 @@
 #include "here_place.h"
 #include "here_route.h"
 #include "here_utils.h"
+#include "here_view.h"
 #include "heremaps-uc-dbus.h"
+
 #include <common/HereConfig.h>
 #include <app.h>
 #include <iostream>
@@ -138,6 +140,10 @@ void* HereManager::CreateInstance(HereSvcType nHereSvc, void* pCbFunc,
 
 	case HERE_SVC_MULTI_REV_GEOCODE:
 		pHere = (HereBase*)new (std::nothrow) HereMultiRevGeocode(pCbFunc, pUserData, reqId);
+		break;
+
+	case HERE_SVC_VIEW:
+		pHere = (HereBase*)new (std::nothrow) HereView(pCbFunc, pUserData, reqId);
 		break;
 
 	default:

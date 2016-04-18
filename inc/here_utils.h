@@ -30,6 +30,7 @@
 #include <maps_preference.h>
 #include <maps_route_maneuver.h>
 #include <maps_service.h>
+#include <maps_view.h>
 
 //plug-in header
 #include "here_types.h"
@@ -42,6 +43,7 @@
 #include <common/GeoCoordinates.h>
 #include <common/GeoBoundingBox.h>
 #include <common/GeoBoundingCircle.h>
+#include <maps/GeoTiledMap.h>
 
 #define HERE_PLUGIN_BEGIN_NAMESPACE  namespace Here { namespace PlugIn {
 #define HERE_PLUGIN_END_NAMESPACE    }}
@@ -127,6 +129,7 @@ public:
 	static GeoRouteQuery::FeatureType Convert(maps_route_feature_e nVal);
 	static GeoRouteQuery::FeatureWeight Convert(maps_route_feature_weight_e nVal);
 	static Maneuver::InstructionDirection Convert(maps_route_turn_type_e nVal);
+	static GeoTiledMap::MapType Convert(maps_view_type_e nMapType, bool bBuildings, bool bTraffic, bool bPublicTransit);
 	static maps_route_turn_type_e Convert(Maneuver::InstructionDirection nVal);
 	static GeoBoundingBox& Convert(maps_area_h hArea, GeoBoundingBox& Box);
 	static maps_area_h& Convert(GeoBoundingBox Box, maps_area_h& hArea);

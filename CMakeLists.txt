@@ -75,6 +75,8 @@ SET(SRCS
 	src/here_multirevgeocode.cpp
 	src/here_route.cpp
 	src/here_utils.cpp
+	src/here_view.cpp
+	src/here_view_objects.cpp
 
 	# UC-DBus
 	src/heremaps-uc-dbus.c

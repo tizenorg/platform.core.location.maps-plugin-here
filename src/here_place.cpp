@@ -1316,6 +1316,7 @@ void HerePlace::__flushReplies(int error)
 			}
 		}
 	}
+	m_bReplyFlushed = true;
 }
 
 bool HerePlace::__compareWithTitle(const maps_place_h &item1, const maps_place_h &item2)
