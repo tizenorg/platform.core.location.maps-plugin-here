@@ -510,7 +510,7 @@ here_error_e HereManager::CheckAgreement()
 	char *strAppId = NULL;
 	here_error_e error = HERE_ERROR_NONE;
 
-	ret = vconf_get_int(VCONFKEY_LOCATION_HEREMAPS_CONSENT, &enabled);
+	ret = vconf_get_bool(VCONFKEY_LOCATION_HEREMAPS_CONSENT, &enabled);
 	MAPS_LOGD("VCONFKEY_LOCATION_HEREMAPS_CONSENT is %d", enabled);
 	if (ret != 0 || enabled == 0) {
 		error = HERE_ERROR_SERVICE_NOT_AVAILABLE;

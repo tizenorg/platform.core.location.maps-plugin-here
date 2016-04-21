@@ -65,7 +65,7 @@ static void read_vconf(heremaps_uc_app_data *ad)
 	int enabled = 0;
 	int ret = 0;
 
-	ret = vconf_get_int(VCONFKEY_LOCATION_HEREMAPS_CONSENT, &enabled);
+	ret = vconf_get_bool(VCONFKEY_LOCATION_HEREMAPS_CONSENT, &enabled);
 	if (ret != 0)
 		LS_LOGE("Fail to get vconf value");
 
@@ -86,11 +86,11 @@ static void save_vconf(int value, heremaps_uc_app_data *ad)
 	int enabled = 0;
 	int ret = 0;
 
-	ret = vconf_get_int(VCONFKEY_LOCATION_HEREMAPS_CONSENT, &enabled);
+	ret = vconf_get_bool(VCONFKEY_LOCATION_HEREMAPS_CONSENT, &enabled);
 	if (ret != 0)
 		LS_LOGE("Fail to get vconf value");
 	else if (enabled != value) {
-		ret = vconf_set_int(VCONFKEY_LOCATION_HEREMAPS_CONSENT, value);
+		ret = vconf_set_bool(VCONFKEY_LOCATION_HEREMAPS_CONSENT, value);
 		if (ret != 0)
 			LS_LOGE("Fail to set vconf value");
 	}
