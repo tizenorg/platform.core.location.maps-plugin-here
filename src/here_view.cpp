@@ -459,16 +459,11 @@ here_error_e HereView::DrawMap(Evas* pCanvas, int x, int y, int nWidth, int nHei
 
 	try {
 		for (int i = 0; i < h; i++)
-		{
 			memcpy(dstimg_data+(i*w), srcimg_data+(i*m_pImpl->w+x), w*4);
-		}
-		free(srcimg_data);
 	}
-	catch (std::exception &e)
-	{
+	catch (std::exception &e) {
 		MAPS_LOGD("Exception caught: %s", e.what());
 	}
-
 	g_free(srcimg_data);
 
 	return HERE_ERROR_NONE;
@@ -507,6 +502,11 @@ here_error_e HereView::ScreenToGeolocation(int x, int y, maps_coordinates_h *map
 	double lat = hereCoord.GetLatitude();
 	double lng = hereCoord.GetLongitude();
 
+#if 1
+	int error = maps_coordinates_create(lat, lng, mapsCoord);
+	if (error != MAPS_ERROR_NONE)
+		return (here_error_e)ConvertToHereError(error);
+#else
 	maps_coordinates_h __mapsCoord;
 	int error = maps_coordinates_create(lat, lng, &__mapsCoord);
 	if (error != MAPS_ERROR_NONE)
@@ -523,6 +523,7 @@ here_error_e HereView::ScreenToGeolocation(int x, int y, maps_coordinates_h *map
 		maps_coordinates_clone(__mapsCoord, mapsCoord);
 	}
 	maps_coordinates_destroy(__mapsCoord);
+#endif
 
 	return HERE_ERROR_NONE;
 }
@@ -628,7 +629,6 @@ void HereView::__processViewObject(const maps_view_object_h object, maps_view_ob
 	{
 	case MAPS_VIEW_OBJECT_ADD:			m_pImpl->visualObjects.add(object); break;
 	case MAPS_VIEW_OBJECT_SET_VISIBLE:	m_pImpl->visualObjects.setVisible(object); break;
-	case MAPS_VIEW_OBJECT_MOVE:			m_pImpl->visualObjects.move(object); break;
 	case MAPS_VIEW_OBJECT_CHANGE:			m_pImpl->visualObjects.update(object); break;
 	case MAPS_VIEW_OBJECT_REMOVE:			m_pImpl->visualObjects.remove(object); break;
 	default:			break;

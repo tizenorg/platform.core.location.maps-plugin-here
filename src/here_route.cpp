@@ -193,6 +193,24 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 		}
 	}
 
+	char *szRealtimeTraffic;
+	if (maps_preference_get(hPref, MAPS_ROUTE_REALTIME_TRAFFIC, &szRealtimeTraffic) == MAPS_ERROR_NONE)
+	{
+		if (!strcmp(szRealtimeTraffic, "true") || !strcmp(szRealtimeTraffic, "enabled"))
+		{
+			m_pQuery->SetRealtimeTraffic(1);
+		}
+		else if (!strcmp(szRealtimeTraffic, "false") || !strcmp(szRealtimeTraffic, "disabled"))
+		{
+			m_pQuery->SetRealtimeTraffic(2);
+		}
+		else
+		{
+			m_pQuery->SetRealtimeTraffic(0);
+		}
+		g_free(szRealtimeTraffic);
+	}
+
 	return HERE_ERROR_NONE;
 }
 
@@ -208,7 +226,7 @@ here_error_e HereRoute::StartRoute(void)
 
 void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 {
-	if (m_bCanceled || !m_pCbFunc) // ignore call back if it was cancelled.
+	if (m_bCanceled || !m_pCbFunc || !m_pQuery) // ignore call back if it was cancelled.
 	{
 		delete this;
 		return;
@@ -246,7 +264,11 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 			maps_route_set_distance_unit(mapsRoute, m_eDistanceUnit);
 
 			/* duration */
-			maps_route_set_total_duration(mapsRoute, hereRoute->GetTravelTime());
+			if (m_pQuery->GetRealtimeTraffic() == 1)
+				maps_route_set_total_duration(mapsRoute, hereRoute->GetTrafficTime());
+			else
+				maps_route_set_total_duration(mapsRoute, hereRoute->GetTravelTime());
+
 
 			/* travel mode */
 			maps_route_transport_mode_e eTransportMode;

@@ -357,6 +357,20 @@ public:
      * @return An integer indicating the maximum number of results to be retrieved.
      */
     size_t GetAlternatives(void) const;
+
+    /**
+     * This method sets a value that indicates the realtime traffic status.
+     *
+     * @param uAlternatives An integer indicating the realtime traffic status.
+     */
+    void SetRealtimeTraffic(size_t uTraffic);
+
+    /**
+     * This method retrieves a value that indicates the realtime traffic status.
+     *
+     * @return An integer indicating the realtime traffic status.
+     */
+    size_t GetRealtimeTraffic(void) const;
 #endif
 
     /**

@@ -157,24 +157,42 @@ public:
     
     /**
      * This method retrieves the map zoom level.
-     * 
+     *
      * @return A value indicating the new zoom level.
      */
     double GetZoomLevel() const;
     
     /**
      * This method retrieves the minimum map zoom level.
-     * 
+     *
      * @return A value indicating the minimum map zoom level.
      */
     double GetMinimumZoomLevel() const;
     
+#ifdef TIZEN_CUSTOMIZATION
+    /**
+     * This method sets the minimum map zoom level.
+     *
+     * @return A value indicating the minimum map zoom level.
+     */
+    void SetMinimumZoomLevel(double zoom);
+#endif
+
     /**
      * This method retrieves the maximum map zoom level.
-     * 
+     *
      * @return A value indicating the maximum map zoom level.
      */
     double GetMaximumZoomLevel() const;
+
+#ifdef TIZEN_CUSTOMIZATION
+    /**
+     * This method sets the maximum map zoom level.
+     *
+     * @return A value indicating the maximum map zoom level.
+     */
+    void SetMaximumZoomLevel(double zoom);
+#endif
    
     /**
      * This method pans the map the caller-specified number of pixels

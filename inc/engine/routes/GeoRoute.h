@@ -175,6 +175,26 @@ public:
      */
     int GetTravelTime() const;
 
+#ifdef TIZEN_MIGRATION
+    /**
+     * This method sets a class property that holds the time required to traffic
+     * the length of the route.
+     *
+     * @param aSecs An integer value specifying the time required to traffic the
+     *        length of the route in seconds.
+     */
+    void SetTrafficTime(int aSecs);
+
+    /**
+     * This method retrieves the value of a class property that holds the time
+     * required to traffic the length of the route.
+     *
+     * @return An integer value specifying the time required to traffic the
+     *        length of the route in seconds.
+     */
+    int GetTrafficTime() const;
+#endif
+
     /**
      * This method sets a class property that holds the length of the route --
      * the total distance to travel between the start and end points of the
