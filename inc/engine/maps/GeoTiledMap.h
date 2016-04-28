@@ -532,7 +532,7 @@ private:
     HERE_MAPS_NO_COPY_NO_ASSIGN(GeoTiledMap);
 
     class GeoTiledMapImpl;
-    std::auto_ptr<GeoTiledMapImpl> m_pImpl;
+	GeoTiledMapImpl *m_pImpl;
 };
 
 HERE_MAPS_END_NAMESPACE
