@@ -81,7 +81,9 @@ int HerePluginCancelRequest(int nReqId);
 
 /* Mapping API */
 
-int HerePluginSetMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc);
+int HerePluginCreateMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc);
+
+int HerePluginDestroyMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc);
 
 int HerePluginRenderMap(const maps_coordinates_h mapsCoord, const double dZoom, const double dAngle,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);

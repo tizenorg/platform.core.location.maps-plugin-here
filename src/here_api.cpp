@@ -659,7 +659,32 @@ int HerePluginCancelRequest(int nReqId)
 	return (HereManager::GetHandler()->CancelInstance(nReqId));
 }
 
-int HerePluginSetMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
+int HerePluginCreateMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
+{
+	if (!HereManager::GetHandler())
+		return HERE_ERROR_INVALID_OPERATION;
+
+	/* creating instance */
+	HereView *pView =
+		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
+
+	if(!pView)
+		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
+
+	/* sending request */
+	here_error_e error = HERE_ERROR_NONE;
+
+	if (hView)
+		error = pView->Init(hView, pCbFunc);
+	else
+		error = pView->Close();
+
+	delete pView;
+
+	return error;
+}
+
+int HerePluginDestroyMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
 {
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
