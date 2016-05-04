@@ -81,35 +81,36 @@ int HerePluginCancelRequest(int nReqId);
 
 /* Mapping API */
 
-int HerePluginSetMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc);
+int HerePluginCreateMapView(maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc);
 
-int HerePluginRenderMap(const maps_coordinates_h mapsCoord, const double dZoom, const double dAngle,
+int HerePluginDestroyMapView(maps_view_h hView);
+
+int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, const double dZoom, const double dAngle,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);
 
-int HerePluginRenderMapArea(const maps_area_h hArea, const double dZoom, const double dAngle,
+int HerePluginRenderMapArea(maps_view_h hView, const maps_area_h hArea, const double dZoom, const double dAngle,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);
 
-int HerePluginMoveCenter(const int delta_x, const int delta_y,
+int HerePluginMoveCenter(maps_view_h hView, const int delta_x, const int delta_y,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);
 
-int HerePluginSetScalebar(bool enable);
+int HerePluginSetScalebar(maps_view_h hView, bool enable);
 
-int HerePluginGetScalebar(bool *enabled);
+int HerePluginGetScalebar(maps_view_h hView, bool *enabled);
 
 int HerePluginDrawMap(Evas* pCanvas, const int x, const int y,
 	const int nWidth, const int nHeight);
 
-int HerePluginGetCenter(maps_coordinates_h *center);
+int HerePluginGetCenter(maps_view_h hView, maps_coordinates_h *center);
 
-int HerePluginScreenToGeography(const int x, const int y, maps_coordinates_h *mapsCoord);
+int HerePluginScreenToGeography(maps_view_h hView, const int x, const int y, maps_coordinates_h *mapsCoord);
 
-int HerePluginGeographyToScreen(const maps_coordinates_h mapsCoord, int *x, int *y);
+int HerePluginGeographyToScreen(maps_view_h hView, const maps_coordinates_h mapsCoord, int *x, int *y);
 
-int HerePluginGetMinZoomLevel(int *nMinZoomLevel);
+int HerePluginGetMinZoomLevel(maps_view_h hView, int *nMinZoomLevel);
 
-int HerePluginGetMaxZoomLevel(int *nMaxZoomLevel);
+int HerePluginGetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel);
 
-int HerePluginOnViewObject(const maps_view_object_h object,
-				const maps_view_object_operation_e operation);
+int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, const maps_view_object_operation_e operation);
 
 #endif //_LOCATION_HERE_API_H_

@@ -264,8 +264,7 @@ EXPORT_API int maps_plugin_get_place_details(const char* url,
 }
 
 EXPORT_API int maps_plugin_search_route(const maps_coordinates_h origin, const maps_coordinates_h destination,
-	maps_preference_h preference, maps_service_search_route_cb callback,
-	void* user_data, int* request_id)
+	maps_preference_h preference, maps_service_search_route_cb callback, void* user_data, int* request_id)
 {
 	int ret = HerePluginSearchRoute(origin, destination, preference, callback, user_data, request_id);
 
@@ -295,24 +294,28 @@ EXPORT_API int maps_plugin_cancel_request(int request_id)
 }
 
 /* Mapping */
-EXPORT_API int maps_plugin_set_map_view(const maps_view_h view, maps_plugin_map_view_ready_cb pCbFunc)
+EXPORT_API int maps_plugin_create_map_view(maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
 {
-	int ret = HerePluginSetMapView(view, pCbFunc);
+	int ret = HerePluginCreateMapView(hView, pCbFunc);
 
 	MAPS_LOGD("here_error_e = %d", ret);
 
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_render_map(const maps_coordinates_h coordinates,
-					const double zoom_factor,
-					const double rotation_angle,
-					maps_plugin_render_map_cb callback,
-					void* user_data,
-					int* request_id)
-
+EXPORT_API int maps_plugin_destroy_map_view(maps_view_h hView)
 {
-	int ret = HerePluginRenderMap(coordinates, zoom_factor, rotation_angle,
+	int ret = HerePluginDestroyMapView(hView);
+
+	MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
+
+EXPORT_API int maps_plugin_render_map(maps_view_h hView, const maps_coordinates_h coordinates, const double zoom_factor,
+					const double rotation_angle, maps_plugin_render_map_cb callback, void* user_data, int* request_id)
+{
+	int ret = HerePluginRenderMap(hView, coordinates, zoom_factor, rotation_angle,
 					callback, user_data, request_id);
 
 	if (ret != HERE_ERROR_NONE)
@@ -321,15 +324,10 @@ EXPORT_API int maps_plugin_render_map(const maps_coordinates_h coordinates,
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_render_map_area(const maps_area_h area,
-					const double zoom_factor,
-					const double rotation_angle,
-					maps_plugin_render_map_cb callback,
-					void* user_data,
-					int* request_id)
+EXPORT_API int maps_plugin_render_map_area(maps_view_h hView, const maps_area_h area, const double zoom_factor,
+					const double rotation_angle, maps_plugin_render_map_cb callback, void* user_data, int* request_id)
 {
-	int ret = HerePluginRenderMapArea(area, zoom_factor, rotation_angle,
-					callback, user_data, request_id);
+	int ret = HerePluginRenderMapArea(hView, area, zoom_factor, rotation_angle, callback, user_data, request_id);
 
 	if (ret != HERE_ERROR_NONE)
 		MAPS_LOGD("here_error_e = %d", ret);
@@ -337,13 +335,10 @@ EXPORT_API int maps_plugin_render_map_area(const maps_area_h area,
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_move_center(const int delta_x, const int delta_y,
-					maps_plugin_render_map_cb callback,
-					void* user_data,
-					int* request_id)
+EXPORT_API int maps_plugin_move_center(maps_view_h hView, const int delta_x, const int delta_y, maps_plugin_render_map_cb callback,
+					void* user_data, int* request_id)
 {
-	int ret = HerePluginMoveCenter(delta_x, delta_y,
-					callback, user_data, request_id);
+	int ret = HerePluginMoveCenter(hView, delta_x, delta_y, callback, user_data, request_id);
 
 	if (ret != HERE_ERROR_NONE)
 		MAPS_LOGD("here_error_e = %d", ret);
@@ -351,9 +346,9 @@ EXPORT_API int maps_plugin_move_center(const int delta_x, const int delta_y,
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_set_scalebar(bool enable)
+EXPORT_API int maps_plugin_set_scalebar(maps_view_h hView, bool enable)
 {
-	int ret = HerePluginSetScalebar(enable);
+	int ret = HerePluginSetScalebar(hView, enable);
 
 	if (ret != HERE_ERROR_NONE)
 		MAPS_LOGD("here_error_e = %d", ret);
@@ -361,14 +356,13 @@ EXPORT_API int maps_plugin_set_scalebar(bool enable)
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_get_scalebar(bool *enabled)
+EXPORT_API int maps_plugin_get_scalebar(maps_view_h hView, bool *enabled)
 {
-	int ret = HerePluginGetScalebar(enabled);
+	int ret = HerePluginGetScalebar(hView, enabled);
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_draw_map(Evas* canvas, const int x, const int y,
-				    const int width, const int height)
+EXPORT_API int maps_plugin_draw_map(maps_view_h hView, Evas* canvas, const int x, const int y, const int width, const int height)
 {
 	int ret = HerePluginDrawMap(canvas, x, y, width, height);
 
@@ -378,42 +372,39 @@ EXPORT_API int maps_plugin_draw_map(Evas* canvas, const int x, const int y,
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_get_center(maps_coordinates_h *center)
+EXPORT_API int maps_plugin_get_center(maps_view_h hView, maps_coordinates_h *center)
 {
-	int ret = HerePluginGetCenter(center);
+	int ret = HerePluginGetCenter(hView, center);
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_screen_to_geography(const int x, const int y,
-					       maps_coordinates_h *mapsCoord)
+EXPORT_API int maps_plugin_screen_to_geography(maps_view_h hView, const int x, const int y, maps_coordinates_h *mapsCoord)
 {
-	int ret = HerePluginScreenToGeography(x, y, mapsCoord);
+	int ret = HerePluginScreenToGeography(hView, x, y, mapsCoord);
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_geography_to_screen(const maps_coordinates_h mapsCoord,
-					       int* x, int* y)
+EXPORT_API int maps_plugin_geography_to_screen(maps_view_h hView, const maps_coordinates_h mapsCoord, int* x, int* y)
 {
-	int ret = HerePluginGeographyToScreen(mapsCoord, x, y);
+	int ret = HerePluginGeographyToScreen(hView, mapsCoord, x, y);
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_get_min_zoom_level(int *min_zoom_level)
+EXPORT_API int maps_plugin_get_min_zoom_level(maps_view_h hView, int *min_zoom_level)
 {
-	int ret = HerePluginGetMinZoomLevel(min_zoom_level);
+	int ret = HerePluginGetMinZoomLevel(hView, min_zoom_level);
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_get_max_zoom_level(int *max_zoom_level)
+EXPORT_API int maps_plugin_get_max_zoom_level(maps_view_h hView, int *max_zoom_level)
 {
-	int ret = HerePluginGetMaxZoomLevel(max_zoom_level);
+	int ret = HerePluginGetMaxZoomLevel(hView, max_zoom_level);
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_on_object(const maps_view_object_h object,
-			       const maps_view_object_operation_e operation)
+EXPORT_API int maps_plugin_on_object(maps_view_h hView, const maps_view_object_h object, const maps_view_object_operation_e operation)
 {
-	int ret = HerePluginOnViewObject(object, operation);
+	int ret = HerePluginOnViewObject(hView, object, operation);
 
 	if (ret != HERE_ERROR_NONE)
 		MAPS_LOGD("here_error_e = %d", ret);

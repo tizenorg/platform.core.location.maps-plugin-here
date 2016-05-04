@@ -70,12 +70,14 @@ public:
      */
     const String& GetAppId() const;
 
+#ifdef TIZEN_MIGRATION
     /**
      * This method retrieves the request app id.
      *
      * @return A constant reference to a string containing the request app id.
      */
     const String& GetRequestAppId() const;
+#endif
 
     /**
      * This is a static method which returns the singleton's instance.
@@ -84,6 +86,7 @@ public:
      */
     static ApplicationContext& GetInstance();
 
+#ifdef TIZEN_MIGRATION
     /**
      * This method initialises the singleton object.
      *
@@ -100,6 +103,22 @@ public:
      *        <code>false</code>.
      */
     bool Initialize(const String& sAppCode, const String& sAppId, const String& sRequestAppId = "");
+#else
+    /**
+     * This method initialises the singleton object.
+     *
+     * @param sAppCode A constant reference to a string containing the app code.
+     *
+     * @param sAppId A constant reference to a string containing the app id.
+     *
+     * @return A Boolean indicating the result of initialization,
+     *        <code>true</code> on success, <code>false</code> on failure. Note
+     *        that if the object already exists and has been initialized,
+     *        further attempts to call this methods fail (the return value is
+     *        <code>false</code>.
+     */
+    bool Initialize(const String& sAppCode, const String& sAppId);
+#endif
 
     /**
      * This method queries initialisation status.
