@@ -659,7 +659,7 @@ int HerePluginCancelRequest(int nReqId)
 	return (HereManager::GetHandler()->CancelInstance(nReqId));
 }
 
-int HerePluginSetMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
+int HerePluginCreateMapView(maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
 {
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -676,15 +676,35 @@ int HerePluginSetMapView(const maps_view_h hView, maps_plugin_map_view_ready_cb 
 
 	if (hView)
 		error = pView->Init(hView, pCbFunc);
-	else
-		error = pView->Close();
 
 	delete pView;
 
 	return error;
 }
 
-int HerePluginRenderMap(const maps_coordinates_h mapsCoord, const double dZoom, const double dAngle,
+int HerePluginDestroyMapView(maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
+{
+	if (!HereManager::GetHandler())
+		return HERE_ERROR_INVALID_OPERATION;
+
+	/* creating instance */
+	HereView *pView =
+		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
+
+	if(!pView)
+		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
+
+	/* sending request */
+	here_error_e error = HERE_ERROR_NONE;
+
+	error = pView->Close(hView);
+
+	delete pView;
+
+	return error;
+}
+
+int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, const double dZoom, const double dAngle,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
 {
 	if (!mapsCoord || !pCbFunc || !nReqId)
@@ -701,16 +721,16 @@ int HerePluginRenderMap(const maps_coordinates_h mapsCoord, const double dZoom, 
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* sending request */
-	here_error_e error = pView->RenderMap(mapsCoord, dZoom, dAngle);
+	here_error_e error = pView->RenderMap(hView, mapsCoord, dZoom, dAngle);
 	delete pView;
 
 	return error;
 }
 
-int HerePluginRenderMapArea(const maps_area_h hArea, const double dZoom, const double dAngle,
+int HerePluginRenderMapArea(maps_view_h hView, const maps_area_h hArea, const double dZoom, const double dAngle,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
 {
-	if (!hArea || !pCbFunc || !nReqId)
+	if (!hView || !hArea || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!HereManager::GetHandler())
@@ -724,14 +744,13 @@ int HerePluginRenderMapArea(const maps_area_h hArea, const double dZoom, const d
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* sending request */
-	here_error_e error = pView->RenderMapByArea(hArea, dZoom, dAngle);
+	here_error_e error = pView->RenderMapByArea(hView, hArea, dZoom, dAngle);
 	delete pView;
 
 	return error;
 }
 
-int HerePluginMoveCenter(const int delta_x, const int delta_y,
-	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
+int HerePluginMoveCenter(maps_view_h hView, const int delta_x, const int delta_y, maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
 {
 	if (!pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
@@ -747,13 +766,13 @@ int HerePluginMoveCenter(const int delta_x, const int delta_y,
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* sending request */
-	here_error_e error = pView->MoveCenter(delta_x, delta_y);
+	here_error_e error = pView->MoveCenter(hView, delta_x, delta_y);
 	delete pView;
 
 	return error;
 }
 
-int HerePluginSetScalebar(bool enable)
+int HerePluginSetScalebar(maps_view_h hView, bool enable)
 {
 	if (!HereManager::GetHandler())
 		return HERE_ERROR_INVALID_OPERATION;
@@ -765,13 +784,13 @@ int HerePluginSetScalebar(bool enable)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* sending request */
-	here_error_e error = pView->SetScalebar(enable);
+	here_error_e error = pView->SetScalebar(hView, enable);
 	delete pView;
 
 	return error;
 }
 
-int HerePluginGetScalebar(bool *enabled)
+int HerePluginGetScalebar(maps_view_h hView, bool *enabled)
 {
 	if (!enabled)
 		return HERE_ERROR_INVALID_PARAMETER;
@@ -785,7 +804,7 @@ int HerePluginGetScalebar(bool *enabled)
 	if(!pView)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
-	here_error_e error = pView->GetScalebar(enabled);
+	here_error_e error = pView->GetScalebar(hView, enabled);
 	delete pView;
 
 	return error;
@@ -797,9 +816,9 @@ int HerePluginDrawMap(Evas* pCanvas, const int x, const int y,
 	return HERE_ERROR_NONE;
 }
 
-int HerePluginGetCenter(maps_coordinates_h *center)
+int HerePluginGetCenter(maps_view_h hView, maps_coordinates_h *center)
 {
-	if (!center)
+	if (!hView || !center)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!HereManager::GetHandler())
@@ -813,13 +832,13 @@ int HerePluginGetCenter(maps_coordinates_h *center)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* sending request */
-	here_error_e error = pView->GetCenter(center);
+	here_error_e error = pView->GetCenter(hView, center);
 	delete pView;
 
 	return error;
 }
 
-int HerePluginScreenToGeography(const int x, const int y, maps_coordinates_h *mapsCoord)
+int HerePluginScreenToGeography(maps_view_h hView, const int x, const int y, maps_coordinates_h *mapsCoord)
 {
 	if (!mapsCoord)
 		return HERE_ERROR_INVALID_PARAMETER;
@@ -835,13 +854,13 @@ int HerePluginScreenToGeography(const int x, const int y, maps_coordinates_h *ma
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* sending request */
-	here_error_e error = pView->ScreenToGeolocation(x, y, mapsCoord);
+	here_error_e error = pView->ScreenToGeolocation(hView, x, y, mapsCoord);
 	delete pView;
 
 	return error;
 }
 
-int HerePluginGeographyToScreen(const maps_coordinates_h mapsCoord, int *x, int *y)
+int HerePluginGeographyToScreen(maps_view_h hView, const maps_coordinates_h mapsCoord, int *x, int *y)
 {
 	if (!mapsCoord || !x || !y)
 		return HERE_ERROR_INVALID_PARAMETER;
@@ -857,24 +876,23 @@ int HerePluginGeographyToScreen(const maps_coordinates_h mapsCoord, int *x, int 
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* sending request */
-	here_error_e error = pView->GeolocationToScreen(mapsCoord, x, y);
+	here_error_e error = pView->GeolocationToScreen(hView, mapsCoord, x, y);
 	delete pView;
 
 	return error;
 }
 
-int HerePluginGetMinZoomLevel(int *nMinZoomLevel)
+int HerePluginGetMinZoomLevel(maps_view_h hView, int *nMinZoomLevel)
 {
-	return HereView::GetMinZoomLevel(nMinZoomLevel);
+	return HereView::GetMinZoomLevel(hView, nMinZoomLevel);
 }
 
-int HerePluginGetMaxZoomLevel(int *nMaxZoomLevel)
+int HerePluginGetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel)
 {
-	return HereView::GetMaxZoomLevel(nMaxZoomLevel);
+	return HereView::GetMaxZoomLevel(hView, nMaxZoomLevel);
 }
 
-int HerePluginOnViewObject(const maps_view_object_h object,
-			   const maps_view_object_operation_e operation)
+int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, const maps_view_object_operation_e operation)
 {
-	return HereView::OnViewObject(object, operation);
+	return HereView::OnViewObject(hView, object, operation);
 }

@@ -459,7 +459,7 @@ public:
      * be called when the map has been ready after initialized. A function object of
      * this type returns <code>void</code> and receives no arguments.
      */
-    typedef void(*ReadyMapSignalFunctor)(void);
+    typedef void(*ReadyMapSignalFunctor)(void *data);
 
     /**
      * This method sets a callback to be invoked when the map has
@@ -468,7 +468,7 @@ public:
      * @param slot A function object to be called when the map has
      *        been ready after initialization.
      */
-    void SetReadyMapSignal(ReadyMapSignalFunctor callback);
+    void SetReadyMapSignal(ReadyMapSignalFunctor callback, void *data);
 
     /**
      * This method sets the angle of the map.
