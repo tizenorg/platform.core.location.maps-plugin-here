@@ -119,11 +119,12 @@ EXPORT_API int maps_plugin_is_service_supported(maps_service_e service, bool *su
 		case MAPS_SERVICE_SEARCH_PLACE_LIST:
 		case MAPS_SERVICE_SEARCH_GET_PLACE_DETAILS:
 			*supported = TRUE;
-			return MAPS_ERROR_NONE;
+			break;
 		default:
 			*supported = FALSE;
-			return MAPS_ERROR_NOT_SUPPORTED;
+			break;
 	}
+	return MAPS_ERROR_NONE;
 }
 
 EXPORT_API int maps_plugin_is_data_supported(maps_service_data_e service, bool *supported)
@@ -147,11 +148,12 @@ EXPORT_API int maps_plugin_is_data_supported(maps_service_data_e service, bool *
 		case MAPS_ROUTE_SEGMENTS_PATH:
 		case MAPS_ROUTE_SEGMENTS_MANEUVERS:
 			*supported = TRUE;
-			return MAPS_ERROR_NONE;
+			break;
 		default:
 			*supported = FALSE;
-			return MAPS_ERROR_NOT_SUPPORTED;
+			break;
 	}
+	return MAPS_ERROR_NONE;
 }
 
 EXPORT_API int maps_plugin_geocode(const char* address, const maps_preference_h preference,
