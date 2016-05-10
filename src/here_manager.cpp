@@ -261,7 +261,7 @@ here_error_e HereManager::SetCredentials(const char *szKey)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	String strKey(szKey);
-	String strAppId, strAppCode;
+	String strAppId, strAppCode, strRequestAppId;
 	size_t nCodeStart;
 
 	nCodeStart = strKey.find("/");
@@ -275,7 +275,20 @@ here_error_e HereManager::SetCredentials(const char *szKey)
 	strAppId = strKey.substr(0, nCodeStart);
 	strAppCode = strKey.substr(nCodeStart+1, std::string::npos);
 
-	if(!ApplicationContext::GetInstance().Initialize(strAppCode, strAppId))
+	if (ApplicationContext::GetInstance().GetRequestAppId().length() < 1) {
+		char *strAppId = NULL;
+		pid_t nProcessId = getpid();
+
+		app_manager_get_app_id(nProcessId, &strAppId);
+		MAPS_LOGE("RequestAppId is %s", strAppId);
+
+		strRequestAppId.append(strAppId);
+
+		if (strAppId != NULL)
+			g_free(strAppId);
+	}
+
+	if(!ApplicationContext::GetInstance().Initialize(strAppCode, strAppId, strRequestAppId))
 		return HERE_ERROR_INVALID_OPERATION;
 
 	//MAPS_LOGD("[success] credential setted to 'XXXXX/XXXXX'");
