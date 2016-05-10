@@ -71,6 +71,13 @@ public:
     const String& GetAppId() const;
 
     /**
+     * This method retrieves the request app id.
+     * 
+     * @return A constant reference to a string containing the request app id. 
+     */
+    const String& GetRequestAppId() const;
+
+    /**
      * This is a static method which returns the singleton's instance.
      *
      * @return A static reference to the instance of this singleton class.
@@ -84,13 +91,15 @@ public:
      *
      * @param sAppId A constant reference to a string containing the app id.
      *
+     * @param sRequestAppId A constant reference to a string containing the request app id.
+     *
      * @return A Boolean indicating the result of initialization,
      *        <code>true</code> on success, <code>false</code> on failure. Note
      *        that if the object already exists and has been initialized,
      *        further attempts to call this methods fail (the return value is
      *        <code>false</code>.
      */
-    bool Initialize(const String& sAppCode, const String& sAppId);
+    bool Initialize(const String& sAppCode, const String& sAppId, const String& sRequestAppId);
 
     /**
      * This method queries initialisation status.
