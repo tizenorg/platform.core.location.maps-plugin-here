@@ -118,6 +118,7 @@ EXPORT_API int maps_plugin_is_service_supported(maps_service_e service, bool *su
 		case MAPS_SERVICE_MULTI_REVERSE_GEOCODE:
 		case MAPS_SERVICE_SEARCH_PLACE_LIST:
 		case MAPS_SERVICE_SEARCH_GET_PLACE_DETAILS:
+		case MAPS_SERVICE_VIEW:
 			*supported = TRUE;
 			break;
 		default:
@@ -147,8 +148,12 @@ EXPORT_API int maps_plugin_is_data_supported(maps_service_data_e service, bool *
 		case MAPS_ROUTE_PATH:
 		case MAPS_ROUTE_SEGMENTS_PATH:
 		case MAPS_ROUTE_SEGMENTS_MANEUVERS:
+		case MAPS_VIEW_TRAFFIC:
+		case MAPS_VIEW_PUBLIC_TRANSIT:
+		case MAPS_VIEW_SCALEBAR:
 			*supported = TRUE;
 			break;
+		case MAPS_VIEW_BUILDING:
 		default:
 			*supported = FALSE;
 			break;
