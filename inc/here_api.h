@@ -64,10 +64,12 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 	void * pUserData, int *nReqId);
 
 int HerePluginSearchPlaceList(maps_area_h hArea, maps_item_hashtable_h hPref,
-	maps_place_filter_h hFilter, maps_service_search_place_list_cb pCbFunc, void * pUserData, int *nReqId);
+	maps_place_filter_h hFilter, maps_service_search_place_list_cb pCbFunc,
+	void * pUserData, int *nReqId);
 
 int HerePluginSearchPlaceDetails(const char* szUrl,
-	maps_service_get_place_details_cb pCbFunc, void * pUserData, int *nReqId);
+	maps_service_get_place_details_cb pCbFunc,
+	void * pUserData, int *nReqId);
 
 int HerePluginSearchRoute(maps_coordinates_h hOrigin, maps_coordinates_h hDestination,
 	maps_item_hashtable_h hPref, maps_service_search_route_cb pCbFunc,
@@ -85,25 +87,24 @@ int HerePluginCreateMapView(maps_view_h hView, maps_plugin_map_view_ready_cb pCb
 
 int HerePluginDestroyMapView(maps_view_h hView);
 
-int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, const double dZoom, const double dAngle,
+int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, double dZoom, double dAngle,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);
 
-int HerePluginRenderMapArea(maps_view_h hView, const maps_area_h hArea, const double dZoom, const double dAngle,
+int HerePluginRenderMapArea(maps_view_h hView, const maps_area_h hArea, double dZoom, double dAngle,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);
 
-int HerePluginMoveCenter(maps_view_h hView, const int delta_x, const int delta_y,
+int HerePluginMoveCenter(maps_view_h hView, int delta_x, int delta_y,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);
 
 int HerePluginSetScalebar(maps_view_h hView, bool enable);
 
 int HerePluginGetScalebar(maps_view_h hView, bool *enabled);
 
-int HerePluginDrawMap(Evas* pCanvas, const int x, const int y,
-	const int nWidth, const int nHeight);
+int HerePluginDrawMap(maps_view_h hView, Evas* pCanvas, int x, int y, int w, int h);
 
 int HerePluginGetCenter(maps_view_h hView, maps_coordinates_h *center);
 
-int HerePluginScreenToGeography(maps_view_h hView, const int x, const int y, maps_coordinates_h *mapsCoord);
+int HerePluginScreenToGeography(maps_view_h hView, int x, int y, maps_coordinates_h *mapsCoord);
 
 int HerePluginGeographyToScreen(maps_view_h hView, const maps_coordinates_h mapsCoord, int *x, int *y);
 
@@ -111,6 +112,6 @@ int HerePluginGetMinZoomLevel(maps_view_h hView, int *nMinZoomLevel);
 
 int HerePluginGetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel);
 
-int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, const maps_view_object_operation_e operation);
+int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation);
 
 #endif //_LOCATION_HERE_API_H_

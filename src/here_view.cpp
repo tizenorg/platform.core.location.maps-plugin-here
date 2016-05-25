@@ -333,6 +333,7 @@ void HereView::__setMapType(maps_view_h hView)
 	maps_view_get_traffic_enabled(hView, &traffic_enabled);
 
 	bool public_transit_enabled = false;
+	maps_view_get_public_transit_enabled(hView, &public_transit_enabled);
 
 	GeoTiledMap::MapType hereMapType = HereUtils::Convert(map_type, buildings_enabled,
 						traffic_enabled, public_transit_enabled);

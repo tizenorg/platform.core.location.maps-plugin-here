@@ -317,11 +317,12 @@ EXPORT_API int maps_plugin_destroy_map_view(maps_view_h hView)
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_render_map(maps_view_h hView, const maps_coordinates_h coordinates, const double zoom_factor,
-					const double rotation_angle, maps_plugin_render_map_cb callback, void* user_data, int* request_id)
+EXPORT_API int maps_plugin_render_map(maps_view_h hView,
+	const maps_coordinates_h coordinates, double zoom_factor, double rotation_angle,
+	maps_plugin_render_map_cb callback, void* user_data, int* request_id)
 {
 	int ret = HerePluginRenderMap(hView, coordinates, zoom_factor, rotation_angle,
-					callback, user_data, request_id);
+				callback, user_data, request_id);
 
 	if (ret != HERE_ERROR_NONE)
 		MAPS_LOGD("here_error_e = %d", ret);
@@ -329,10 +330,12 @@ EXPORT_API int maps_plugin_render_map(maps_view_h hView, const maps_coordinates_
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_render_map_area(maps_view_h hView, const maps_area_h area, const double zoom_factor,
-					const double rotation_angle, maps_plugin_render_map_cb callback, void* user_data, int* request_id)
+EXPORT_API int maps_plugin_render_map_area(maps_view_h hView, const maps_area_h area,
+	double zoom_factor, double rotation_angle,
+	maps_plugin_render_map_cb callback, void* user_data, int* request_id)
 {
-	int ret = HerePluginRenderMapArea(hView, area, zoom_factor, rotation_angle, callback, user_data, request_id);
+	int ret = HerePluginRenderMapArea(hView, area, zoom_factor, rotation_angle,
+				callback, user_data, request_id);
 
 	if (ret != HERE_ERROR_NONE)
 		MAPS_LOGD("here_error_e = %d", ret);
@@ -340,8 +343,8 @@ EXPORT_API int maps_plugin_render_map_area(maps_view_h hView, const maps_area_h 
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_move_center(maps_view_h hView, const int delta_x, const int delta_y, maps_plugin_render_map_cb callback,
-					void* user_data, int* request_id)
+EXPORT_API int maps_plugin_move_center(maps_view_h hView, int delta_x, int delta_y,
+	maps_plugin_render_map_cb callback, void* user_data, int* request_id)
 {
 	int ret = HerePluginMoveCenter(hView, delta_x, delta_y, callback, user_data, request_id);
 
@@ -367,9 +370,9 @@ EXPORT_API int maps_plugin_get_scalebar(maps_view_h hView, bool *enabled)
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_draw_map(maps_view_h hView, Evas* canvas, const int x, const int y, const int width, const int height)
+EXPORT_API int maps_plugin_draw_map(maps_view_h hView, Evas* canvas, int x, int y, int w, int h)
 {
-	int ret = HerePluginDrawMap(canvas, x, y, width, height);
+	int ret = HerePluginDrawMap(hView, canvas, x, y, w, h);
 
 	if (ret != HERE_ERROR_NONE)
 		MAPS_LOGD("here_error_e = %d", ret);
@@ -383,7 +386,7 @@ EXPORT_API int maps_plugin_get_center(maps_view_h hView, maps_coordinates_h *cen
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_screen_to_geography(maps_view_h hView, const int x, const int y, maps_coordinates_h *mapsCoord)
+EXPORT_API int maps_plugin_screen_to_geography(maps_view_h hView, int x, int y, maps_coordinates_h *mapsCoord)
 {
 	int ret = HerePluginScreenToGeography(hView, x, y, mapsCoord);
 	return ConvertToMapsError(ret);
@@ -407,7 +410,7 @@ EXPORT_API int maps_plugin_get_max_zoom_level(maps_view_h hView, int *max_zoom_l
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_on_object(maps_view_h hView, const maps_view_object_h object, const maps_view_object_operation_e operation)
+EXPORT_API int maps_plugin_on_object(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation)
 {
 	int ret = HerePluginOnViewObject(hView, object, operation);
 

@@ -329,7 +329,9 @@ here_error_e HereViewObjects::__updateMarker(maps_view_object_h hMarker, GeoMapO
 		hereMarker->SetPosition(GeoCoordinates(lat, lng));
 
 		/* origin */
-		Tizen::Maps::FloatPoint fpntOrigin(0.5, 1);
+		Tizen::Maps::FloatPoint fpntOrigin(0.5, 0.5);
+		if (type == MAPS_VIEW_MARKER_PIN)
+			fpntOrigin.y = 1.0;
 		hereMarker->SetMarkerOrigin(fpntOrigin);
 
 		/* z-order */

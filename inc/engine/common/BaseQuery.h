@@ -62,11 +62,6 @@ protected:
     static const String ILLEGAL_URL;
 
     /**
-     * This constant represents an App ID.
-     */
-    String RequestAppId;
-
-    /**
      * This is the default constructor.
      */
     BaseQuery();

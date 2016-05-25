@@ -37,10 +37,10 @@ namespace _Util
 	long GetHashCode(const char *string);
 
 	EXPORT_API Bitmap* DecodePngToBmp(const byte* buffer, size_t size,
-                                          MediaPixelFormat pixelFormat=MEDIA_PIXEL_FORMAT_RGBA8888);
+										MediaPixelFormat pixelFormat=MEDIA_PIXEL_FORMAT_RGBA8888);
 
 	EXPORT_API void ConvertRGBA2BGRA(void *data, unsigned int w, unsigned int h,
-                                         MediaPixelFormat format=MEDIA_PIXEL_FORMAT_RGBA8888);
+										MediaPixelFormat format=MEDIA_PIXEL_FORMAT_RGBA8888);
 
 	template<typename T>
 	inline T

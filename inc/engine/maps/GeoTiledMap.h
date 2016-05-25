@@ -454,7 +454,6 @@ public:
      */
     void SetEvasGlApi(Evas_GL_API *__glapi);
 
-#ifdef TIZEN_MIGRATION
     /**
      * This typedef defines a function object as a type. The function object can
      * be called when the map has been ready after initialized. A function object of
@@ -469,25 +468,8 @@ public:
      * @param slot A function object to be called when the map has
      *        been ready after initialization.
      */
-    void SetReadyMapSignal(ReadyMapSignalFunctor callback, void *data);
-#else
-    /**
-     * This typedef defines a function object as a type. The function object can
-     * be called when the map has been ready after initialized. A function object of
-     * this type returns <code>void</code> and receives no arguments.
-     */
-    typedef void(*ReadyMapSignalFunctor)(void);
+    void SetReadyMapSignal(ReadyMapSignalFunctor callback, void *data = NULL);
 
-    /**
-      * This method sets a callback to be invoked when the map has
-      * been ready after initialization.
-      *
-      * @param slot A function object to be called when the map has
-      *		  been ready after initialization.
-      */
-    void SetReadyMapSignal(ReadyMapSignalFunctor callback);
-
-#endif
     /**
      * This method sets the angle of the map.
      *
@@ -550,7 +532,11 @@ private:
     HERE_MAPS_NO_COPY_NO_ASSIGN(GeoTiledMap);
 
     class GeoTiledMapImpl;
+#ifdef TIZEN_MIGRATION
     GeoTiledMapImpl *m_pImpl;
+#else
+    std::auto_ptr<GeoTiledMapImpl> m_pImpl;
+#endif
 };
 
 HERE_MAPS_END_NAMESPACE

@@ -464,7 +464,8 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 }
 
 int HerePluginSearchPlaceList(maps_area_h hArea, maps_item_hashtable_h hPref,
-	maps_place_filter_h hFilter, maps_service_search_place_list_cb pCbFunc, void *pUserData, int *nReqId)
+	maps_place_filter_h hFilter, maps_service_search_place_list_cb pCbFunc,
+	void *pUserData, int *nReqId)
 {
 	/* checking parmaters */
 	if (!hFilter || !pCbFunc || !nReqId)
@@ -511,7 +512,8 @@ int HerePluginSearchPlaceList(maps_area_h hArea, maps_item_hashtable_h hPref,
 }
 
 int HerePluginSearchPlaceDetails(const char* szUrl,
-	maps_service_get_place_details_cb pCbFunc, void *pUserData, int *nReqId)
+	maps_service_get_place_details_cb pCbFunc,
+	void *pUserData, int *nReqId)
 {
 	/* checking parmaters */
 	if (!szUrl || (szUrl && *szUrl == '\0') || !pCbFunc || !nReqId)
@@ -703,7 +705,7 @@ int HerePluginDestroyMapView(maps_view_h hView)
 	return error;
 }
 
-int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, const double dZoom, const double dAngle,
+int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, double dZoom, double dAngle,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
 {
 	if (!hView || !mapsCoord || !pCbFunc || !nReqId)
@@ -726,7 +728,7 @@ int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, c
 	return error;
 }
 
-int HerePluginRenderMapArea(maps_view_h hView, const maps_area_h hArea, const double dZoom, const double dAngle,
+int HerePluginRenderMapArea(maps_view_h hView, const maps_area_h hArea, double dZoom, double dAngle,
 	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
 {
 	if (!hView || !hArea || !pCbFunc || !nReqId)
@@ -749,7 +751,8 @@ int HerePluginRenderMapArea(maps_view_h hView, const maps_area_h hArea, const do
 	return error;
 }
 
-int HerePluginMoveCenter(maps_view_h hView, const int delta_x, const int delta_y, maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
+int HerePluginMoveCenter(maps_view_h hView, int delta_x, int delta_y,
+	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
 {
 	if (!hView || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
@@ -809,8 +812,7 @@ int HerePluginGetScalebar(maps_view_h hView, bool *enabled)
 	return error;
 }
 
-int HerePluginDrawMap(Evas* pCanvas, const int x, const int y,
-	const int nWidth, const int nHeight)
+int HerePluginDrawMap(maps_view_h hView, Evas* pCanvas, int x, int y, int w, int h)
 {
 	return HERE_ERROR_NONE;
 }
@@ -837,7 +839,7 @@ int HerePluginGetCenter(maps_view_h hView, maps_coordinates_h *center)
 	return error;
 }
 
-int HerePluginScreenToGeography(maps_view_h hView, const int x, const int y, maps_coordinates_h *mapsCoord)
+int HerePluginScreenToGeography(maps_view_h hView, int x, int y, maps_coordinates_h *mapsCoord)
 {
 	if (!hView || !mapsCoord)
 		return HERE_ERROR_INVALID_PARAMETER;
@@ -897,7 +899,7 @@ int HerePluginGetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel)
 	return HereView::GetMaxZoomLevel(hView, nMaxZoomLevel);
 }
 
-int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, const maps_view_object_operation_e operation)
+int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation)
 {
 	if (!hView)
 		return HERE_ERROR_INVALID_PARAMETER;
