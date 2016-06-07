@@ -1,3 +1,8 @@
+[Version]   maps-plugin-here_0.3.2
+[Date]      07 June 2016
+[Title]     modified internal APIs for maps-service
+[Developer] Seechan Kim <cbible.kim@samsung.com>
+
 [Version]   maps-plugin-here_0.3.0
 [Date]      18 April 2016
 [Title]     Added new Maps View APIs

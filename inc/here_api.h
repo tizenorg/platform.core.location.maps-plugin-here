@@ -87,14 +87,9 @@ int HerePluginCreateMapView(maps_view_h hView, maps_plugin_map_view_ready_cb pCb
 
 int HerePluginDestroyMapView(maps_view_h hView);
 
-int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, double dZoom, double dAngle,
-	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);
+int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, double dZoom, double dAngle);
 
-int HerePluginRenderMapArea(maps_view_h hView, const maps_area_h hArea, double dZoom, double dAngle,
-	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);
-
-int HerePluginMoveCenter(maps_view_h hView, int delta_x, int delta_y,
-	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId);
+int HerePluginMoveCenter(maps_view_h hView, int delta_x, int delta_y);
 
 int HerePluginSetScalebar(maps_view_h hView, bool enable);
 
