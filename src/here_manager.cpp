@@ -143,7 +143,7 @@ void* HereManager::CreateInstance(HereSvcType nHereSvc, void* pCbFunc,
 		break;
 
 	case HERE_SVC_VIEW:
-		pHere = (HereBase*)new (std::nothrow) HereView(pCbFunc, pUserData, reqId);
+		pHere = (HereBase*)new (std::nothrow) HereView();
 		break;
 
 	default:
