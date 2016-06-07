@@ -318,8 +318,7 @@ EXPORT_API int maps_plugin_destroy_map_view(maps_view_h hView)
 }
 
 EXPORT_API int maps_plugin_render_map(maps_view_h hView,
-	const maps_coordinates_h coordinates, double zoom_factor, double rotation_angle,
-	maps_plugin_render_map_cb callback, void* user_data, int* request_id)
+	const maps_coordinates_h coordinates, double zoom_factor, double rotation_angle)
 {
 	int ret = HerePluginRenderMap(hView, coordinates, zoom_factor, rotation_angle);
 
@@ -329,8 +328,7 @@ EXPORT_API int maps_plugin_render_map(maps_view_h hView,
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_move_center(maps_view_h hView, int delta_x, int delta_y,
-	maps_plugin_render_map_cb callback, void* user_data, int* request_id)
+EXPORT_API int maps_plugin_move_center(maps_view_h hView, int delta_x, int delta_y)
 {
 	int ret = HerePluginMoveCenter(hView, delta_x, delta_y);
 
@@ -356,19 +354,13 @@ EXPORT_API int maps_plugin_get_scalebar(maps_view_h hView, bool *enabled)
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_draw_map(maps_view_h hView, Evas* canvas, int x, int y, int w, int h)
+EXPORT_API int maps_plugin_on_object(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation)
 {
-	int ret = HerePluginDrawMap(hView, canvas, x, y, w, h);
+	int ret = HerePluginOnViewObject(hView, object, operation);
 
 	if (ret != HERE_ERROR_NONE)
 		MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
-	return ConvertToMapsError(ret);
-}
-
-EXPORT_API int maps_plugin_get_center(maps_view_h hView, maps_coordinates_h *center)
-{
-	int ret = HerePluginGetCenter(hView, center);
 	return ConvertToMapsError(ret);
 }
 
@@ -396,16 +388,11 @@ EXPORT_API int maps_plugin_get_max_zoom_level(maps_view_h hView, int *max_zoom_l
 	return ConvertToMapsError(ret);
 }
 
-EXPORT_API int maps_plugin_on_object(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation)
+EXPORT_API int maps_plugin_get_center(maps_view_h hView, maps_coordinates_h *center)
 {
-	int ret = HerePluginOnViewObject(hView, object, operation);
-
-	if (ret != HERE_ERROR_NONE)
-		MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
-
+	int ret = HerePluginGetCenter(hView, center);
 	return ConvertToMapsError(ret);
 }
-
 
 } // end of extern "C"
 
