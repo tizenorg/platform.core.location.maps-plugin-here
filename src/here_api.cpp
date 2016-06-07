@@ -661,154 +661,74 @@ int HerePluginCancelRequest(int nReqId)
 	return (HereManager::GetHandler()->CancelInstance(nReqId));
 }
 
+/*****************************************************************************/
+/*                                                                           */
+/*  Maps Widget                                                              */
+/*                                                                           */
+/*****************************************************************************/
+
 int HerePluginCreateMapView(maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
 {
-	if (!hView || !HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	/* creating instance */
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	/* sending request */
-	here_error_e error = HERE_ERROR_NONE;
-
-	error = pView->Init(hView, pCbFunc);
-
-	delete pView;
-
-	return error;
+	HereView *vh = NULL, *ovh = NULL;
+	vh = new HereView();
+	if (!vh) return HERE_ERROR_OUT_OF_MEMORY;
+	maps_view_get_maps_plugin_view_handle(hView, (void**)&ovh);
+	maps_view_set_maps_plugin_view_handle(hView, vh);
+	if (ovh)
+		delete ovh;
+	return vh->Init(hView, pCbFunc);
 }
 
 int HerePluginDestroyMapView(maps_view_h hView)
 {
-	if (!hView || !HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	/* creating instance */
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	/* sending request */
-	here_error_e error = HERE_ERROR_NONE;
-
-	error = pView->Close(hView);
-
-	delete pView;
-
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh) {
+		maps_view_set_maps_plugin_view_handle(hView, NULL);
+		error = vh->Close(hView);
+		delete vh;
+	}
 	return error;
 }
 
-int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, double dZoom, double dAngle,
-	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
+int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, double dZoom, double dAngle)
 {
-	if (!hView || !mapsCoord || !pCbFunc || !nReqId)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	if (!HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW,
-		(void*)pCbFunc, pUserData, nReqId));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	/* sending request */
-	here_error_e error = pView->RenderMap(hView, mapsCoord, dZoom, dAngle);
-	delete pView;
-
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->RenderMap(hView, mapsCoord, dZoom, dAngle);
 	return error;
 }
 
-int HerePluginRenderMapArea(maps_view_h hView, const maps_area_h hArea, double dZoom, double dAngle,
-	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
+int HerePluginMoveCenter(maps_view_h hView, int delta_x, int delta_y)
 {
-	if (!hView || !hArea || !pCbFunc || !nReqId)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	if (!HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW,
-		(void*)pCbFunc, pUserData, nReqId));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	/* sending request */
-	here_error_e error = pView->RenderMapByArea(hView, hArea, dZoom, dAngle);
-	delete pView;
-
-	return error;
-}
-
-int HerePluginMoveCenter(maps_view_h hView, int delta_x, int delta_y,
-	maps_plugin_render_map_cb pCbFunc, void* pUserData, int* nReqId)
-{
-	if (!hView || !pCbFunc || !nReqId)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	if (!HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW,
-		(void*)pCbFunc, pUserData, nReqId));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	/* sending request */
-	here_error_e error = pView->MoveCenter(hView, delta_x, delta_y);
-	delete pView;
-
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->MoveCenter(hView, delta_x, delta_y);
 	return error;
 }
 
 int HerePluginSetScalebar(maps_view_h hView, bool enable)
 {
-	if (!hView || !HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	/* sending request */
-	here_error_e error = pView->SetScalebar(hView, enable);
-	delete pView;
-
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->SetScalebar(hView, enable);
 	return error;
 }
 
 int HerePluginGetScalebar(maps_view_h hView, bool *enabled)
 {
-	if (!hView || !enabled)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	if (!HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	here_error_e error = pView->GetScalebar(hView, enabled);
-	delete pView;
-
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->GetScalebar(hView, enabled);
 	return error;
 }
 
@@ -819,90 +739,60 @@ int HerePluginDrawMap(maps_view_h hView, Evas* pCanvas, int x, int y, int w, int
 
 int HerePluginGetCenter(maps_view_h hView, maps_coordinates_h *center)
 {
-	if (!hView || !center)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	if (!HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	/* creating instance */
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	/* sending request */
-	here_error_e error = pView->GetCenter(hView, center);
-	delete pView;
-
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->GetCenter(hView, center);
 	return error;
 }
 
 int HerePluginScreenToGeography(maps_view_h hView, int x, int y, maps_coordinates_h *mapsCoord)
 {
-	if (!hView || !mapsCoord)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	if (!HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	/* creating instance */
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	/* sending request */
-	here_error_e error = pView->ScreenToGeolocation(hView, x, y, mapsCoord);
-	delete pView;
-
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->ScreenToGeolocation(hView, x, y, mapsCoord);
 	return error;
 }
 
 int HerePluginGeographyToScreen(maps_view_h hView, const maps_coordinates_h mapsCoord, int *x, int *y)
 {
-	if (!hView || !mapsCoord || !x || !y)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	if (!HereManager::GetHandler())
-		return HERE_ERROR_INVALID_OPERATION;
-
-	/* creating instance */
-	HereView *pView =
-		(HereView*)(HereManager::GetHandler()->CreateInstance(HereManager::HERE_SVC_VIEW));
-
-	if(!pView)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	/* sending request */
-	here_error_e error = pView->GeolocationToScreen(hView, mapsCoord, x, y);
-	delete pView;
-
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->GeolocationToScreen(hView, mapsCoord, x, y);
 	return error;
 }
 
 int HerePluginGetMinZoomLevel(maps_view_h hView, int *nMinZoomLevel)
 {
-	if (!hView)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	return HereView::GetMinZoomLevel(hView, nMinZoomLevel);
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->GetMinZoomLevel(hView, nMinZoomLevel);
+	return error;
 }
 
 int HerePluginGetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel)
 {
-	if (!hView)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	return HereView::GetMaxZoomLevel(hView, nMaxZoomLevel);
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->GetMaxZoomLevel(hView, nMaxZoomLevel);
+	return error;
 }
 
 int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation)
 {
-	if (!hView)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	return HereView::OnViewObject(hView, object, operation);
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->OnViewObject(hView, object, operation);
+	return error;
 }

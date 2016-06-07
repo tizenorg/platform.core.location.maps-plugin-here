@@ -29,7 +29,7 @@ EXPORT_API int maps_plugin_init(maps_plugin_h *plugin)
 {
 	int ret = HerePluginInit(plugin);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -38,7 +38,7 @@ EXPORT_API int maps_plugin_init_module(maps_plugin_h *plugin, const char *module
 {
 	int ret = HerePluginInit(plugin, module);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -47,7 +47,7 @@ EXPORT_API int maps_plugin_shutdown(maps_plugin_h plugin)
 {
 	int ret = HerePluginShutdown(plugin);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -66,7 +66,7 @@ EXPORT_API int maps_plugin_set_provider_key(const char* provider_key)
 {
 	int ret = HerePluginSetProviderKey(provider_key);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -75,7 +75,7 @@ EXPORT_API int maps_plugin_get_provider_key(char** provider_key)
 {
 	int ret = HerePluginGetProviderKey(provider_key);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -84,7 +84,7 @@ EXPORT_API int maps_plugin_set_preference(maps_preference_h preference)
 {
 	int ret = HerePluginSetPreference(preference);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -93,7 +93,7 @@ EXPORT_API int maps_plugin_get_preference(maps_preference_h* preference)
 {
 	int ret = HerePluginGetPreference(preference);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -166,7 +166,7 @@ EXPORT_API int maps_plugin_geocode(const char* address, const maps_preference_h 
 {
 	int ret = HerePluginGeocode(address, preference, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -177,7 +177,7 @@ EXPORT_API int maps_plugin_geocode_inside_area(const char* address, const maps_a
 {
 	int ret = HerePluginGeocodeInsideArea(address, bounds, preference, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -188,7 +188,7 @@ EXPORT_API int maps_plugin_geocode_by_structured_address(const maps_address_h ad
 {
 	int ret = HerePluginGeocodeByStructuredAddress(address, preference, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -199,7 +199,7 @@ EXPORT_API int maps_plugin_reverse_geocode(double latitude, double longitude,
 {
 	int ret = HerePluginReverseGeocode(latitude, longitude, preference, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -210,7 +210,7 @@ EXPORT_API int maps_plugin_multi_reverse_geocode(const maps_coordinates_list_h g
 {
 	int ret = HerePluginMultiReverseGeocode(geocode_list, preference, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -221,7 +221,7 @@ EXPORT_API int maps_plugin_search_place(const maps_coordinates_h position, int d
 {
 	int ret = HerePluginSearchPlace(position, distance, preference, filter, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -232,7 +232,7 @@ EXPORT_API int maps_plugin_search_place_by_area(const maps_area_h boundary,
 {
 	int ret = HerePluginSearchPlaceByArea(boundary, preference, filter, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -243,7 +243,7 @@ EXPORT_API int maps_plugin_search_place_by_address(const char* address, const ma
 {
 	int ret = HerePluginSearchPlaceByAddress(address, boundary, preference, filter, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -253,7 +253,7 @@ EXPORT_API int maps_plugin_search_place_list(const maps_area_h boundary, const m
 {
 	int ret = HerePluginSearchPlaceList(boundary, preference, filter, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -263,7 +263,7 @@ EXPORT_API int maps_plugin_get_place_details(const char* url,
 {
 	int ret = HerePluginSearchPlaceDetails(url, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -273,7 +273,7 @@ EXPORT_API int maps_plugin_search_route(const maps_coordinates_h origin, const m
 {
 	int ret = HerePluginSearchRoute(origin, destination, preference, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -284,7 +284,7 @@ EXPORT_API int maps_plugin_search_route_waypoints(const maps_coordinates_h* wayp
 {
 	int ret = HerePluginSearchRouteWaypoints(waypoint_list, waypoint_num, preference, callback, user_data, request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -293,7 +293,7 @@ EXPORT_API int maps_plugin_cancel_request(int request_id)
 {
 	int ret = HerePluginCancelRequest(request_id);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -303,7 +303,7 @@ EXPORT_API int maps_plugin_create_map_view(maps_view_h hView, maps_plugin_map_vi
 {
 	int ret = HerePluginCreateMapView(hView, pCbFunc);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -312,7 +312,7 @@ EXPORT_API int maps_plugin_destroy_map_view(maps_view_h hView)
 {
 	int ret = HerePluginDestroyMapView(hView);
 
-	MAPS_LOGD("here_error_e = %d", ret);
+	MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -321,24 +321,10 @@ EXPORT_API int maps_plugin_render_map(maps_view_h hView,
 	const maps_coordinates_h coordinates, double zoom_factor, double rotation_angle,
 	maps_plugin_render_map_cb callback, void* user_data, int* request_id)
 {
-	int ret = HerePluginRenderMap(hView, coordinates, zoom_factor, rotation_angle,
-				callback, user_data, request_id);
+	int ret = HerePluginRenderMap(hView, coordinates, zoom_factor, rotation_angle);
 
 	if (ret != HERE_ERROR_NONE)
-		MAPS_LOGD("here_error_e = %d", ret);
-
-	return ConvertToMapsError(ret);
-}
-
-EXPORT_API int maps_plugin_render_map_area(maps_view_h hView, const maps_area_h area,
-	double zoom_factor, double rotation_angle,
-	maps_plugin_render_map_cb callback, void* user_data, int* request_id)
-{
-	int ret = HerePluginRenderMapArea(hView, area, zoom_factor, rotation_angle,
-				callback, user_data, request_id);
-
-	if (ret != HERE_ERROR_NONE)
-		MAPS_LOGD("here_error_e = %d", ret);
+		MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -346,10 +332,10 @@ EXPORT_API int maps_plugin_render_map_area(maps_view_h hView, const maps_area_h 
 EXPORT_API int maps_plugin_move_center(maps_view_h hView, int delta_x, int delta_y,
 	maps_plugin_render_map_cb callback, void* user_data, int* request_id)
 {
-	int ret = HerePluginMoveCenter(hView, delta_x, delta_y, callback, user_data, request_id);
+	int ret = HerePluginMoveCenter(hView, delta_x, delta_y);
 
 	if (ret != HERE_ERROR_NONE)
-		MAPS_LOGD("here_error_e = %d", ret);
+		MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -359,7 +345,7 @@ EXPORT_API int maps_plugin_set_scalebar(maps_view_h hView, bool enable)
 	int ret = HerePluginSetScalebar(hView, enable);
 
 	if (ret != HERE_ERROR_NONE)
-		MAPS_LOGD("here_error_e = %d", ret);
+		MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -375,7 +361,7 @@ EXPORT_API int maps_plugin_draw_map(maps_view_h hView, Evas* canvas, int x, int 
 	int ret = HerePluginDrawMap(hView, canvas, x, y, w, h);
 
 	if (ret != HERE_ERROR_NONE)
-		MAPS_LOGD("here_error_e = %d", ret);
+		MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
@@ -415,7 +401,7 @@ EXPORT_API int maps_plugin_on_object(maps_view_h hView, const maps_view_object_h
 	int ret = HerePluginOnViewObject(hView, object, operation);
 
 	if (ret != HERE_ERROR_NONE)
-		MAPS_LOGD("here_error_e = %d", ret);
+		MAPS_LOGD("here_error_e = %d, %s", ret, ConverHereErrorToString(ret));
 
 	return ConvertToMapsError(ret);
 }
