@@ -145,8 +145,6 @@ public:
 	static bool IsValid(maps_coordinates_s geoCoord);
 	static bool IsValidCoord(double dLat, double dLng);
 	static bool IsValid(maps_area_s hArea);
-
-private:
 };
 
 HERE_PLUGIN_END_NAMESPACE
