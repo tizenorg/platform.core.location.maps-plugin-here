@@ -56,31 +56,31 @@ HereView::~HereView()
 {
 }
 
-here_error_e HereView::Init(maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc)
+here_error_e HereView::init(maps_view_h view, maps_plugin_map_view_ready_cb callback)
 {
-	if (!hView)
+	if (!view)
 		return HERE_ERROR_INVALID_PARAMETER;
 
-	__idler = ecore_idler_add(__idlerCb, (void*)hView);
+	__idler = ecore_idler_add(__idlerCb, (void*)view);
 
 	here_error_e error = HERE_ERROR_NONE;
 	int error2 = MAPS_ERROR_NONE;
 
 	do {
-		error2 = maps_view_get_viewport(hView, &__img);
+		error2 = maps_view_get_viewport(view, &__img);
 		if (error2 != MAPS_ERROR_NONE) break;
 
-		error2 = maps_view_get_screen_location(hView, &__x, &__y, &__w, &__h);
+		error2 = maps_view_get_screen_location(view, &__x, &__y, &__w, &__h);
 		if (error2 != MAPS_ERROR_NONE) break;
 
-		error = __initOpenGL();
+		error = initOpenGL();
 		if (error != HERE_ERROR_NONE) break;
 
-		error = __initOpenGLSurface(hView);
+		error = initOpenGLSurface(view);
 		if (error != HERE_ERROR_NONE) break;
 
-		error = __initMap(hView, pCbFunc);
-	} while(0);
+		error = initMap(view, callback);
+	} while (0);
 
 	if (error == HERE_ERROR_NONE && error2 != MAPS_ERROR_NONE)
 		error = (here_error_e)ConvertToHereError(error2);
@@ -88,7 +88,7 @@ here_error_e HereView::Init(maps_view_h hView, maps_plugin_map_view_ready_cb pCb
 	return error;
 }
 
-here_error_e HereView::__initOpenGL()
+here_error_e HereView::initOpenGL()
 {
 	__cfg = evas_gl_config_new();
 	if (!__cfg) {
@@ -122,9 +122,9 @@ here_error_e HereView::__initOpenGL()
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::__initOpenGLSurface(maps_view_h hView)
+here_error_e HereView::initOpenGLSurface(maps_view_h view)
 {
-	if (!hView || !__gl || !__cfg || !__img || !__ctx)
+	if (!view || !__gl || !__cfg || !__img || !__ctx)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	evas_object_image_pixels_get_callback_set(__img, NULL, NULL);
@@ -155,35 +155,35 @@ here_error_e HereView::__initOpenGLSurface(maps_view_h hView)
 	}
 
 	evas_object_image_native_surface_set(__img, &ns);
-	evas_object_image_pixels_get_callback_set(__img, __pixelGetCb, hView);
+	evas_object_image_pixels_get_callback_set(__img, __pixelGetCb, view);
 	__isInitialized = true;
 
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::__initMap(maps_view_h hView,  maps_plugin_map_view_ready_cb pCbFunc)
+here_error_e HereView::initMap(maps_view_h view,  maps_plugin_map_view_ready_cb callback)
 {
-	if (!hView)
+	if (!view)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	__map = new (std::nothrow) GeoTiledMap();
 	if (!__map)
 		return HERE_ERROR_OUT_OF_MEMORY;
 
-	__readyCb = pCbFunc;
+	__readyCb = callback;
 
-	__map->SetReadyMapSignal((GeoTiledMap::ReadyMapSignalFunctor)__readyMapCb, (void *)hView);
+	__map->SetReadyMapSignal((GeoTiledMap::ReadyMapSignalFunctor)__readyMapCb, (void *)view);
 	__map->SetEvasGlApi(__api);
-	__map->SetMapSize(Dimension(__w,__h));
+	__map->SetMapSize(Dimension(__w, __h));
 
 	__visualObjects.set(__map, evas_object_evas_get(__img));
 
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::Close(maps_view_h hView)
+here_error_e HereView::close(maps_view_h view)
 {
-	if (!hView)
+	if (!view)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	__isInitialized = false;
@@ -250,23 +250,23 @@ void HereView::__renderingCb(void *data)
 	evas_object_image_pixels_dirty_set((Evas_Object*)data, EINA_TRUE);
 }
 
-void HereView::__setMapType(maps_view_h hView)
+void HereView::setMapType(maps_view_h view)
 {
-	if (!hView)
+	if (!view)
 		return;
 
 	/* When the theme is changed, clear cache */
 	maps_view_type_e map_type;
-	maps_view_get_type(hView, &map_type);
+	maps_view_get_type(view, &map_type);
 
 	bool buildings_enabled = false;
-	maps_view_get_buildings_enabled(hView, &buildings_enabled);
+	maps_view_get_buildings_enabled(view, &buildings_enabled);
 
 	bool traffic_enabled = false;
-	maps_view_get_traffic_enabled(hView, &traffic_enabled);
+	maps_view_get_traffic_enabled(view, &traffic_enabled);
 
 	bool public_transit_enabled = false;
-	maps_view_get_public_transit_enabled(hView, &public_transit_enabled);
+	maps_view_get_public_transit_enabled(view, &public_transit_enabled);
 
 	GeoTiledMap::MapType hereMapType = HereUtils::Convert(map_type, buildings_enabled,
 						traffic_enabled, public_transit_enabled);
@@ -282,33 +282,32 @@ void HereView::__setMapType(maps_view_h hView)
 	}
 }
 
-here_error_e HereView::RenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, double dZoom, double dAngle)
+here_error_e HereView::renderMap(maps_view_h view, const maps_coordinates_h coord, double zoom, double angle)
 {
-	if (!hView || !mapsCoord)
+	if (!view || !coord)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!__isInitialized || !__map || !__api)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	/* set map type */
-	__setMapType(hView);
+	setMapType(view);
 
 	/* resize window */
 	int x, y, w, h;
-	maps_view_get_screen_location(hView, &x, &y, &w, &h);
+	maps_view_get_screen_location(view, &x, &y, &w, &h);
 	__w = MAX(__w, 1);
 	__h = MAX(__h, 1);
 
-	if (x != __x || y != __y || w != __w || h != __h)
-	{
+	if (x != __x || y != __y || w != __w || h != __h) {
 		__x = x;
 		__y = y;
 		__w = w;
 		__h = h;
 
 		__api->glViewport(0, 0, __w, __h);
-		__map->SetMapSize(Dimension(__w,__h));
-		__initOpenGLSurface(hView);
+		__map->SetMapSize(Dimension(__w, __h));
+		initOpenGLSurface(view);
 	}
 
 	/* callback */
@@ -316,22 +315,21 @@ here_error_e HereView::RenderMap(maps_view_h hView, const maps_coordinates_h map
 	__map->SetUpdateMapSignal(callback);
 
 	/* zoom level */
-	if (__map->GetZoomLevel() != dZoom)
-	{
-		__zoom = dZoom;
-		__map->SetZoomLevel(dZoom, false);
+	if (__map->GetZoomLevel() != zoom) {
+		__zoom = zoom;
+		__map->SetZoomLevel(zoom, false);
 	}
 
 	/* angle */
-	if (__angle != dAngle) {
-		__angle = dAngle;
-		__map->SetAngle(dAngle);
+	if (__angle != angle) {
+		__angle = angle;
+		__map->SetAngle(angle);
 	}
 
 	/* center */
 	double lat, lng;
-	maps_coordinates_get_latitude(mapsCoord, &lat);
-	maps_coordinates_get_longitude(mapsCoord, &lng);
+	maps_coordinates_get_latitude(coord, &lat);
+	maps_coordinates_get_longitude(coord, &lng);
 
 	GeoCoordinates geoCoord(lat, lng);
 	__lat = lat;
@@ -341,20 +339,9 @@ here_error_e HereView::RenderMap(maps_view_h hView, const maps_coordinates_h map
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::RenderMapByArea(maps_view_h hView, const maps_area_h hArea, double dZoom, double dAngle)
+here_error_e HereView::moveCenter(maps_view_h view, int delta_x, int delta_y)
 {
-	if (!hView || !hArea)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	if (!__isInitialized || !__map)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	return HERE_ERROR_NONE;
-}
-
-here_error_e HereView::MoveCenter(maps_view_h hView, int delta_x, int delta_y)
-{
-	if (!hView)
+	if (!view)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!__isInitialized || !__map)
@@ -368,9 +355,9 @@ here_error_e HereView::MoveCenter(maps_view_h hView, int delta_x, int delta_y)
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::GetCenter(maps_view_h hView, maps_coordinates_h *center)
+here_error_e HereView::getCenter(maps_view_h view, maps_coordinates_h *center)
 {
-	if (!hView || !center)
+	if (!view || !center)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!__isInitialized || !__map)
@@ -387,9 +374,9 @@ here_error_e HereView::GetCenter(maps_view_h hView, maps_coordinates_h *center)
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::SetScalebar(maps_view_h hView, bool enable)
+here_error_e HereView::setScalebarEnabled(maps_view_h view, bool enable)
 {
-	if (!hView)
+	if (!view)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!__isInitialized || !__map)
@@ -400,9 +387,9 @@ here_error_e HereView::SetScalebar(maps_view_h hView, bool enable)
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::GetScalebar(maps_view_h hView, bool *enabled)
+here_error_e HereView::getScalebarEnabled(maps_view_h view, bool *enabled)
 {
-	if (!hView || !enabled)
+	if (!view || !enabled)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!__isInitialized || !__map)
@@ -412,119 +399,75 @@ here_error_e HereView::GetScalebar(maps_view_h hView, bool *enabled)
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::DrawMap(maps_view_h hView, Evas* pCanvas, int x, int y, int nWidth, int nHeight)
+here_error_e HereView::convertScreenToGeolocation(maps_view_h view, int x, int y, maps_coordinates_h *coord)
 {
-	if (!hView || !pCanvas || nWidth <= 0 || nHeight <= 0)
-		return HERE_ERROR_INVALID_PARAMETER;
-
-	if (!__isInitialized || !__map || !__map->GetRootPixmap() || !__api || __w <= 0 || __h <= 0)
-		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
-
-	unsigned char* srcimg_data = (unsigned char*)malloc(__w * __h * 4);
-	if (!srcimg_data)
-		return HERE_ERROR_OUT_OF_MEMORY;
-
-	Evas_Object *dstimg = evas_object_image_filled_add(pCanvas);
-	if (!dstimg) {
-		g_free(srcimg_data);
-		return HERE_ERROR_INVALID_OPERATION;
-	}
-
-	unsigned char *dstimg_data = (unsigned char *)evas_object_image_data_get(dstimg, EINA_TRUE);
-	if (!dstimg_data) {
-		g_free(srcimg_data);
-		return HERE_ERROR_INVALID_OPERATION;
-	}
-
-	int w = nWidth;
-	int h = nHeight;
-
-	if (__w < w) w = __w;
-	if (__h < h) h = __h;
-
-	__api->glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, srcimg_data);
-
-	try {
-		for(int i = 0; i < h; i++)
-			memcpy(dstimg_data+(i*w), srcimg_data+(i * w + x), w * 4);
-	}
-	catch(std::exception &e) {
-		MAPS_LOGD("Exception caught: %s", e.what());
-	}
-	g_free(srcimg_data);
-
-	return HERE_ERROR_NONE;
-}
-
-here_error_e HereView::ScreenToGeolocation(maps_view_h hView, int x, int y, maps_coordinates_h *mapsCoord)
-{
-	if (!hView || !mapsCoord)
+	if (!view || !coord)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!__isInitialized || !__map)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
-	Tizen::Maps::Point mapsPoint(x, y);
-	GeoCoordinates hereCoord = __map->ScreenPositionToCoordinate(mapsPoint);
-	double lat = hereCoord.GetLatitude();
-	double lng = hereCoord.GetLongitude();
+	Tizen::Maps::Point point(x, y);
+	GeoCoordinates geoCoord = __map->ScreenPositionToCoordinate(point);
+	double lat = geoCoord.GetLatitude();
+	double lng = geoCoord.GetLongitude();
 
-	int error = maps_coordinates_create(lat, lng, mapsCoord);
+	int error = maps_coordinates_create(lat, lng, coord);
 	if (error != MAPS_ERROR_NONE)
 		return (here_error_e)ConvertToHereError(error);
 
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::GeolocationToScreen(maps_view_h hView, const maps_coordinates_h mapsCoord, int *x, int *y)
+here_error_e HereView::convertGeolocationToScreen(maps_view_h view, const maps_coordinates_h coord, int *x, int *y)
 {
-	if (!hView || !x || !y)
+	if (!view || !x || !y)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!__isInitialized || !__map)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	double lat, lng;
-	maps_coordinates_get_latitude(mapsCoord, &lat);
-	maps_coordinates_get_longitude(mapsCoord, &lng);
-	GeoCoordinates hereCoord(lat, lng);
-	Tizen::Maps::Point mapsPoint = __map->CoordinateToScreenPosition(hereCoord);
+	maps_coordinates_get_latitude(coord, &lat);
+	maps_coordinates_get_longitude(coord, &lng);
+	GeoCoordinates geoCoord(lat, lng);
+	Tizen::Maps::Point point = __map->CoordinateToScreenPosition(geoCoord);
 
-	*x = mapsPoint.x;
-	*y = mapsPoint.y;
+	*x = point.x;
+	*y = point.y;
 
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::GetMinZoomLevel(maps_view_h hView, int *nMinZoomLevel)
+here_error_e HereView::getMinZoomLevel(maps_view_h view, int *zoom)
 {
-	if (!hView || !nMinZoomLevel)
+	if (!view || !zoom)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!__isInitialized || !__map)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
-	*nMinZoomLevel = (int)__map->GetMinimumZoomLevel();
+	*zoom = (int)__map->GetMinimumZoomLevel();
 
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::GetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel)
+here_error_e HereView::getMaxZoomLevel(maps_view_h view, int *zoom)
 {
-	if (!hView || !nMaxZoomLevel)
+	if (!view || !zoom)
 		return HERE_ERROR_INVALID_PARAMETER;
 
 	if (!__isInitialized || !__map)
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
-	*nMaxZoomLevel = (int)__map->GetMaximumZoomLevel();
+	*zoom = (int)__map->GetMaximumZoomLevel();
 
 	return HERE_ERROR_NONE;
 }
 
-here_error_e HereView::OnViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation)
+here_error_e HereView::onViewObject(maps_view_h view, const maps_view_object_h object, maps_view_object_operation_e operation)
 {
-	if (!hView || !object ||
+	if (!view || !object ||
 		operation < MAPS_VIEW_OBJECT_ADD || operation > MAPS_VIEW_OBJECT_REMOVE)
 		return HERE_ERROR_INVALID_PARAMETER;
 
@@ -532,7 +475,7 @@ here_error_e HereView::OnViewObject(maps_view_h hView, const maps_view_object_h 
 		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
 
 	if (__map->GetRootPixmap())
-		__processViewObject(hView, object, operation);
+		__processViewObject(view, object, operation);
 	else
 		__pendingObjects.push_back(std::make_pair(object, operation));
 
@@ -557,10 +500,10 @@ Eina_Bool HereView::__idlerCb(void *data)
 	return true;
 }
 
-void HereView::__processViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation)
+void HereView::__processViewObject(maps_view_h view, const maps_view_object_h object, maps_view_object_operation_e operation)
 {
 	HereView *hv = NULL;
-	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&hv);
+	int maps_error = maps_view_get_maps_plugin_view_handle(view, (void**)&hv);
 	if (maps_error != MAPS_ERROR_NONE || !hv) return;
 
 	maps_view_object_type_e type;

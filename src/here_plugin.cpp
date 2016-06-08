@@ -24,7 +24,6 @@
 
 extern "C"
 {
-
 EXPORT_API int maps_plugin_init(maps_plugin_h *plugin)
 {
 	int ret = HerePluginInit(plugin);

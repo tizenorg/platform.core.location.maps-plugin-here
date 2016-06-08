@@ -95,8 +95,6 @@ int HerePluginSetScalebar(maps_view_h hView, bool enable);
 
 int HerePluginGetScalebar(maps_view_h hView, bool *enabled);
 
-int HerePluginDrawMap(maps_view_h hView, Evas* pCanvas, int x, int y, int w, int h);
-
 int HerePluginGetCenter(maps_view_h hView, maps_coordinates_h *center);
 
 int HerePluginScreenToGeography(maps_view_h hView, int x, int y, maps_coordinates_h *mapsCoord);

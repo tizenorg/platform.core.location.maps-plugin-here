@@ -77,8 +77,7 @@ bool HereManager::Create()
 		m_pHereManager = new (std::nothrow) HereManager();
 
 	pthread_mutex_lock(&g_mtxRef);
-	if (m_pHereManager)
-	{
+	if (m_pHereManager) {
 		m_nRefCnt++;
 		result = true;
 		MAPS_LOGD("Created a HereManager instance (%d).", m_nRefCnt);
@@ -96,8 +95,7 @@ void HereManager::Close()
 	bool terminate = (--m_nRefCnt == 0 && m_pHereManager);
 	pthread_mutex_unlock(&g_mtxRef);
 
-	if (terminate)
-	{
+	if (terminate) {
 		m_pHereManager->TerminateAllServices();
 		HereConfig::Shutdown();
 
@@ -163,10 +161,8 @@ here_error_e HereManager::CloseInstance(int nReqId)
 	HereSvcList::iterator it;
 
 	pthread_mutex_lock(&m_mtxHereList);
-	for (it = m_HereList.begin(); it != m_HereList.end(); it++)
-	{
-		if ((*it)->GetReqId() == nReqId)
-		{
+	for (it = m_HereList.begin(); it != m_HereList.end(); it++) {
+		if ((*it)->GetReqId() == nReqId) {
 			m_HereList.erase(it);
 			break;
 		}
@@ -181,10 +177,8 @@ here_error_e HereManager::CancelInstance(int nReqId)
 	HereSvcList::iterator it;
 
 	pthread_mutex_lock(&m_mtxHereList);
-	for (it = m_HereList.begin(); it != m_HereList.end(); it++)
-	{
-		if ((*it)->GetReqId() == nReqId)
-		{
+	for (it = m_HereList.begin(); it != m_HereList.end(); it++) {
+		if ((*it)->GetReqId() == nReqId) {
 			m_HereList.erase(it);
 			RestItemHandle::Cancel((*it)->GetRestReqId());
 			(*it)->TerminateService();
@@ -202,12 +196,9 @@ bool HereManager::AppInfoMetadataCb(const char *metadata_key, const char *metada
 	if (!metadata_key || !metadata_value)
 		return false;
 
-	if (!strncmp(metadata_key, "http://tizen.org/metadata/here_key", 35) && strlen(metadata_value) > 0 )
-	{
+	if (!strncmp(metadata_key, "http://tizen.org/metadata/here_key", 35) && strlen(metadata_value) > 0) {
 		if (m_pHereManager->SetCredentials(metadata_value) == HERE_ERROR_NONE)
-		{
 			MAPS_LOGD("Succeeded getting credential from metadata");
-		}
 
 		return false;
 	}
@@ -224,15 +215,13 @@ here_error_e HereManager::SetCredentials(void)
 
 	nProcessId = getpid();
 	nRet = app_manager_get_app_id(nProcessId, &strAppId);
-	if (nRet != APP_MANAGER_ERROR_NONE)
-	{
+	if (nRet != APP_MANAGER_ERROR_NONE) {
 		MAPS_LOGI("Get app_id [%ld]. nRet[%d]", nProcessId, nRet);
 		return HERE_ERROR_NONE;
 	}
 
 	nRet = app_info_create(strAppId, &hAppInfo);
-	if (nRet != APP_MANAGER_ERROR_NONE)
-	{
+	if (nRet != APP_MANAGER_ERROR_NONE) {
 		MAPS_LOGI("Get appinfo of [%s]. nRet[%d]", strAppId, nRet);
 		if (strAppId) free(strAppId);
 		return HERE_ERROR_NONE;
@@ -242,15 +231,11 @@ here_error_e HereManager::SetCredentials(void)
 
 	nRet = app_info_foreach_metadata(hAppInfo, AppInfoMetadataCb, NULL);
 	if (nRet != APP_MANAGER_ERROR_NONE)
-	{
 		MAPS_LOGI("Get metadata. nRet[%d]", nRet);
-	}
 
 	nRet = app_info_destroy(hAppInfo);
 	if (nRet != APP_MANAGER_ERROR_NONE)
-	{
 		MAPS_LOGI("Destroy app_info. nRet[%d]", nRet);
-	}
 
 	return HERE_ERROR_NONE;
 }
@@ -266,8 +251,7 @@ here_error_e HereManager::SetCredentials(const char *szKey)
 
 	nCodeStart = strKey.find("/");
 
-	if(nCodeStart == 0 || nCodeStart >= (strKey.length()-1))
-	{
+	if(nCodeStart == 0 || nCodeStart >= (strKey.length()-1)) {
 		MAPS_LOGE("[error] Key type fault : Key type should be as like XXXXX/YYYYY");
 		return HERE_ERROR_INVALID_PARAMETER;
 	}
@@ -285,8 +269,9 @@ here_error_e HereManager::SetCredentials(const char *szKey)
 			strRequestAppId.append(strAppId);
 			g_free(strAppId);
 		}
-	} else
+	} else {
 		strRequestAppId = ApplicationContext::GetInstance().GetRequestAppId();
+	}
 
 	if(!ApplicationContext::GetInstance().Initialize(strAppCode, strAppId, strRequestAppId))
 		return HERE_ERROR_INVALID_OPERATION;
@@ -324,8 +309,7 @@ here_error_e HereManager::SetPreference(maps_preference_h hPref)
 	if (!hPref)
 		return HERE_ERROR_INVALID_PARAMETER;
 
-	if (m_hPref)
-	{
+	if (m_hPref) {
 		if (maps_preference_destroy(m_hPref) != MAPS_ERROR_NONE)
 			return HERE_ERROR_INVALID_OPERATION;
 	}
@@ -338,7 +322,7 @@ here_error_e HereManager::SetPreference(maps_preference_h hPref)
 		error = maps_preference_get_language(hPref, &szLanguage);
 		if (error == MAPS_ERROR_NONE && szLanguage && strlen(szLanguage) > 0)
 			ApplicationContext::GetInstance().SetPreferredLanguage(String(szLanguage));
-	} while(0);
+	} while (0);
 
 	return (here_error_e)ConvertToHereError(error);
 }
@@ -367,11 +351,9 @@ void HereManager::TerminateAllServices(void)
 {
 	HereSvcList::iterator it;
 
-	while (1)
-	{
+	while (1) {
 		pthread_mutex_lock(&m_mtxHereList);
-		if (m_HereList.empty())
-		{
+		if (m_HereList.empty()) {
 			pthread_mutex_unlock(&m_mtxHereList);
 			break;
 		}
@@ -381,14 +363,12 @@ void HereManager::TerminateAllServices(void)
 		try {
 			if (*it) (*it)->TerminateService();
 			m_HereList.erase(it);
-		}
-		catch (std::exception &e) {
+		} catch (std::exception &e) {
 			MAPS_LOGD("Exception caught: %s", e.what());
 		}
 	};
 
-	if (m_hPref)
-	{
+	if (m_hPref) {
 		maps_preference_destroy(m_hPref);
 		m_hPref = NULL;
 	}
@@ -398,8 +378,7 @@ here_error_e HereManager::ConvertNetworkErrorCode(const int nErrorCode)
 {
 	here_error_e err = HERE_ERROR_NONE;
 
-	switch (nErrorCode)
-	{
+	switch (nErrorCode) {
 	case CONNECTION_ERROR_NONE:
 		//MAPS_LOGD("No error");
 		err = HERE_ERROR_NONE;
@@ -476,21 +455,16 @@ here_error_e HereManager::SetProxyAddress()
 
 	char *proxy_address = NULL;
 
-	if (!m_hConnection)
-	{
+	if (!m_hConnection) {
 		errorCode = connection_create(&m_hConnection);
 		if (errorCode == CONNECTION_ERROR_NONE)
-		{
 			errorCode = connection_set_type_changed_cb(m_hConnection, NetworkStateChangedIndCb, this);
-
-		}
 	}
 	if (errorCode != CONNECTION_ERROR_NONE)
 		return ConvertNetworkErrorCode(errorCode);
 
 	errorCode = connection_get_proxy(m_hConnection, CONNECTION_ADDRESS_FAMILY_IPV4, &proxy_address);
-	if (errorCode == CONNECTION_ERROR_NONE)
-	{
+	if (errorCode == CONNECTION_ERROR_NONE) {
 		MAPS_LOGD("Proxy = %s", (proxy_address ? proxy_address : "(null)"));
 		Tizen::Maps::HereConfig::SetProxyAddress(proxy_address);
 	}

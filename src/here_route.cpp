@@ -31,8 +31,7 @@ HereRoute::HereRoute(void *pCbFunc, void *pUserData, int nReqId)
 
 HereRoute::~HereRoute()
 {
-	if (m_pQuery)
-	{
+	if (m_pQuery) {
 		delete m_pQuery;
 		m_pQuery = NULL;
 	}
@@ -81,8 +80,7 @@ here_error_e HereRoute::PrepareWaypoint(const maps_coordinates_h* hWaypointList,
 	GeoCoordinates hereCoord;
 	double dLatitude, dLongitude;
 
-	for (int index = 0; index < nWaypointNum; index++)
-	{
+	for (int index = 0; index < nWaypointNum; index++) {
 		if (hWaypointList[index] != NULL) {
 			maps_coordinates_get_latitude(hWaypointList[index], &dLatitude);
 			maps_coordinates_get_longitude(hWaypointList[index], &dLongitude);
@@ -120,8 +118,7 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 
 	/* transport mode */
 	maps_route_transport_mode_e eTransMode;
-	if (maps_preference_get_route_transport_mode(hPref, &eTransMode) == MAPS_ERROR_NONE)
-	{
+	if (maps_preference_get_route_transport_mode(hPref, &eTransMode) == MAPS_ERROR_NONE) {
 		m_pQuery->SetTravelModes(HereUtils::Convert(eTransMode));
 	}
 
@@ -129,16 +126,14 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 	maps_route_feature_e eFeature;
 	maps_route_feature_weight_e eFeatureWeight;
 	if (maps_preference_get_route_feature(hPref, &eFeature) == MAPS_ERROR_NONE &&
-	    maps_preference_get_route_feature_weight(hPref, &eFeatureWeight) == MAPS_ERROR_NONE)
-	{
+	    maps_preference_get_route_feature_weight(hPref, &eFeatureWeight) == MAPS_ERROR_NONE) {
 		m_pQuery->SetFeatureWeight(HereUtils::Convert(eFeature),
 			HereUtils::Convert(eFeatureWeight));
 	}
 
 	/* exclude areas */
 	char *szAreaToAvoid;
-	if (maps_preference_get(hPref, MAPS_ROUTE_RECT_AREA_TO_AVOID, &szAreaToAvoid) == MAPS_ERROR_NONE)
-	{
+	if (maps_preference_get(hPref, MAPS_ROUTE_RECT_AREA_TO_AVOID, &szAreaToAvoid) == MAPS_ERROR_NONE) {
 		GeoBoundingBox gbBox;
 		GeoBoundingBoxList gbBoxList;
 		gbBoxList.push_back(HereUtils::Convert(szAreaToAvoid, gbBox));
@@ -149,10 +144,8 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 	/* optimization */
 	GeoRouteQuery::RouteOptimization hereOpt;
 	maps_route_optimization_e mapsOpt;
-	if (maps_preference_get_route_optimization(hPref, &mapsOpt) == MAPS_ERROR_NONE)
-	{
-		switch (mapsOpt)
-		{
+	if (maps_preference_get_route_optimization(hPref, &mapsOpt) == MAPS_ERROR_NONE) {
+		switch (mapsOpt) {
 		case MAPS_ROUTE_TYPE_FASTEST:  hereOpt = GeoRouteQuery::RO_FastestRoute;  break;
 		case MAPS_ROUTE_TYPE_SHORTEST: hereOpt = GeoRouteQuery::RO_ShortestRoute; break;
 		default:                       hereOpt = GeoRouteQuery::RO_FastestRoute;  break;
@@ -163,10 +156,8 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 	/* Metric System */
 	GeoRouteQuery::MetricSystem eMetric;
 	maps_distance_unit_e eUnit;
-	if (maps_preference_get_distance_unit(hPref, &eUnit) == MAPS_ERROR_NONE)
-	{
-		switch (eUnit)
-		{
+	if (maps_preference_get_distance_unit(hPref, &eUnit) == MAPS_ERROR_NONE) {
+		switch (eUnit) {
 		case MAPS_DISTANCE_UNIT_M:  eMetric = GeoRouteQuery::DIST_metric;   break;
 		case MAPS_DISTANCE_UNIT_KM: eMetric = GeoRouteQuery::DIST_metric;   break;
 		default:                    eMetric = GeoRouteQuery::DIST_imperial; break;
@@ -176,8 +167,7 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 	}
 
 	char *szViewBounds;
-	if (maps_preference_get(hPref, MAPS_ROUTE_GEOMETRY_BOUNDING_BOX, &szViewBounds) == MAPS_ERROR_NONE)
-	{
+	if (maps_preference_get(hPref, MAPS_ROUTE_GEOMETRY_BOUNDING_BOX, &szViewBounds) == MAPS_ERROR_NONE) {
 		GeoBoundingBox gbBox;
 		HereUtils::Convert(szViewBounds, gbBox);
 		m_pQuery->SetViewBounds(gbBox);
@@ -185,27 +175,19 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 	}
 
 	bool is_alternatives_enabled = false;
-	if (maps_preference_get_route_alternatives_enabled(hPref, &is_alternatives_enabled) == MAPS_ERROR_NONE)
-	{
+	if (maps_preference_get_route_alternatives_enabled(hPref, &is_alternatives_enabled) == MAPS_ERROR_NONE) {
 		if (is_alternatives_enabled)
-		{
 			m_pQuery->SetAlternatives(2);
-		}
 	}
 
 	char *szRealtimeTraffic;
 	if (maps_preference_get(hPref, MAPS_ROUTE_REALTIME_TRAFFIC, &szRealtimeTraffic) == MAPS_ERROR_NONE)
 	{
-		if (!strcmp(szRealtimeTraffic, "true") || !strcmp(szRealtimeTraffic, "enabled"))
-		{
+		if (!strcmp(szRealtimeTraffic, "true") || !strcmp(szRealtimeTraffic, "enabled")) {
 			m_pQuery->SetRealtimeTraffic(1);
-		}
-		else if (!strcmp(szRealtimeTraffic, "false") || !strcmp(szRealtimeTraffic, "disabled"))
-		{
+		} else if (!strcmp(szRealtimeTraffic, "false") || !strcmp(szRealtimeTraffic, "disabled")) {
 			m_pQuery->SetRealtimeTraffic(2);
-		}
-		else
-		{
+		} else {
 			m_pQuery->SetRealtimeTraffic(0);
 		}
 		g_free(szRealtimeTraffic);
@@ -226,8 +208,7 @@ here_error_e HereRoute::StartRoute(void)
 
 void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 {
-	if (m_bCanceled || !m_pCbFunc || !m_pQuery) // ignore call back if it was cancelled.
-	{
+	if (m_bCanceled || !m_pCbFunc || !m_pQuery) { // ignore call back if it was cancelled.
 		delete this;
 		return;
 	}
@@ -238,20 +219,17 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 	int nReplyIdx = 0, nReplyNum = hereRouteList.size();
 	GeoRouteList::iterator hereRoute;
 
-	if (nReplyNum == 0)
-	{
+	if (nReplyNum == 0) {
 		((maps_service_search_route_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND, m_nReqId,
 			0, 0, NULL, m_pUserData);
 		delete this;
 		return;
 	}
 
-	for (hereRoute = hereRouteList.begin() ; hereRoute != hereRouteList.end() ; hereRoute++)
-	{
+	for (hereRoute = hereRouteList.begin() ; hereRoute != hereRouteList.end() ; hereRoute++) {
 		error = (maps_error_e)maps_route_create(&mapsRoute);
 
-		if (error == MAPS_ERROR_NONE)
-		{
+		if (error == MAPS_ERROR_NONE) {
 			/* route id */
 			if (!hereRoute->GetRouteId().empty())
 				maps_route_set_route_id(mapsRoute, (char*)hereRoute->GetRouteId().c_str());
@@ -280,16 +258,13 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 			maps_item_list_h mapsPathList;
 			maps_coordinates_h mapsPath;
 
-			if (maps_item_list_create(&mapsPathList) == MAPS_ERROR_NONE)
-			{
+			if (maps_item_list_create(&mapsPathList) == MAPS_ERROR_NONE) {
 				GeoCoordinateList::iterator herePath;
-				for (herePath = herePathList.begin(); herePath != herePathList.end(); herePath++)
-				{
+				for (herePath = herePathList.begin(); herePath != herePathList.end(); herePath++) {
 					double dLat = herePath->GetLatitude();
 					double dLng = herePath->GetLongitude();
 
-					if(maps_coordinates_create(dLat, dLng, &mapsPath) == MAPS_ERROR_NONE)
-					{
+					if(maps_coordinates_create(dLat, dLng, &mapsPath) == MAPS_ERROR_NONE) {
 						if (herePath == herePathList.begin())
 							maps_route_set_origin(mapsRoute, mapsPath);
 						else if (herePath == herePathList.end()-1)
@@ -301,8 +276,7 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 					}
 				}
 
-				if (maps_item_list_items(mapsPathList))
-				{
+				if (maps_item_list_items(mapsPathList)) {
 					maps_route_set_path(mapsRoute, mapsPathList);
 					maps_item_list_remove_all(mapsPathList, maps_coordinates_destroy);
 				}
@@ -312,8 +286,7 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 			/* bounding box */
 			maps_area_h hMapsArea = NULL;
 			HereUtils::Convert(hereRoute->GetBounds(), hMapsArea);
-			if (hMapsArea)
-			{
+			if (hMapsArea) {
 				maps_route_set_bounding_box(mapsRoute, hMapsArea);
 				maps_area_destroy(hMapsArea);
 			}
@@ -322,16 +295,12 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 			ProcessSegments(mapsRoute, hereRoute->GetRouteSegmentList());
 		}
 
-		if (m_bCanceled)
-		{
+		if (m_bCanceled) {
 			maps_route_destroy(mapsRoute);
 			break;
-		}
-		else
-		{
+		} else {
 			if (((maps_service_search_route_cb)m_pCbFunc)(error, m_nReqId,
-				nReplyIdx++, nReplyNum, mapsRoute, m_pUserData) == FALSE)
-			{
+				nReplyIdx++, nReplyNum, mapsRoute, m_pUserData) == FALSE) {
 				delete this;
 				return;
 			}
@@ -377,8 +346,7 @@ maps_error_e HereRoute::ProcessSegments(maps_route_h mapsRoute, const RouteSegme
 		GeoCoordinateList herePathList = hereSegm->GetPath();
 		int here_path_list_size = herePathList.size();
 
-		if (here_path_list_size > 0)
-		{
+		if (here_path_list_size > 0) {
 			GeoCoordinates hereOrig = herePathList.at(0);
 			GeoCoordinates hereDest = herePathList.at(here_path_list_size-1);
 
@@ -400,8 +368,7 @@ maps_error_e HereRoute::ProcessSegments(maps_route_h mapsRoute, const RouteSegme
 		maps_route_segment_destroy(mapsSegm);
 	}
 
-	if (maps_item_list_items(mapsSegmList))
-	{
+	if (maps_item_list_items(mapsSegmList)) {
 		maps_route_set_segments(mapsRoute, mapsSegmList);
 		maps_item_list_remove_all(mapsSegmList, maps_route_segment_destroy);
 	}
@@ -423,14 +390,12 @@ maps_error_e HereRoute::ProcessManeuver(maps_route_segment_h mapsSegm, const Man
 		return error;
 
 	ManeuverList::const_iterator hereMane;
-	for (hereMane = hereManeList.begin() ; hereMane != hereManeList.end() ; hereMane++)
-	{
+	for (hereMane = hereManeList.begin() ; hereMane != hereManeList.end() ; hereMane++) {
 		if (maps_route_maneuver_create(&mapsManeuver) != MAPS_ERROR_NONE) continue;
 
 		/* position */
 		if (maps_coordinates_create(hereMane->GetPosition().GetLatitude(),
-			hereMane->GetPosition().GetLongitude(), &mapsCoord) == MAPS_ERROR_NONE)
-		{
+			hereMane->GetPosition().GetLongitude(), &mapsCoord) == MAPS_ERROR_NONE) {
 			maps_route_maneuver_set_position(mapsManeuver, mapsCoord);
 			maps_coordinates_destroy(mapsCoord);
 		}
@@ -456,8 +421,7 @@ maps_error_e HereRoute::ProcessManeuver(maps_route_segment_h mapsSegm, const Man
 		maps_route_maneuver_destroy(mapsManeuver);
 	}
 
-	if (maps_item_list_items(mapsManeList))
-	{
+	if (maps_item_list_items(mapsManeList)) {
 		maps_route_segment_set_maneuvers(mapsSegm, mapsManeList);
 		maps_item_list_remove_all(mapsManeList, maps_route_maneuver_destroy);
 	}

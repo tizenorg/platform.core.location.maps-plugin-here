@@ -39,20 +39,17 @@ HerePlace::HerePlace(void *pCbFunc, void *pUserData, int nReqId)
 
 HerePlace::~HerePlace()
 {
-	if (m_pDiscoveryQuery)
-	{
+	if (m_pDiscoveryQuery) {
 		delete m_pDiscoveryQuery;
 		m_pDiscoveryQuery = NULL;
 	}
 
-	if (m_pPlaceDetailsQuery)
-	{
+	if (m_pPlaceDetailsQuery) {
 		delete m_pPlaceDetailsQuery;
 		m_pPlaceDetailsQuery = NULL;
 	}
 
-	while(!m_PlaceList.empty())
-	{
+	while (!m_PlaceList.empty()) {
 		maps_place_destroy(m_PlaceList.front());
 		m_PlaceList.pop_front();
 	}
@@ -115,8 +112,7 @@ here_error_e HerePlace::PrepareDiscoveryFilter(maps_place_filter_h hFilter)
 
 	int ret;
 	maps_place_category_h mapsCate = NULL;
-	if (maps_place_filter_get_category(hFilter, &mapsCate) == MAPS_ERROR_NONE)
-	{
+	if (maps_place_filter_get_category(hFilter, &mapsCate) == MAPS_ERROR_NONE) {
 		CategoryList hereCateList;
 		Category hereCate;
 		char *szId = NULL, *szName = NULL, *szUrl = NULL;
@@ -132,10 +128,9 @@ here_error_e HerePlace::PrepareDiscoveryFilter(maps_place_filter_h hFilter)
 		g_free(szUrl);
 
 		ret = maps_place_category_get_id(mapsCate, &szId);
-		if (ret == MAPS_ERROR_NONE && szId && *szId)
+		if (ret == MAPS_ERROR_NONE && szId && *szId) {
 			hereCate.SetCategoryId(CategoryId(szId));
-		else if (hereCate.GetTitle().size() > 0)
-		{
+		} else if (hereCate.GetTitle().size() > 0) {
 			hereCate.SetCategoryId(CategoryId(hereCate.GetTitle()));
 			hereCate.SetTitle("");
 		}
@@ -154,8 +149,7 @@ here_error_e HerePlace::PrepareDiscoveryFilter(maps_place_filter_h hFilter)
 
 	char *szKeyword = NULL;
 	ret = maps_place_filter_get_keyword(hFilter, &szKeyword);
-	if (ret == MAPS_ERROR_NONE && szKeyword && *szKeyword)
-	{
+	if (ret == MAPS_ERROR_NONE && szKeyword && *szKeyword) {
 		String szSearchText = m_pDiscoveryQuery->GetSearchText();
 		if (szSearchText.size() > 0) szSearchText += " ";
 		szSearchText += szKeyword;
@@ -165,13 +159,10 @@ here_error_e HerePlace::PrepareDiscoveryFilter(maps_place_filter_h hFilter)
 
 	char *szAddress = NULL;
 	ret = maps_place_filter_get_place_address(hFilter, &szAddress);
-	if (ret == MAPS_ERROR_NONE && szAddress && *szAddress)
-	{
+	if (ret == MAPS_ERROR_NONE && szAddress && *szAddress) {
 		String szSearchText = szAddress;
 		if (m_pDiscoveryQuery->GetSearchText().size() > 0)
-		{
 			szSearchText += " " + m_pDiscoveryQuery->GetSearchText();
-		}
 		m_pDiscoveryQuery->SetSearchText(szSearchText);
 	}
 	g_free(szAddress);
@@ -216,32 +207,24 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 
 	/* Merge search text with other search text being in preference */
 	String szSearchText = (szAddr ? szAddr : "");
-	if (m_pDiscoveryQuery->GetSearchText().size() > 0)
-	{
+	if (m_pDiscoveryQuery->GetSearchText().size() > 0) {
 		if (szSearchText.size() > 0) szSearchText += " ";
 		szSearchText += m_pDiscoveryQuery->GetSearchText();
 	}
 	m_pDiscoveryQuery->SetSearchText(szSearchText);
 
 	/* Decide command type */
-	if (!szSearchText.empty())
-	{
+	if (!szSearchText.empty()) {
 		cmdType = PLACE_CMD_TEXT;
-	}
-	else if (pArea->type == MAPS_AREA_CIRCLE && pArea->circle.radius == 0)
-	{
+	} else if (pArea->type == MAPS_AREA_CIRCLE && pArea->circle.radius == 0) {
 		cmdType = PLACE_CMD_CENTER;
-	}
-	else
-	{
+	} else {
 		cmdType = PLACE_CMD_AREA;
 	}
 
 	/* Get proximity with area */
-	if (cmdType == PLACE_CMD_TEXT || cmdType == PLACE_CMD_CENTER)
-	{
-		if (pArea->type == MAPS_AREA_RECTANGLE)
-		{
+	if (cmdType == PLACE_CMD_TEXT || cmdType == PLACE_CMD_CENTER) {
+		if (pArea->type == MAPS_AREA_RECTANGLE) {
 			double dLat1 = pArea->rect.top_left.latitude;
 			double dLng1 = pArea->rect.top_left.longitude;
 			double dLat2 = pArea->rect.bottom_right.latitude;
@@ -251,47 +234,35 @@ here_error_e HerePlace::StartDiscoveryPlace(maps_area_h hArea, const char *szAdd
 
 			geoCoord.SetLatitude(dLat);
 			geoCoord.SetLongitude(dLng);
-		}
-		else if(pArea->type == MAPS_AREA_CIRCLE)
-		{
+		} else if (pArea->type == MAPS_AREA_CIRCLE) {
 			double dLat = pArea->circle.center.latitude;
 			double dLng = pArea->circle.center.longitude;
 
 			geoCoord.SetLatitude(dLat);
 			geoCoord.SetLongitude(dLng);
-		}
-		else
+		} else {
 			return HERE_ERROR_INVALID_PARAMETER;
-	}
-	else if (cmdType == PLACE_CMD_AREA)
-	{
-		if (pArea->type == MAPS_AREA_RECTANGLE)
-		{
+		}
+	} else if (cmdType == PLACE_CMD_AREA) {
+		if (pArea->type == MAPS_AREA_RECTANGLE) {
 			HereUtils::Convert(hArea, geoBox);
 			geoArea = &geoBox;
-		}
-		else if (pArea->type == MAPS_AREA_CIRCLE)
-		{
+		} else if (pArea->type == MAPS_AREA_CIRCLE) {
 			HereUtils::Convert(hArea, geoCircle);
 			geoArea = &geoCircle;
-		}
-		else
+		} else {
 			return HERE_ERROR_INVALID_PARAMETER;
+		}
 	}
 
 	/* Set properties */
-	if (cmdType == PLACE_CMD_TEXT)
-	{
+	if (cmdType == PLACE_CMD_TEXT) {
 		m_pDiscoveryQuery->SetType(DiscoveryQuery::QT_SEARCH);
 		m_pDiscoveryQuery->SetProximity(geoCoord);
-	}
-	else if (cmdType == PLACE_CMD_CENTER)
-	{
+	} else if (cmdType == PLACE_CMD_CENTER) {
 		m_pDiscoveryQuery->SetType(DiscoveryQuery::QT_EXPLORE);
 		m_pDiscoveryQuery->SetProximity(geoCoord);
-	}
-	else
-	{
+	} else {
 		m_pDiscoveryQuery->SetType(DiscoveryQuery::QT_EXPLORE);
 		if (geoArea)
 			m_pDiscoveryQuery->SetArea(*geoArea);
@@ -373,7 +344,7 @@ here_error_e HerePlace::StartPlaceDetailsInternal(const char *szUrl)
 	return (bExcuted ? HERE_ERROR_NONE : HERE_ERROR_INVALID_OPERATION);
 }
 
-void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
+void HerePlace::OnDiscoverReply(const DiscoveryReply &Reply)
 {
 	maps_place_h mapsPlace;
 	PlaceItemList herePlaceList = Reply.GetPlaceItems();
@@ -389,8 +360,7 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 	int error = MAPS_ERROR_UNKNOWN, sub_error;
 	bool is_valid, isPending;
 
-	if (m_bCanceled || !m_pCbFunc)
-	{
+	if (m_bCanceled || !m_pCbFunc) {
 		delete this;
 		return;
 	}
@@ -400,10 +370,8 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 
 	for (herePlaceIt = herePlaceList.begin();
 		herePlaceIt != herePlaceList.end();
-		herePlaceIt++)
-	{
-		if ((error = maps_place_create(&mapsPlace)) == MAPS_ERROR_NONE)
-		{
+		herePlaceIt++) {
+		if ((error = maps_place_create(&mapsPlace)) == MAPS_ERROR_NONE) {
 			isPending = false;
 
 			/* title, uri, id */
@@ -424,15 +392,13 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 			/* position */
 			hereCoord = herePlaceIt->GetPosition();
 			if (maps_coordinates_create(hereCoord.GetLatitude(), hereCoord.GetLongitude(),
-				&mapsCoord) == MAPS_ERROR_NONE)
-			{
+				&mapsCoord) == MAPS_ERROR_NONE) {
 				maps_place_set_location(mapsPlace, mapsCoord);
 				maps_coordinates_destroy(mapsCoord);
 			}
 
 			/* rating (optional) */
-			if (maps_place_rating_create(&mapsRating) == MAPS_ERROR_NONE)
-			{
+			if (maps_place_rating_create(&mapsRating) == MAPS_ERROR_NONE) {
 				maps_place_rating_set_average(mapsRating, herePlaceIt->GetAverageRating());
 				maps_place_set_rating(mapsPlace, mapsRating);
 				maps_place_rating_destroy(mapsRating);
@@ -442,35 +408,29 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 			hereCate = herePlaceIt->GetCategory();
 
 			maps_item_list_h mapsCateList;
-			if (maps_item_list_create(&mapsCateList) == MAPS_ERROR_NONE)
-			{
-				if (maps_place_category_create(&mapsCate) == MAPS_ERROR_NONE)
-				{
+			if (maps_item_list_create(&mapsCateList) == MAPS_ERROR_NONE) {
+				if (maps_place_category_create(&mapsCate) == MAPS_ERROR_NONE) {
 					is_valid = false;
 
-					if (!hereCate.GetCategoryId().ToString().empty())
-					{
+					if (!hereCate.GetCategoryId().ToString().empty()) {
 						sub_error = maps_place_category_set_id(mapsCate,
 								(char*)hereCate.GetCategoryId().ToString().c_str());
 						is_valid |= (sub_error == MAPS_ERROR_NONE);
 					}
 
-					if (!hereCate.GetTitle().empty())
-					{
+					if (!hereCate.GetTitle().empty()) {
 						sub_error = maps_place_category_set_name(mapsCate,
 								(char*)hereCate.GetTitle().c_str());
 						is_valid |= (sub_error == MAPS_ERROR_NONE);
 					}
 
-					if (!hereCate.GetHref().empty())
-					{
+					if (!hereCate.GetHref().empty()) {
 						sub_error = maps_place_category_set_url(mapsCate,
 								(char*)hereCate.GetHref().c_str());
 						is_valid |= (sub_error == MAPS_ERROR_NONE);
 					}
 
-					if (is_valid)
-					{
+					if (is_valid) {
 						maps_item_list_append(mapsCateList, mapsCate, maps_place_category_clone);
 						maps_place_set_categories(mapsPlace, mapsCateList);
 						maps_item_list_remove_all(mapsCateList, maps_place_category_destroy);
@@ -490,13 +450,10 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 			/* vicinity */
 
 			/* If needed PlaceDetails information, postpone to send a reply */
-			if(__sending_place_details_query_automatically && !m_bReplyWithList)
-			{
+			if(__sending_place_details_query_automatically && !m_bReplyWithList) {
 				hereLinkObj = herePlaceIt->GetLinkObject();
-				if (!hereLinkObj.GetHref().empty() && !hereLinkObj.GetId().empty())
-				{
-					if (StartPlaceDetailsInternal(hereLinkObj.GetHref().c_str()) == HERE_ERROR_NONE)
-					{
+				if (!hereLinkObj.GetHref().empty() && !hereLinkObj.GetId().empty()) {
+					if (StartPlaceDetailsInternal(hereLinkObj.GetHref().c_str()) == HERE_ERROR_NONE) {
 						m_PlaceList.push_back(mapsPlace);
 						isPending = true;
 						MAPS_LOGD("Add maps_place_h to the pending list. id=%s", hereLinkObj.GetId().data());
@@ -508,42 +465,35 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 				m_nReplyIdx++;
 				m_PlaceList.push_back(mapsPlace);
 			}
-		}
-		else
-		{
+		} else {
 			m_nReplyCnt--;
 		}
 	}
 
 	for (hereSearchIt = hereSearchList.begin();
 		hereSearchIt != hereSearchList.end();
-		hereSearchIt++)
-	{
+		hereSearchIt++) {
 		error = maps_place_create(&mapsPlace);
 
-		if(error == MAPS_ERROR_NONE)
-		{
+		if(error == MAPS_ERROR_NONE) {
 			is_valid = false;
 
 			// title, uri, szId
 			hereLinkObj = hereSearchIt->GetLinkObject();
 
-			if (!hereLinkObj.GetTitle().empty())
-			{
+			if (!hereLinkObj.GetTitle().empty()) {
 				sub_error = maps_place_set_name(mapsPlace,
 						(char*)hereLinkObj.GetTitle().c_str());
 				is_valid |= (sub_error == MAPS_ERROR_NONE);
 			}
 
-			if (!hereLinkObj.GetHref().empty())
-			{
+			if (!hereLinkObj.GetHref().empty()) {
 				sub_error = maps_place_set_uri(mapsPlace,
 						(char*)hereLinkObj.GetHref().c_str());
 				is_valid |= (sub_error == MAPS_ERROR_NONE);
 			}
 
-			if (!hereLinkObj.GetId().empty())
-			{
+			if (!hereLinkObj.GetId().empty()) {
 				sub_error = maps_place_set_id(mapsPlace,
 						(char*)hereLinkObj.GetId().c_str());
 				is_valid |= (sub_error == MAPS_ERROR_NONE);
@@ -551,28 +501,22 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 			/* icon */
 			/* type */
 
-			if (!is_valid)
-			{
+			if (!is_valid) {
 				m_nReplyCnt--;
 				error = MAPS_ERROR_NOT_FOUND;
 				maps_place_destroy(mapsPlace);
 				mapsPlace = NULL;
-			}
-			else
-			{
+			} else {
 				m_PlaceList.push_back(mapsPlace);
 				m_nReplyIdx++;
 			}
-		}
-		else
-		{
+		} else {
 			m_nReplyCnt--;
 		}
 	}
 
 
-	if (!m_bReplyFlushed && (m_nReplyCnt == 0 || m_nReplyIdx == m_nReplyCnt))
-	{
+	if (!m_bReplyFlushed && (m_nReplyCnt == 0 || m_nReplyIdx == m_nReplyCnt)) {
 		if (m_nReplyCnt == 0)
 			error = MAPS_ERROR_NOT_FOUND;
 
@@ -583,8 +527,7 @@ void HerePlace::OnDiscoverReply (const DiscoveryReply &Reply)
 
 void HerePlace::OnDiscoverFailure(const DiscoveryReply& Reply)
 {
-	if (!m_bReplyFlushed)
-	{
+	if (!m_bReplyFlushed) {
 		m_nReplyIdx = 0;
 		m_nReplyCnt = 0;
 		__flushReplies((maps_error_e)GetErrorCode(Reply));
@@ -592,12 +535,10 @@ void HerePlace::OnDiscoverFailure(const DiscoveryReply& Reply)
 	}
 }
 
-void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
+void HerePlace::OnPlaceDetailsReply(const PlaceDetailsReply &Reply)
 {
-	if (m_nReplyCnt == 0)
-	{
-		if (m_bCanceled || !m_pCbFunc)
-		{
+	if (m_nReplyCnt == 0) {
+		if (m_bCanceled || !m_pCbFunc) {
 			delete this;
 			return;
 		}
@@ -613,13 +554,10 @@ void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
 
 	/* Finding maps_place_h which is already pending since DiscoverReply */
 	PlaceList::iterator it;
-	for (it = m_PlaceList.begin(); it != m_PlaceList.end(); it++)
-	{
-		if (maps_place_get_id(*it, &placeId) == MAPS_ERROR_NONE)
-		{
+	for (it = m_PlaceList.begin(); it != m_PlaceList.end(); it++) {
+		if (maps_place_get_id(*it, &placeId) == MAPS_ERROR_NONE) {
 			placeIdLen = strlen(placeId);
-			if(!herePlace.GetPlaceId().compare(0, placeIdLen, placeId))
-			{
+			if(!herePlace.GetPlaceId().compare(0, placeIdLen, placeId)) {
 				mapsPlace = *it;
 				isPending = true;
 				MAPS_LOGD("Found maps_place_h in the pending list. id=%s", placeId);
@@ -634,33 +572,28 @@ void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
 	if (!mapsPlace)
 		error = maps_place_create(&mapsPlace);
 
-	if (error == MAPS_ERROR_NONE)
-	{
+	if (error == MAPS_ERROR_NONE) {
 		is_valid = false;
 
 		/* name */
-		if (!herePlace.GetName().empty())
-		{
+		if (!herePlace.GetName().empty()) {
 			sub_error = maps_place_set_name(mapsPlace, (char*)herePlace.GetName().c_str());
 			is_valid |= (sub_error == MAPS_ERROR_NONE);
 		}
 
 		/* id */
-		if (!herePlace.GetPlaceId().empty())
-		{
+		if (!herePlace.GetPlaceId().empty()) {
 			sub_error = maps_place_set_id(mapsPlace, (char*)herePlace.GetPlaceId().c_str());
 			is_valid |= (sub_error == MAPS_ERROR_NONE);
 		}
 
 		/* view */
-		if (!herePlace.GetView().empty())
-		{
+		if (!herePlace.GetView().empty()) {
 			sub_error = maps_place_set_uri(mapsPlace, (char*)herePlace.GetView().c_str());
 			is_valid |= (sub_error == MAPS_ERROR_NONE);
 		}
 
-		if (is_valid)
-		{
+		if (is_valid) {
 			/* icon */
 			/* maps not supported // herePlace.GetIconPath(); */
 
@@ -688,22 +621,17 @@ void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
 				m_PlaceList.push_back(mapsPlace);
 
 			m_nReplyIdx++;
-		}
-		else
-		{
+		} else {
 			m_nReplyCnt--;
 			error = MAPS_ERROR_NOT_FOUND;
 			maps_place_destroy(mapsPlace);
 			mapsPlace = NULL;
 		}
-	}
-	else
-	{
+	} else {
 		m_nReplyCnt--;
 	}
 
-	if (!m_bReplyFlushed && (m_nReplyCnt == 0 || m_nReplyIdx == m_nReplyCnt))
-	{
+	if (!m_bReplyFlushed && (m_nReplyCnt == 0 || m_nReplyIdx == m_nReplyCnt)) {
 		if (m_nReplyCnt == 0)
 			error = MAPS_ERROR_NOT_FOUND;
 
@@ -714,18 +642,14 @@ void HerePlace::OnPlaceDetailsReply (const PlaceDetailsReply &Reply)
 
 void HerePlace::OnPlaceDetailsFailure(const PlaceDetailsReply& Reply)
 {
-	if (!m_bPlaceDetailsInternal)
-	{
-		if (!m_bReplyFlushed)
-		{
+	if (!m_bPlaceDetailsInternal) {
+		if (!m_bReplyFlushed) {
 			m_nReplyIdx = 0;
 			m_nReplyCnt = 0;
 			__flushReplies(GetErrorCode(Reply));
 			delete this;
 		}
-	}
-	else
-	{
+	} else {
 		m_nReplyIdx++;
 		MAPS_LOGD("Internal error during updating detailed information for the place. (%d/%d)", m_nReplyIdx, m_nReplyCnt);
 		if (!m_bReplyFlushed && (m_nReplyIdx == m_nReplyCnt))
@@ -745,8 +669,7 @@ void HerePlace::ProcessPlaceLocation(PlaceDetails herePlace, maps_place_h mapsPl
 	maps_coordinates_h mapsCoord;
 
 	if (maps_coordinates_create(hereCoord.GetLatitude(),
-		hereCoord.GetLongitude(), &mapsCoord) == MAPS_ERROR_NONE)
-	{
+		hereCoord.GetLongitude(), &mapsCoord) == MAPS_ERROR_NONE) {
 		maps_place_set_location(mapsPlace, mapsCoord);
 		maps_coordinates_destroy(mapsCoord);
 	}
@@ -757,75 +680,63 @@ void HerePlace::ProcessPlaceLocation(PlaceDetails herePlace, maps_place_h mapsPl
 	int error;
 	bool is_valid;
 
-	if (maps_address_create(&mapsAddr) == MAPS_ERROR_NONE)
-	{
+	if (maps_address_create(&mapsAddr) == MAPS_ERROR_NONE) {
 		is_valid = false;
 
-		if (!hereAddr.GetHouseNumber().empty())
-		{
+		if (!hereAddr.GetHouseNumber().empty()) {
 			error = maps_address_set_building_number(mapsAddr,
 					hereAddr.GetHouseNumber().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereAddr.GetStreet().empty())
-		{
+		if (!hereAddr.GetStreet().empty()) {
 			error = maps_address_set_street(mapsAddr, hereAddr.GetStreet().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereAddr.GetDistrict().empty())
-		{
+		if (!hereAddr.GetDistrict().empty()) {
 			error = maps_address_set_district(mapsAddr, hereAddr.GetDistrict().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereAddr.GetCity().empty())
-		{
+		if (!hereAddr.GetCity().empty()) {
 			error = maps_address_set_city(mapsAddr, hereAddr.GetCity().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereAddr.GetState().empty())
-		{
+		if (!hereAddr.GetState().empty()) {
 			error = maps_address_set_state(mapsAddr, hereAddr.GetState().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereAddr.GetCountry().empty())
-		{
+		if (!hereAddr.GetCountry().empty()) {
 			error = maps_address_set_country(mapsAddr, hereAddr.GetCountry().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereAddr.GetCountryCode().empty())
-		{
+		if (!hereAddr.GetCountryCode().empty()) {
 			error = maps_address_set_country_code(mapsAddr, hereAddr.GetCountryCode().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereAddr.GetCounty().empty())
-		{
+		if (!hereAddr.GetCounty().empty()) {
 			error = maps_address_set_county(mapsAddr, hereAddr.GetCounty().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereAddr.GetPostalCode().empty())
-		{
+		if (!hereAddr.GetPostalCode().empty()) {
 			error = maps_address_set_postal_code(mapsAddr, hereAddr.GetPostalCode().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereAddr.GetLabel().empty())
-		{
+		if (!hereAddr.GetLabel().empty()) {
 			error = maps_address_set_freetext(mapsAddr, hereAddr.GetLabel().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
 		if (is_valid)
-		{
 			maps_place_set_address(mapsPlace, mapsAddr);
-		}
+
 		maps_address_destroy(mapsAddr);
 	}
 }
@@ -845,43 +756,37 @@ void HerePlace::ProcessPlaceContact(PlaceDetails herePlace, maps_place_h mapsPla
 
 	if (maps_item_list_create(&mapsContList) != MAPS_ERROR_NONE) return;
 
-	for (hereCont = hereContList.begin(); hereCont != hereContList.end(); hereCont++)
-	{
+	for (hereCont = hereContList.begin(); hereCont != hereContList.end(); hereCont++) {
 		if (maps_place_contact_create(&mapsCont) != MAPS_ERROR_NONE) continue;
 
 		is_valid = false;
 
-		if (!hereCont->GetLabel().empty())
-		{
+		if (!hereCont->GetLabel().empty()) {
 			error = maps_place_contact_set_label(mapsCont,
 				(char*)hereCont->GetLabel().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereCont->GetValue().empty())
-		{
+		if (!hereCont->GetValue().empty()) {
 			error = maps_place_contact_set_value(mapsCont,
 				(char*)hereCont->GetValue().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereCont->GetContactType().empty())
-		{
+		if (!hereCont->GetContactType().empty()) {
 			error = maps_place_contact_set_type(mapsCont,
 				(char*)hereCont->GetContactType().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
 		if (is_valid)
-		{
 			maps_item_list_append(mapsContList, mapsCont,
 				maps_place_contact_clone);
-		}
+
 		maps_place_contact_destroy(mapsCont);
 	}
 
-	if (maps_item_list_items(mapsContList))
-	{
+	if (maps_item_list_items(mapsContList)) {
 		maps_place_set_contacts(mapsPlace, mapsContList);
 		maps_item_list_remove_all(mapsContList, maps_place_contact_destroy);
 	}
@@ -905,36 +810,31 @@ void HerePlace::ProcessPlaceCategory(PlaceDetails herePlace, maps_place_h mapsPl
 	hereCate = hereCateList.begin();
 	if (maps_place_category_create(&mapsCate) == MAPS_ERROR_NONE)
 	{
-		if (!hereCate->GetCategoryId().ToString().empty())
-		{
+		if (!hereCate->GetCategoryId().ToString().empty()) {
 			error = maps_place_category_set_id(mapsCate,
 				hereCate->GetCategoryId().ToString().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereCate->GetTitle().empty())
-		{
+		if (!hereCate->GetTitle().empty()) {
 			error = maps_place_category_set_name(mapsCate,
 				hereCate->GetTitle().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereCate->GetHref().empty())
-		{
+		if (!hereCate->GetHref().empty()) {
 			error = maps_place_category_set_url(mapsCate,
 				hereCate->GetHref().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (is_valid)
-		{
+		if (is_valid) {
 			maps_item_list_append(mapsCateList, mapsCate, maps_place_category_clone);
 		}
 		maps_place_category_destroy(mapsCate);
 	}
 
-	if (maps_item_list_items(mapsCateList))
-	{
+	if (maps_item_list_items(mapsCateList)) {
 		maps_place_set_categories(mapsPlace, mapsCateList);
 		maps_item_list_remove_all(mapsCateList, maps_place_category_destroy);
 	}
@@ -956,8 +856,7 @@ void HerePlace::ProcessPlaceImage(PlaceDetails herePlace, maps_place_h mapsPlace
 
 	if (maps_item_list_create(&mapsImageList) != MAPS_ERROR_NONE) return;
 
-	for (hereImage = hereImageList.begin(); hereImage != hereImageList.end(); hereImage++)
-	{
+	for (hereImage = hereImageList.begin(); hereImage != hereImageList.end(); hereImage++) {
 		if (maps_place_image_create(&mapsImage) != MAPS_ERROR_NONE) continue;
 
 		is_valid = false;
@@ -968,53 +867,45 @@ void HerePlace::ProcessPlaceImage(PlaceDetails herePlace, maps_place_h mapsPlace
 		/* here not supported
 		// maps_place_image_set_media(maps_place_image_h mapsPlace, maps_place_media_h media); */
 
-		if (!hereImage->GetSource().empty())
-		{
+		if (!hereImage->GetSource().empty()) {
 			error = maps_place_image_set_url(mapsImage, (char*)hereImage->GetSource().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereImage->GetImageId().empty())
-		{
+		if (!hereImage->GetImageId().empty()) {
 			error = maps_place_image_set_id(mapsImage, (char*)hereImage->GetImageId().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
 		hereImageUser = hereImage->GetUser();
-		if (maps_place_link_object_create(&mapsImageUser) == MAPS_ERROR_NONE)
-		{
+		if (maps_place_link_object_create(&mapsImageUser) == MAPS_ERROR_NONE) {
 			is_valid2 = false;
 
-			if (!hereImageUser.GetId().empty())
-			{
+			if (!hereImageUser.GetId().empty()) {
 				error = maps_place_link_object_set_id(mapsImageUser,
 						(char*)hereImageUser.GetId().c_str());
 				is_valid2 |= (error == MAPS_ERROR_NONE);
 			}
 
-			if (!hereImageUser.GetTitle().empty())
-			{
+			if (!hereImageUser.GetTitle().empty()) {
 				error = maps_place_link_object_set_name(mapsImageUser,
 						(char*)hereImageUser.GetTitle().c_str());
 				is_valid2 |= (error == MAPS_ERROR_NONE);
 			}
 
-			if (!hereImageUser.GetHref().empty())
-			{
+			if (!hereImageUser.GetHref().empty()) {
 				error = maps_place_link_object_set_string(mapsImageUser,
 						(char*)hereImageUser.GetHref().c_str());
 				is_valid2 |= (error == MAPS_ERROR_NONE);
 			}
 
-			if (!hereImageUser.GetType().empty())
-			{
+			if (!hereImageUser.GetType().empty()) {
 				error = maps_place_link_object_set_type(mapsImageUser,
 						(char*)hereImageUser.GetType().c_str());
 				is_valid2 |= (error == MAPS_ERROR_NONE);
 			}
 
-			if (is_valid2)
-			{
+			if (is_valid2) {
 				maps_place_image_set_user_link(mapsImage, mapsImageUser);
 				is_valid |= is_valid2;
 			}
@@ -1022,14 +913,12 @@ void HerePlace::ProcessPlaceImage(PlaceDetails herePlace, maps_place_h mapsPlace
 		}
 
 		if (is_valid)
-		{
 			maps_item_list_append(mapsImageList, mapsImage, maps_place_image_clone);
-		}
+
 		maps_place_image_destroy(mapsImage);
 	}
 
-	if (maps_item_list_items(mapsImageList))
-	{
+	if (maps_item_list_items(mapsImageList)) {
 		maps_place_set_images(mapsPlace, mapsImageList);
 		maps_item_list_remove_all(mapsImageList, maps_place_image_destroy);
 	}
@@ -1049,21 +938,18 @@ void HerePlace::ProcessPlaceDetails(PlaceDetails herePlace, maps_place_h mapsPla
 
 	if (maps_item_list_create(&mapsEditList) != MAPS_ERROR_NONE) return;
 
-	for (hereEdit = hereEditList.begin(); hereEdit != hereEditList.end(); hereEdit++)
-	{
+	for (hereEdit = hereEditList.begin(); hereEdit != hereEditList.end(); hereEdit++) {
 		if (maps_place_editorial_create(&mapsEdit) != MAPS_ERROR_NONE) continue;
 
 		is_valid = false;
 
-		if (!hereEdit->GetDescription().empty())
-		{
+		if (!hereEdit->GetDescription().empty()) {
 			error = maps_place_editorial_set_description(mapsEdit,
 				(char*)hereEdit->GetDescription().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereEdit->GetLanguage().empty())
-		{
+		if (!hereEdit->GetLanguage().empty()) {
 			error = maps_place_editorial_set_language(mapsEdit,
 				(char*)hereEdit->GetLanguage().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
@@ -1072,14 +958,12 @@ void HerePlace::ProcessPlaceDetails(PlaceDetails herePlace, maps_place_h mapsPla
 		/* maps_place_editorial_set_media(mapsEdit, maps_place_media_h media); */
 
 		if (is_valid)
-		{
 			maps_item_list_append(mapsEditList, mapsEdit, maps_place_editorial_clone);
-		}
+
 		maps_place_editorial_destroy(mapsEdit);
 	}
 
-	if (maps_item_list_items(mapsEditList))
-	{
+	if (maps_item_list_items(mapsEditList)) {
 		maps_place_set_editorials(mapsPlace, mapsEditList);
 		maps_item_list_remove_all(mapsEditList, maps_place_editorial_destroy);
 	}
@@ -1101,28 +985,24 @@ void HerePlace::ProcessPlaceReviews(PlaceDetails herePlace, maps_place_h mapsPla
 
 	if (maps_item_list_create(&mapsReviewList) != MAPS_ERROR_NONE) return;
 
-	for (hereReview = hereReviewList.begin(); hereReview != hereReviewList.end(); hereReview++)
-	{
+	for (hereReview = hereReviewList.begin(); hereReview != hereReviewList.end(); hereReview++) {
 		if (maps_place_review_create(&mapsReview) != MAPS_ERROR_NONE) continue;
 
 		is_valid = false;
 
-		if (!hereReview->GetDateTime().empty())
-		{
+		if (!hereReview->GetDateTime().empty()) {
 			error = maps_place_review_set_date(mapsReview,
 				(char*)hereReview->GetDateTime().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereReview->GetDescription().empty())
-		{
+		if (!hereReview->GetDescription().empty()) {
 			error = maps_place_review_set_description(mapsReview,
 				(char*)hereReview->GetDescription().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (!hereReview->GetLanguage().empty())
-		{
+		if (!hereReview->GetLanguage().empty()) {
 			error = maps_place_review_set_language(mapsReview,
 				(char*)hereReview->GetLanguage().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
@@ -1132,63 +1012,55 @@ void HerePlace::ProcessPlaceReviews(PlaceDetails herePlace, maps_place_h mapsPla
 
 		maps_place_review_set_rating(mapsReview, hereReview->GetRating());
 
-		if (!hereReview->GetTitle().empty())
-		{
+		if (!hereReview->GetTitle().empty()) {
 			error = maps_place_review_set_title(mapsReview,
 				(char*)hereReview->GetTitle().c_str());
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
 		hereReviewUser = hereReview->GetUser();
-		if (maps_place_link_object_create(&mapsReviewUser) == MAPS_ERROR_NONE)
-		{
+		if (maps_place_link_object_create(&mapsReviewUser) == MAPS_ERROR_NONE) {
 			is_valid2 = false;
 
-			if (!hereReviewUser.GetId().empty())
-			{
+			if (!hereReviewUser.GetId().empty()) {
 				error = maps_place_link_object_set_id(mapsReviewUser,
 					(char*)hereReviewUser.GetId().c_str());
 				is_valid2 |= (error == MAPS_ERROR_NONE);
 			}
 
-			if (!hereReviewUser.GetTitle().empty())
-			{
+			if (!hereReviewUser.GetTitle().empty()) {
 				error = maps_place_link_object_set_name(mapsReviewUser,
 					(char*)hereReviewUser.GetTitle().c_str());
 				is_valid2 |= (error == MAPS_ERROR_NONE);
 			}
 
-			if (!hereReviewUser.GetHref().empty())
-			{
+			if (!hereReviewUser.GetHref().empty()) {
 				error = maps_place_link_object_set_string(mapsReviewUser,
 					(char*)hereReviewUser.GetHref().c_str());
 				is_valid2 |= (error == MAPS_ERROR_NONE);
 			}
 
-			if (!hereReviewUser.GetType().empty())
-			{
+			if (!hereReviewUser.GetType().empty()) {
 				error = maps_place_link_object_set_type(mapsReviewUser,
 					(char*)hereReviewUser.GetType().c_str());
 				is_valid2 |= (error == MAPS_ERROR_NONE);
 			}
 
-			if (is_valid2)
-			{
+			if (is_valid2) {
 				maps_place_review_set_user_link(mapsReview, mapsReviewUser);
 				is_valid |= is_valid2;
 			}
+
 			maps_place_link_object_destroy(mapsReviewUser);
 		}
 
 		if (is_valid)
-		{
 			maps_item_list_append(mapsReviewList, mapsReview, maps_place_review_clone);
-		}
+
 		maps_place_review_destroy(mapsReview);
 	}
 
-	if (maps_item_list_items(mapsReviewList))
-	{
+	if (maps_item_list_items(mapsReviewList)) {
 		maps_place_set_reviews(mapsPlace, mapsReviewList);
 		maps_item_list_remove_all(mapsReviewList, maps_place_review_destroy);
 	}
@@ -1220,31 +1092,27 @@ void HerePlace::ProcessPlaceRated(PlaceDetails herePlace, maps_place_h mapsPlace
 	//need to check if GetId() exist
 	//maps_place_link_object_set_id(mapsRelated, hereRelated.GetId());
 
-	if (!hereRelated.GetTitle().empty())
-	{
+	if (!hereRelated.GetTitle().empty()) {
 		error = maps_place_link_object_set_name(mapsRelated,
 			(char*)hereRelated.GetTitle().c_str());
 		is_valid |= (error == MAPS_ERROR_NONE);
 	}
 
-	if (!hereRelated.GetHref().empty())
-	{
+	if (!hereRelated.GetHref().empty()) {
 		error = maps_place_link_object_set_string(mapsRelated,
 			(char*)hereRelated.GetHref().c_str());
 		is_valid |= (error == MAPS_ERROR_NONE);
 	}
 
-	if (!hereRelated.GetType().empty())
-	{
+	if (!hereRelated.GetType().empty()) {
 		error = maps_place_link_object_set_type(mapsRelated,
 			(char*)hereRelated.GetType().c_str());
 		is_valid |= (error == MAPS_ERROR_NONE);
 	}
 
 	if (is_valid)
-	{
 		maps_place_set_related_link(mapsPlace, mapsRelated);
-	}
+
 	maps_place_link_object_destroy(mapsRelated);
 }
 
@@ -1256,10 +1124,8 @@ void HerePlace::__flushReplies(int error)
 	m_nReplyIdx = 0;
 	__sortList(m_PlaceList);
 
-	if (m_bPlaceDetails)
-	{
-		if (error != MAPS_ERROR_NONE)
-		{
+	if (m_bPlaceDetails) {
+		if (error != MAPS_ERROR_NONE) {
 			((maps_service_get_place_details_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, NULL, m_pUserData);
 			return;
 		}
@@ -1268,22 +1134,18 @@ void HerePlace::__flushReplies(int error)
 		m_PlaceList.pop_front();
 
 		((maps_service_get_place_details_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, mapsPlace, m_pUserData);
-	}
-	else if (m_bReplyWithList)
-	{
+	} else if (m_bReplyWithList) {
 		if (error == MAPS_ERROR_NONE)
 			error = maps_place_list_create(&placeList);
 
-		if (error != MAPS_ERROR_NONE)
-		{
+		if (error != MAPS_ERROR_NONE) {
 			if (placeList)
 				maps_place_list_destroy(placeList);
 			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, 0, NULL, m_pUserData);
 			return;
 		}
 
-		while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty())
-		{
+		while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty()) {
 			mapsPlace = m_PlaceList.front();
 			m_PlaceList.pop_front();
 
@@ -1294,26 +1156,20 @@ void HerePlace::__flushReplies(int error)
 			((maps_service_search_place_list_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, maps_item_list_items(placeList), placeList, m_pUserData);
 		else
 			maps_place_list_destroy(placeList);
-	}
-	else
-	{
-		if (error != MAPS_ERROR_NONE)
-		{
+	} else {
+		if (error != MAPS_ERROR_NONE) {
 			((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId, 0, 0, NULL, m_pUserData);
 			return;
 		}
 
-		while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty())
-		{
+		while (m_nReplyIdx < m_nReplyCnt && !m_bCanceled && !m_PlaceList.empty()) {
 			mapsPlace = m_PlaceList.front();
 			m_PlaceList.pop_front();
 
 			/* callback function */
 			if (((maps_service_search_place_cb)m_pCbFunc)((maps_error_e)error, m_nReqId,
 				m_nReplyIdx++, m_nReplyCnt, mapsPlace, m_pUserData) == FALSE)
-			{
 				break;
-			}
 		}
 	}
 	m_bReplyFlushed = true;
@@ -1326,9 +1182,8 @@ bool HerePlace::__compareWithTitle(const maps_place_h &item1, const maps_place_h
 
 	if (maps_place_get_name(item1, &str1) == MAPS_ERROR_NONE &&
 		maps_place_get_name(item2, &str2) == MAPS_ERROR_NONE)
-	{
 		result = (strcmp(str1, str2) < 0);
-	}
+
 	g_free(str1);
 	g_free(str2);
 	return result;
@@ -1341,9 +1196,8 @@ bool HerePlace::__compareWithId(const maps_place_h &item1, const maps_place_h &i
 
 	if (maps_place_get_id(item1, &str1) == MAPS_ERROR_NONE &&
 		maps_place_get_id(item2, &str2) == MAPS_ERROR_NONE)
-	{
 		result = (strcmp(str1, str2) < 0);
-	}
+
 	g_free(str1);
 	g_free(str2);
 	return result;
@@ -1356,9 +1210,8 @@ bool HerePlace::__compareWithDistance(const maps_place_h &item1, const maps_plac
 
 	if (maps_place_get_distance(item1, &num1) == MAPS_ERROR_NONE &&
 		maps_place_get_distance(item2, &num2) == MAPS_ERROR_NONE)
-	{
 		result = (num1 < num2);
-	}
+
 	return result;
 }
 
@@ -1366,16 +1219,13 @@ bool HerePlace::__compareWithRating(const maps_place_h &item1, const maps_place_
 {
 	bool result = false;
 	maps_place_rating_h rat1 = NULL, rat2 = NULL;
-	double num1 = 0, num2 = 0;	
+	double num1 = 0, num2 = 0;
 
 	if (maps_place_get_rating(item1, &rat1) == MAPS_ERROR_NONE &&
-		maps_place_get_rating(item2, &rat2) == MAPS_ERROR_NONE)
-	{
+		maps_place_get_rating(item2, &rat2) == MAPS_ERROR_NONE)	{
 		if (maps_place_rating_get_average(rat1, &num1) == MAPS_ERROR_NONE &&
 			maps_place_rating_get_average(rat2, &num2) == MAPS_ERROR_NONE)
-		{
 			result = (num1 > num2);
-		}
 	}
 	maps_place_rating_destroy(rat1);
 	maps_place_rating_destroy(rat2);
@@ -1401,9 +1251,8 @@ bool HerePlace::__compareWithCategory(const maps_place_h &item1, const maps_plac
 
 	if (maps_place_category_get_id(item1, &str1) == MAPS_ERROR_NONE &&
 		maps_place_category_get_id(item2, &str2) == MAPS_ERROR_NONE)
-	{
 		result = (strcmp(str1, str2) < 0);
-	}
+
 	maps_place_category_destroy(item1);
 	maps_place_category_destroy(item2);
 	g_free(str1);
@@ -1415,24 +1264,15 @@ void HerePlace::__sortList(PlaceList &list)
 {
 	if (!m_szSortBy) return;
 
-	if (!strcmp(m_szSortBy, "name") || !strcmp(m_szSortBy, "title"))
-	{
+	if (!strcmp(m_szSortBy, "name") || !strcmp(m_szSortBy, "title")) {
 		std::sort(list.begin(), list.end(), __compareWithTitle);
-	}
-	else if (!strcmp(m_szSortBy, "id"))
-	{
+	} else if (!strcmp(m_szSortBy, "id")) {
 		std::sort(list.begin(), list.end(), __compareWithId);
-	}
-	else if (!strcmp(m_szSortBy, "distance"))
-	{
+	} else if (!strcmp(m_szSortBy, "distance")) {
 		std::sort(list.begin(), list.end(), __compareWithDistance);
-	}
-	else if (!strcmp(m_szSortBy, "rate") || !strcmp(m_szSortBy, "rating"))
-	{
+	} else if (!strcmp(m_szSortBy, "rate") || !strcmp(m_szSortBy, "rating")) {
 		std::sort(list.begin(), list.end(), __compareWithRating);
-	}
-	else if (!strcmp(m_szSortBy, "category"))
-	{
+	} else if (!strcmp(m_szSortBy, "category")) {
 		std::sort(list.begin(), list.end(), __compareWithCategory);
 	}
 }

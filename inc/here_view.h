@@ -49,32 +49,30 @@ public:
 	HereView();
 	~HereView();
 
-	here_error_e Init(maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc);
-	here_error_e Close(maps_view_h hView);
-	here_error_e RenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, double dZoom, double dAngle);
-	here_error_e RenderMapByArea(maps_view_h hView, const maps_area_h hArea, double dZoom, double dAngle);
-	here_error_e DrawMap(maps_view_h hView, Evas* pCanvas, int x, int y, int nWidth, int nHeight);
-	here_error_e MoveCenter(maps_view_h hView, int delta_x, int delta_y);
-	here_error_e GetCenter(maps_view_h hView, maps_coordinates_h *center);
-	here_error_e SetScalebar(maps_view_h hView, bool enable);
-	here_error_e GetScalebar(maps_view_h hView, bool *enabled);
-	here_error_e ScreenToGeolocation(maps_view_h hView, int x, int y, maps_coordinates_h *mapsCoord);
-	here_error_e GeolocationToScreen(maps_view_h hView, const maps_coordinates_h mapsCoord, int *x, int *y);
+	here_error_e init(maps_view_h view, maps_plugin_map_view_ready_cb callback);
+	here_error_e close(maps_view_h view);
+	here_error_e renderMap(maps_view_h view, const maps_coordinates_h coord, double zoom, double angle);
+	here_error_e moveCenter(maps_view_h view, int delta_x, int delta_y);
+	here_error_e getCenter(maps_view_h view, maps_coordinates_h *center);
+	here_error_e setScalebarEnabled(maps_view_h view, bool enable);
+	here_error_e getScalebarEnabled(maps_view_h view, bool *enabled);
+	here_error_e convertScreenToGeolocation(maps_view_h view, int x, int y, maps_coordinates_h *coord);
+	here_error_e convertGeolocationToScreen(maps_view_h view, const maps_coordinates_h coord, int *x, int *y);
 
-	here_error_e GetMinZoomLevel(maps_view_h hView, int *nMinZoomLevel);
-	here_error_e GetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel);
-	here_error_e OnViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation);
+	here_error_e getMinZoomLevel(maps_view_h view, int *zoom);
+	here_error_e getMaxZoomLevel(maps_view_h view, int *zoom);
+	here_error_e onViewObject(maps_view_h view, const maps_view_object_h object, maps_view_object_operation_e operation);
 
 private:
-	here_error_e __initOpenGL();
-	here_error_e __initOpenGLSurface(maps_view_h hView);
-	here_error_e __initMap(maps_view_h hView, maps_plugin_map_view_ready_cb pCbFunc);
-	static void __readyMapCb(maps_view_h hView);
+	here_error_e initOpenGL();
+	here_error_e initOpenGLSurface(maps_view_h view);
+	here_error_e initMap(maps_view_h view, maps_plugin_map_view_ready_cb callback);
+	void setMapType(maps_view_h view);
+	static void __readyMapCb(maps_view_h view);
 	static Eina_Bool __idlerCb(void *data);
 	static void __renderingCb(void *data);
 	static void __pixelGetCb(void *data, Evas_Object *obj);
-	static void __processViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation);
-	void __setMapType(maps_view_h hView);
+	static void __processViewObject(maps_view_h view, const maps_view_object_h object, maps_view_object_operation_e operation);
 
 private:
 	Here::Maps::GeoTiledMap *__map;

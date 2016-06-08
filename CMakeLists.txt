@@ -7,7 +7,7 @@ SET(PREFIX ${CMAKE_INSTALL_PREFIX})
 SET(LIBDIR ${LIBDIR})
 
 # Dependencies
-SET(dependents 
+SET(dependents
 	glib-2.0
 	gmodule-2.0
 	libxml-2.0

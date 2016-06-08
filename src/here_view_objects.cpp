@@ -66,8 +66,7 @@ here_error_e HereViewObjects::__add(maps_view_object_h hObj)
 	maps_view_object_type_e type;
 	maps_view_object_get_type(hObj, &type);
 
-	switch(type)
-	{
+	switch(type) {
 	case MAPS_VIEW_OBJECT_MARKER:
 		hereObject = new (std::nothrow) GeoMapObjectMarker;
 		error = __updateMarker(hObj, (GeoMapObjectMarker*)hereObject);
@@ -84,11 +83,9 @@ here_error_e HereViewObjects::__add(maps_view_object_h hObj)
 		break;
 #ifdef TIZEN_3_0_NEXT_MS
 	case MAPS_VIEW_OBJECT_ROUTE:
-		for (int i=0; i < 2; i++)
-		{
+		for (int i=0; i < 2; i++) {
 			hereObject = new (std::nothrow) GeoMapObjectPolyline;
-			if (hereObject)
-			{
+			if (hereObject) {
 				__map->AddObject(hereObject);
 				error = __updateRoute(hObj);
 				if (error != HERE_ERROR_NONE) break;
@@ -98,8 +95,7 @@ here_error_e HereViewObjects::__add(maps_view_object_h hObj)
 			}
 
 			hereObject = new (std::nothrow) GeoMapObjectMarker;
-			if (hereObject)
-			{
+			if (hereObject) {
 				__map->AddObject(hereObject);
 				error = __updateRoute(hObj);
 				if (error != HERE_ERROR_NONE) break;
@@ -115,18 +111,16 @@ here_error_e HereViewObjects::__add(maps_view_object_h hObj)
 		break;
 	}
 
-	if (error != HERE_ERROR_NONE)
-	{
+	if (error != HERE_ERROR_NONE) {
 		if (hereObject) delete hereObject;
 		hereObject = NULL;
 	}
 
+	if (hereObject
 #ifdef TIZEN_3_0_NEXT_MS
-	if (hereObject && type != MAPS_VIEW_OBJECT_ROUTE)
-#else
-	if (hereObject)
+		&& type != MAPS_VIEW_OBJECT_ROUTE
 #endif /* TIZEN_3_0_NEXT_MS */
-	{
+	) {
 		__map->AddObject(hereObject);
 		pthread_mutex_lock(&__mutex);
 		__currentObjects.insert(std::make_pair(hObj, hereObject));
@@ -152,8 +146,7 @@ here_error_e HereViewObjects::__remove(maps_view_object_h hObj)
 
 	VisualObjects::iterator it;
 	pthread_mutex_lock(&__mutex);
-	while ((it = __currentObjects.find(hObj)) != __currentObjects.end())
-	{
+	while ((it = __currentObjects.find(hObj)) != __currentObjects.end()) {
 	 	__map->RemoveObject((GeoMapObject*)it->second);
 		it = __currentObjects.erase(it);
 		error = HERE_ERROR_NONE;
@@ -180,9 +173,7 @@ here_error_e HereViewObjects::move(maps_view_object_h hObj)
 
 	VisualObjects::iterator it;
 	while ((it = __currentObjects.find(hObj)) != __currentObjects.end())
-	{
 		MAPS_LOGD("TODO: implement moving");
-	}
 
 	return HERE_ERROR_NONE;
 }
@@ -211,8 +202,7 @@ here_error_e HereViewObjects::__update(maps_view_object_h hObj, GeoMapObject *he
 		maps_view_object_type_e type;
 		maps_view_object_get_type(hObj, &type);
 
-		switch(type)
-		{
+		switch(type) {
 		case MAPS_VIEW_OBJECT_MARKER:
 			error = __updateMarker(hObj, (GeoMapObjectMarker*)hereObject);
 			break;
@@ -234,7 +224,7 @@ here_error_e HereViewObjects::__update(maps_view_object_h hObj, GeoMapObject *he
 		default:
 			break;
 		}
-	} while(0);
+	} while (0);
 
 	return error;
 }
@@ -269,8 +259,7 @@ here_error_e HereViewObjects::__updateMarker(maps_view_object_h hMarker, GeoMapO
 		evas_object_image_file_set(img, szPath, NULL);
 		int err = evas_object_image_load_error_get(img);
 
-		if (err != EVAS_LOAD_ERROR_NONE)
-		{
+		if (err != EVAS_LOAD_ERROR_NONE) {
 			MAPS_LOGE("Failed to load the image file for new marker. '%s'",
 				(szPath ? szPath : "null"));
 			g_free(szPath);
@@ -297,8 +286,7 @@ here_error_e HereViewObjects::__updateMarker(maps_view_object_h hMarker, GeoMapO
 
 		/* resize the marker image */
 		int nw = 0, nh = 0;
-		if (__resizeMarker(hMarker, w, h, &nw, &nh, &dst))
-		{
+		if (__resizeMarker(hMarker, w, h, &nw, &nh, &dst)) {
 			w = nw;
 			h = nh;
 			nSize = w * h * 4;
@@ -320,8 +308,7 @@ here_error_e HereViewObjects::__updateMarker(maps_view_object_h hMarker, GeoMapO
 		maps_coordinates_get_longitude(mapsCoord, &lng);
 		maps_coordinates_destroy(mapsCoord);
 
-		if (!HereUtils::IsValidCoord(lat, lng))
-		{
+		if (!HereUtils::IsValidCoord(lat, lng)) {
 			error = MAPS_ERROR_INVALID_PARAMETER;
 			break;
 		}
@@ -338,7 +325,7 @@ here_error_e HereViewObjects::__updateMarker(maps_view_object_h hMarker, GeoMapO
 		int z_order = 0;
 		maps_view_object_marker_get_z_order(hMarker, &z_order);
 		hereMarker->SetZorder(z_order);
-	} while(0);
+	} while (0);
 
 	if (img) evas_object_del(img);
 	return (here_error_e)ConvertToHereError(error);
@@ -366,7 +353,7 @@ here_error_e HereViewObjects::__updatePolyline(maps_view_object_h hPolyline, Geo
 		error = maps_view_object_polyline_get_width(hPolyline, &nThickness);
 		if (error != MAPS_ERROR_NONE) break;
 		herePolyline->SetStrokeThickness(nThickness);
-	} while(0);
+	} while (0);
 
 	return (here_error_e)ConvertToHereError(error);
 }
@@ -388,7 +375,7 @@ here_error_e HereViewObjects::__updatePolygon(maps_view_object_h hPolygon, GeoMa
 		error = maps_view_object_polygon_get_fill_color(hPolygon, &r, &g, &b, &a);
 		if (error != MAPS_ERROR_NONE) break;
 		herePolygon->SetFillColor(Color(r, g, b, a));
-	} while(0);
+	} while (0);
 
 	return (here_error_e)ConvertToHereError(error);
 }
@@ -400,8 +387,7 @@ here_error_e HereViewObjects::__updateRoute(maps_view_object_h hRoute)
 
 	VisualObjects::iterator it;
 
-	if ((it = __currentObjects.find(hRoute)) != __currentObjects.end())
-	{
+	if ((it = __currentObjects.find(hRoute)) != __currentObjects.end()) {
 		maps_route_h route = NULL;
 		int ret = maps_view_object_route_get_content(hRoute, &route);
 		if (ret !=  MAPS_ERROR_NONE || !route)
@@ -410,19 +396,15 @@ here_error_e HereViewObjects::__updateRoute(maps_view_object_h hRoute)
 		GeoCoordinateList coordList;
 		GeoMapObjectPolyline *polyline_path = NULL, *polyline_seg = NULL;
 
-		if (it->second->GetType() == GeoMapObject::GMO_Polyline)
-		{
-			if (!polyline_path)
-			{
+		if (it->second->GetType() == GeoMapObject::GMO_Polyline) {
+			if (!polyline_path) {
 				MAPS_LOGD("Route Path");
 				polyline_path = (GeoMapObjectPolyline*)it->second;
 				maps_route_foreach_path(route, __foreachForCoordinates, &coordList);
 				polyline_path->SetPath(coordList);
 				polyline_path->SetStrokeColor(Tizen::Maps::Color(255, 0, 0, 255));
 				polyline_path->SetStrokeThickness(3);
-			}
-			else if (!polyline_seg)
-			{
+			} else if (!polyline_seg) {
 				MAPS_LOGD("Route Segments");
 				polyline_seg = (GeoMapObjectPolyline*)it->second;
 				maps_route_foreach_path(route, __foreachForCoordinates, &coordList);
@@ -430,9 +412,7 @@ here_error_e HereViewObjects::__updateRoute(maps_view_object_h hRoute)
 				polyline_seg->SetStrokeColor(Tizen::Maps::Color(0, 255, 0, 255));
 				polyline_seg->SetStrokeThickness(3);
 			}
-		}
-		else if (it->second->GetType() == GeoMapObject::GMO_Marker)
-		{
+		} else if (it->second->GetType() == GeoMapObject::GMO_Marker) {
 			// to implement
 		}
 		maps_route_destroy(route);
@@ -458,10 +438,8 @@ here_error_e HereViewObjects::__setVisible(maps_view_object_h hObj, bool bVisibl
 	here_error_e error = HERE_ERROR_NOT_FOUND;
 
 	VisualObjects::iterator it;
-	for (it = __currentObjects.begin(); it != __currentObjects.end(); it++)
-	{
-		if (it->first == hObj)
-		{
+	for (it = __currentObjects.begin(); it != __currentObjects.end(); it++) {
+		if (it->first == hObj) {
 	 		((GeoMapObject*)it->second)->SetVisible(bVisible);
 			error = HERE_ERROR_NONE;
 		}
@@ -477,9 +455,7 @@ bool HereViewObjects::__foreachForCoordinates(int index, maps_coordinates_h poin
 		return false;
 
 	if (!HereUtils::IsValid(*(maps_coordinates_s*)point))
-	{
 		return false;
-	}
 
 	int error;
 	double lat = 0.0, lng = 0.0;
@@ -490,7 +466,7 @@ bool HereViewObjects::__foreachForCoordinates(int index, maps_coordinates_h poin
 
 		error = maps_coordinates_get_longitude(point, &lng);
 		if (error != MAPS_ERROR_NONE) break;
-	} while(0);
+	} while (0);
 
 	MAPS_LOGD("[%d] %f,%f", index+1, lat, lng);
 
@@ -545,8 +521,7 @@ bool HereViewObjects::__resizeMarker(maps_view_object_h hMarker,
 	int resizedWidth = 0, resizedHeight = 0;
 	maps_view_object_marker_get_size(hMarker, &resizedWidth, &resizedHeight);
 
-	if (__resizeBitmap(bitmap, originWidth, originHeight, resizedWidth, resizedHeight))
-	{
+	if (__resizeBitmap(bitmap, originWidth, originHeight, resizedWidth, resizedHeight)) {
 		*newWidth = resizedWidth;
 		*newHeight = resizedHeight;
 		return true;
@@ -566,10 +541,8 @@ bool HereViewObjects::__resizeBitmap(unsigned char **curBmp, int curWidth, int c
 
 	int newPixel, curPixel;
 
-	for(int y = 0; y < newHeight; y++)
-	{
-	    for(int x = 0; x < newWidth; x++)
-	    {
+	for (int y = 0; y < newHeight; y++) {
+	    for (int x = 0; x < newWidth; x++) {
 	        newPixel = (y * (newWidth *4)) + (x * 4);
 	        curPixel = (((int)(y / scaleHeight) * (curWidth * 4)) + ((int)(x / scaleWidth) * 4));
 

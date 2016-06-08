@@ -107,8 +107,7 @@ here_error_e HereGeocode::StartGeocodeInsideArea(const char* szAddr, const maps_
 	m_pQuery->SetSearchtext(sSearch);
 
 	maps_area_s *pArea = (maps_area_s *)hArea;
-	if (pArea->type == MAPS_AREA_RECTANGLE)
-	{
+	if (pArea->type == MAPS_AREA_RECTANGLE) {
 		double dLatTL = pArea->rect.top_left.latitude;
 		double dLngTL = pArea->rect.top_left.longitude;
 		GeoCoordinates geoCoordTL(dLatTL, dLngTL);
@@ -120,13 +119,10 @@ here_error_e HereGeocode::StartGeocodeInsideArea(const char* szAddr, const maps_
 		GeoBoundingBox BoundingBox(geoCoordTL, geoCoordBR);
 
 		m_pQuery->SetBoundingBox(BoundingBox);
-	}
-	else if (pArea->type == MAPS_AREA_CIRCLE)
-	{
+	} else if (pArea->type == MAPS_AREA_CIRCLE) {
 		MAPS_LOGD("HERE Maps is not supported circle type in GeocoderQuery");
 		return HERE_ERROR_NOT_SUPPORTED;
-	}
-	else {
+	} else {
 		return HERE_ERROR_INVALID_PARAMETER;
 	}
 
@@ -229,8 +225,7 @@ void HereGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 	GeoCoordinates hereCoord;
 	maps_coordinates_h mapsCoord;
 
-	if (nResults == 0)
-	{
+	if (nResults == 0) {
 		((maps_service_geocode_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND, m_nReqId,
 			0, 0, NULL, m_pUserData);
 		delete this;
@@ -241,12 +236,9 @@ void HereGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 	{
 		pResult = (Result*)Reply.GetResult(i);
 
-		if (pResult)
-		{
+		if (pResult) {
 			hereCoord = (pResult->GetLocation()).GetDisplayPosition();
-		}
-		else
-		{
+		} else {
 			hereCoord.SetLatitude(0.0);
 			hereCoord.SetLongitude(0.0);
 		}
@@ -254,16 +246,12 @@ void HereGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 		maps_error_e error = (maps_error_e)maps_coordinates_create(
 				     hereCoord.GetLatitude(), hereCoord.GetLongitude(), &mapsCoord);
 
-		if (m_bCanceled || !m_pCbFunc)
-		{
+		if (m_bCanceled || !m_pCbFunc) {
 			if (mapsCoord) maps_coordinates_destroy(mapsCoord);
 			break;
-		}
-		else
-		{
+		} else {
 			if (((maps_service_geocode_cb)m_pCbFunc)(error, m_nReqId, i,
-				nResults, mapsCoord, m_pUserData) == FALSE)
-			{
+				nResults, mapsCoord, m_pUserData) == FALSE) {
 				delete this;
 				return;
 			}

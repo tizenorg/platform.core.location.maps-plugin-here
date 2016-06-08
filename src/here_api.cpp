@@ -133,7 +133,7 @@ int HerePluginGeocode(const char* szAddr,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pGeocode->StartGeocode(szAddr);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -175,7 +175,7 @@ int HerePluginGeocodeByStructuredAddress(const maps_address_h hAddr,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pGeocode->StartGeocodeByStructuredAddress(hAddr);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -220,7 +220,7 @@ int HerePluginGeocodeInsideArea(const char* szAddr, maps_area_h hArea,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pGeocode->StartGeocodeInsideArea(szAddr, hArea);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -268,7 +268,7 @@ int HerePluginReverseGeocode(double dLatitude, double dLongitude,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pRevGeocode->StartRevGeocode(hPref);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -310,7 +310,7 @@ int HerePluginMultiReverseGeocode(const maps_coordinates_list_h hGeocodeList,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pMultiRevGeocode->StartMultiReverse(hPref);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -358,7 +358,7 @@ int HerePluginSearchPlace(maps_coordinates_h hPos, int nDistance,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pPlace->StartDiscoveryPlace(hPos, nDistance);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -406,7 +406,7 @@ int HerePluginSearchPlaceByArea(maps_area_h hArea,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pPlace->StartDiscoveryPlace(hArea);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -454,7 +454,7 @@ int HerePluginSearchPlaceByAddress(const char* szAddr, maps_area_h hArea,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pPlace->StartDiscoveryPlace(hArea, szAddr);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -502,7 +502,7 @@ int HerePluginSearchPlaceList(maps_area_h hArea, maps_item_hashtable_h hPref,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pPlace->StartDiscoveryPlaceList(hArea);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -541,7 +541,7 @@ int HerePluginSearchPlaceDetails(const char* szUrl,
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pPlace->StartPlaceDetails(szUrl);
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -590,7 +590,7 @@ int HerePluginSearchRoute(maps_coordinates_h hOrigin, maps_coordinates_h hDestin
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pRoute->StartRoute();
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -607,7 +607,7 @@ int HerePluginSearchRouteWaypoints(const maps_coordinates_h* hWaypointList, int 
 	if (!hWaypointList || nWaypointNum < 2 || !pCbFunc || !nReqId)
 		return HERE_ERROR_INVALID_PARAMETER;
 
-	for (int i=0; i<nWaypointNum; i++)
+	for (int i = 0; i < nWaypointNum; i++)
 	{
 		if (!HereUtils::IsValid(*(maps_coordinates_s*)hWaypointList[i]))
 			return HERE_ERROR_INVALID_PARAMETER;
@@ -641,7 +641,7 @@ int HerePluginSearchRouteWaypoints(const maps_coordinates_h* hWaypointList, int 
 		if (error != HERE_ERROR_NONE) break;
 
 		error = pRoute->StartRoute();
-	} while(0);
+	} while (0);
 
 	/* finishing task */
 	if(error != HERE_ERROR_NONE)
@@ -661,6 +661,8 @@ int HerePluginCancelRequest(int nReqId)
 	return (HereManager::GetHandler()->CancelInstance(nReqId));
 }
 
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*  Maps Widget                                                              */
@@ -676,7 +678,7 @@ int HerePluginCreateMapView(maps_view_h hView, maps_plugin_map_view_ready_cb pCb
 	maps_view_set_maps_plugin_view_handle(hView, vh);
 	if (ovh)
 		delete ovh;
-	return vh->Init(hView, pCbFunc);
+	return vh->init(hView, pCbFunc);
 }
 
 int HerePluginDestroyMapView(maps_view_h hView)
@@ -686,19 +688,20 @@ int HerePluginDestroyMapView(maps_view_h hView)
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh) {
 		maps_view_set_maps_plugin_view_handle(hView, NULL);
-		error = vh->Close(hView);
+		error = vh->close(hView);
 		delete vh;
 	}
 	return error;
 }
 
-int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord, double dZoom, double dAngle)
+int HerePluginRenderMap(maps_view_h hView, const maps_coordinates_h mapsCoord,
+	double dZoom, double dAngle)
 {
 	HereView *vh = NULL;
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->RenderMap(hView, mapsCoord, dZoom, dAngle);
+		error = vh->renderMap(hView, mapsCoord, dZoom, dAngle);
 	return error;
 }
 
@@ -708,7 +711,7 @@ int HerePluginMoveCenter(maps_view_h hView, int delta_x, int delta_y)
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->MoveCenter(hView, delta_x, delta_y);
+		error = vh->moveCenter(hView, delta_x, delta_y);
 	return error;
 }
 
@@ -718,7 +721,7 @@ int HerePluginSetScalebar(maps_view_h hView, bool enable)
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->SetScalebar(hView, enable);
+		error = vh->setScalebarEnabled(hView, enable);
 	return error;
 }
 
@@ -728,13 +731,8 @@ int HerePluginGetScalebar(maps_view_h hView, bool *enabled)
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->GetScalebar(hView, enabled);
+		error = vh->getScalebarEnabled(hView, enabled);
 	return error;
-}
-
-int HerePluginDrawMap(maps_view_h hView, Evas* pCanvas, int x, int y, int w, int h)
-{
-	return HERE_ERROR_NONE;
 }
 
 int HerePluginGetCenter(maps_view_h hView, maps_coordinates_h *center)
@@ -743,7 +741,7 @@ int HerePluginGetCenter(maps_view_h hView, maps_coordinates_h *center)
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->GetCenter(hView, center);
+		error = vh->getCenter(hView, center);
 	return error;
 }
 
@@ -753,7 +751,7 @@ int HerePluginScreenToGeography(maps_view_h hView, int x, int y, maps_coordinate
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->ScreenToGeolocation(hView, x, y, mapsCoord);
+		error = vh->convertScreenToGeolocation(hView, x, y, mapsCoord);
 	return error;
 }
 
@@ -763,7 +761,7 @@ int HerePluginGeographyToScreen(maps_view_h hView, const maps_coordinates_h maps
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->GeolocationToScreen(hView, mapsCoord, x, y);
+		error = vh->convertGeolocationToScreen(hView, mapsCoord, x, y);
 	return error;
 }
 
@@ -773,7 +771,7 @@ int HerePluginGetMinZoomLevel(maps_view_h hView, int *nMinZoomLevel)
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->GetMinZoomLevel(hView, nMinZoomLevel);
+		error = vh->getMinZoomLevel(hView, nMinZoomLevel);
 	return error;
 }
 
@@ -783,16 +781,17 @@ int HerePluginGetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel)
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->GetMaxZoomLevel(hView, nMaxZoomLevel);
+		error = vh->getMaxZoomLevel(hView, nMaxZoomLevel);
 	return error;
 }
 
-int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation)
+int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object,
+	maps_view_object_operation_e operation)
 {
 	HereView *vh = NULL;
 	int maps_error = maps_view_get_maps_plugin_view_handle(hView, (void**)&vh);
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
-		error = vh->OnViewObject(hView, object, operation);
+		error = vh->onViewObject(hView, object, operation);
 	return error;
 }

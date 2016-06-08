@@ -57,11 +57,11 @@
 /*
 * Internal Macros
 */
-#define MAPS_LOGD(fmt,args...)  LOGD(fmt, ##args)
-#define MAPS_LOGW(fmt,args...)  LOGW(fmt, ##args)
-#define MAPS_LOGI(fmt,args...)  LOGI(fmt, ##args)
-#define MAPS_LOGE(fmt,args...)  LOGE(fmt, ##args)
-#define MAPS_SECLOG(fmt,args...)  SECURE_LOGD(fmt, ##args)
+#define MAPS_LOGD(fmt, args...)  LOGD(fmt, ##args)
+#define MAPS_LOGW(fmt, args...)  LOGW(fmt, ##args)
+#define MAPS_LOGI(fmt, args...)  LOGI(fmt, ##args)
+#define MAPS_LOGE(fmt, args...)  LOGE(fmt, ##args)
+#define MAPS_SECLOG(fmt, args...)  SECURE_LOGD(fmt, ##args)
 
 #define MAPS_CHECK_CONDITION(condition, error, msg)	\
 	do { \
@@ -81,7 +81,7 @@
 	} while (0)
 
 #define MAPS_NULL_ARG_CHECK(arg)	\
-	MAPS_CHECK_CONDITION(arg != NULL,MAPS_ERROR_INVALID_PARAMETER,"MAPS_ERROR_INVALID_PARAMETER")
+	MAPS_CHECK_CONDITION(arg != NULL, MAPS_ERROR_INVALID_PARAMETER, "MAPS_ERROR_INVALID_PARAMETER")
 
 #define MAPS_PRINT_ERROR_CODE_RETURN(code) \
 	do{ \

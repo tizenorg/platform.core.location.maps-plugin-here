@@ -19,7 +19,7 @@
 HERE_PLUGIN_BEGIN_NAMESPACE
 
 HereRevGeocode::HereRevGeocode(void* pCbFunc, void* pUserData, int nReqId)
-: m_geoCoord(0,0,0)
+	: m_geoCoord(0, 0, 0)
 {
 	m_pQuery = NULL;
 	m_pCbFunc = pCbFunc;
@@ -29,8 +29,7 @@ HereRevGeocode::HereRevGeocode(void* pCbFunc, void* pUserData, int nReqId)
 
 HereRevGeocode::~HereRevGeocode()
 {
-	if (m_pQuery)
-	{
+	if (m_pQuery) {
 		delete m_pQuery;
 		m_pQuery = NULL;
 	}
@@ -99,8 +98,7 @@ here_error_e HereRevGeocode::StartRevGeocode(maps_item_hashtable_h hPref)
 
 void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 {
-	if (m_bCanceled || !m_pCbFunc) // ignore call back
-	{
+	if (m_bCanceled || !m_pCbFunc) { // ignore call back
 		delete this;
 		return;
 	}
@@ -111,16 +109,13 @@ void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 	float fDistance, fShortestDistance = 0;
 	int nShortestIdx = -1;
 
-	for (size_t i = 0; i < (size_t)nResults; i++)
-	{
+	for (size_t i = 0; i < (size_t)nResults; i++) {
 		pResult = (Result*)Reply.GetResult(i);
 
-		if(pResult)
-		{
+		if(pResult) {
 			fDistance = pResult->GetDistance();
 
-			if (nShortestIdx < 0 || fDistance < fShortestDistance)
-			{
+			if (nShortestIdx < 0 || fDistance < fShortestDistance) {
 				fShortestDistance = fDistance;
 				nShortestIdx = i;
 			}
@@ -128,8 +123,7 @@ void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 	}
 
 
-	if (nShortestIdx < 0)
-	{
+	if (nShortestIdx < 0) {
 		((maps_service_reverse_geocode_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND,
 			m_nReqId, 0, 0, NULL, m_pUserData);
 		delete this;
@@ -140,12 +134,10 @@ void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 	maps_error_e error = (maps_error_e)maps_address_create(&hAddr);
 	String *additionalDataValue = NULL;
 
-	if(error == MAPS_ERROR_NONE)
-	{
+	if(error == MAPS_ERROR_NONE) {
 		pResult = (Result*)Reply.GetResult(nShortestIdx);
 
-		if (pResult)
-		{
+		if (pResult) {
 			Address tmpAddr = (pResult->GetLocation()).GetAddress();
 
 			if (!tmpAddr.GetHouseNumber().empty())
@@ -189,12 +181,9 @@ void HereRevGeocode::OnGeoCoderReply(const GeoCoderReply& Reply)
 		}
 	}
 
-	if (m_bCanceled)
-	{
+	if (m_bCanceled) {
 		maps_address_destroy(hAddr);
-	}
-	else
-	{
+	} else {
 		int nResult = (error == MAPS_ERROR_NONE ? 1 : 0);
 		((maps_service_reverse_geocode_cb)m_pCbFunc)(error, m_nReqId, 0, nResult, hAddr, m_pUserData);
 	}
@@ -210,4 +199,3 @@ void HereRevGeocode::OnGeoCoderFailure(const GeoCoderReply& Reply)
 }
 
 HERE_PLUGIN_END_NAMESPACE
-

@@ -19,7 +19,7 @@
 HERE_PLUGIN_BEGIN_NAMESPACE
 
 HereMultiRevGeocode::HereMultiRevGeocode(void* pCbFunc, void* pUserData, int nReqId)
-: m_geoCoord(0,0,0)
+	: m_geoCoord(0, 0, 0)
 {
 	m_pQuery = NULL;
 	m_pCbFunc = pCbFunc;
@@ -29,8 +29,7 @@ HereMultiRevGeocode::HereMultiRevGeocode(void* pCbFunc, void* pUserData, int nRe
 
 HereMultiRevGeocode::~HereMultiRevGeocode()
 {
-	if (m_pQuery)
-	{
+	if (m_pQuery) {
 		delete m_pQuery;
 		m_pQuery = NULL;
 	}
@@ -116,12 +115,10 @@ void HereMultiRevGeocode::OnMultiReverseReply(const MultiReverseReply& Reply)
 	{
 		maps_error_e error = (maps_error_e)maps_address_create(&pAddr);
 
-		if(error == MAPS_ERROR_NONE)
-		{
+		if(error == MAPS_ERROR_NONE) {
 			pResult = (Result*)Reply.GetResult(i);
 
-			if (pResult)
-			{
+			if (pResult) {
 				Address tmpAddr = (pResult->GetLocation()).GetAddress();
 
 				if(!tmpAddr.GetHouseNumber().empty())
@@ -167,16 +164,11 @@ void HereMultiRevGeocode::OnMultiReverseReply(const MultiReverseReply& Reply)
 		maps_address_list_append(address_list, pAddr);
 	}
 
-	if (m_bCanceled || !m_pCbFunc)
-	{
+	if (m_bCanceled || !m_pCbFunc) {
 		maps_address_list_destroy(address_list);
-	}
-	else if (nResults <= 0)
-	{
+	} else if (nResults <= 0) {
 		((maps_service_multi_reverse_geocode_cb)m_pCbFunc)(MAPS_ERROR_NOT_FOUND, m_nReqId, 0, NULL, m_pUserData);
-	}
-	else
-	{
+	} else {
 		((maps_service_multi_reverse_geocode_cb)m_pCbFunc)(MAPS_ERROR_NONE, m_nReqId, nResults, address_list, m_pUserData);
 	}
 
