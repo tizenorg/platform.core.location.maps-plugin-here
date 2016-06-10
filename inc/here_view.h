@@ -18,6 +18,7 @@
 #define HERE_VIEW_H
 
 #include <deque>
+#include <image_util_type.h>
 
 //plug-in header
 #include "here_manager.h"
@@ -58,6 +59,7 @@ public:
 	here_error_e getScalebarEnabled(maps_view_h view, bool *enabled);
 	here_error_e convertScreenToGeolocation(maps_view_h view, int x, int y, maps_coordinates_h *coord);
 	here_error_e convertGeolocationToScreen(maps_view_h view, const maps_coordinates_h coord, int *x, int *y);
+	here_error_e captureSnapshot(maps_view_h view, void **data, int *width, int *height, image_util_colorspace_e *cs);
 
 	here_error_e getMinZoomLevel(maps_view_h view, int *zoom);
 	here_error_e getMaxZoomLevel(maps_view_h view, int *zoom);

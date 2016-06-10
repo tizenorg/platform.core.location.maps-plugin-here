@@ -107,4 +107,6 @@ int HerePluginGetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel);
 
 int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation);
 
+int HerePluginCaptureSnapshot(maps_view_h hView, void **data, int *w, int *h, image_util_colorspace_e *cs);
+
 #endif //_LOCATION_HERE_API_H_

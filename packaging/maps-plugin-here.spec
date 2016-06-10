@@ -27,6 +27,7 @@ BuildRequires: pkgconfig(vconf)
 BuildRequires: pkgconfig(appcore-efl)
 BuildRequires: pkgconfig(ecore)
 BuildRequires: pkgconfig(evas)
+BuildRequires: pkgconfig(capi-media-image-util)
 BuildRequires: gettext-tools
 # for here engine
 BuildRequires: pkgconfig(libcurl)
