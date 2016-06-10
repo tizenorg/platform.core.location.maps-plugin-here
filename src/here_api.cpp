@@ -23,6 +23,7 @@
 #include "here_route.h"
 #include "here_view.h"
 #include <common/HereConfig.h>
+#include <image_util_type.h>
 
 using namespace HERE_PLUGIN_NAMESPACE_PREFIX;
 
@@ -793,5 +794,16 @@ int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object,
 	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
 	if (error == HERE_ERROR_NONE && vh)
 		error = vh->onViewObject(hView, object, operation);
+	return error;
+}
+
+int HerePluginCaptureSnapshot(maps_view_h view, void **data,
+	int *w, int *h, image_util_colorspace_e *cs)
+{
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(view, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->captureSnapshot(view, data, w, h, cs);
 	return error;
 }

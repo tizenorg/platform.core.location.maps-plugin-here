@@ -19,7 +19,7 @@ SET(dependents
 	evas
 	ecore-evas
 	elementary
-	vconf
+	capi-media-image-util
 	)
 
 INCLUDE(FindPkgConfig)

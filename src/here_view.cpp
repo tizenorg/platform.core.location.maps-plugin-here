@@ -530,4 +530,33 @@ void HereView::__processViewObject(maps_view_h view, const maps_view_object_h ob
 	}
 }
 
+here_error_e HereView::captureSnapshot(maps_view_h view, void **data, int *width, int *height, image_util_colorspace_e *cs)
+{
+	if (!__isInitialized || !__map || __w <= 0 || __h <= 0)
+		return HERE_ERROR_SERVICE_NOT_AVAILABLE;
+
+	int sizeOfLine = (__w * 4);
+	unsigned char *readData = (unsigned char*)malloc(sizeOfLine * __h);
+	if (!readData)
+		return HERE_ERROR_OUT_OF_MEMORY;
+
+	*data = (void*)malloc(sizeOfLine * __h);
+	if (!*data) {
+		free(readData);
+		return HERE_ERROR_OUT_OF_MEMORY;
+	}
+
+	__map->PaintMap(__w, __h);
+	__api->glReadPixels(0, 0, __w, __h, GL_RGBA, GL_UNSIGNED_BYTE, readData);
+	for(int i = 0; i < __h; i++)
+		memcpy((unsigned char*)*data + sizeOfLine * i, readData + sizeOfLine * (__h - i - 1), sizeOfLine);
+	free(readData);
+
+	*width = __w;
+	*height = __h;
+	*cs = IMAGE_UTIL_COLORSPACE_RGBA8888;
+
+	return HERE_ERROR_NONE;
+}
+
 HERE_PLUGIN_END_NAMESPACE

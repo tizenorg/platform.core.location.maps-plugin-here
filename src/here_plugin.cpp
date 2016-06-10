@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <image_util_type.h>
 
 #include <maps_plugin.h>
 #include "here_api.h"
@@ -118,6 +119,7 @@ EXPORT_API int maps_plugin_is_service_supported(maps_service_e service, bool *su
 		case MAPS_SERVICE_SEARCH_PLACE_LIST:
 		case MAPS_SERVICE_SEARCH_GET_PLACE_DETAILS:
 		case MAPS_SERVICE_VIEW:
+		case MAPS_SERVICE_VIEW_SNAPSHOT:
 			*supported = TRUE;
 			break;
 		default:
@@ -393,5 +395,15 @@ EXPORT_API int maps_plugin_get_center(maps_view_h hView, maps_coordinates_h *cen
 	return ConvertToMapsError(ret);
 }
 
+EXPORT_API int maps_plugin_capture_snapshot(maps_view_h view, void **data,
+	int *width, int *height, image_util_colorspace_e *cs)
+{
+	int ret = HerePluginCaptureSnapshot(view, data, width, height, cs);
+
+	if (ret != HERE_ERROR_NONE)
+		MAPS_LOGD("here_error_e = %d", ret);
+
+	return ConvertToMapsError(ret);
+}
 } // end of extern "C"
 
