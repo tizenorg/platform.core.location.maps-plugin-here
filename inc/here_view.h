@@ -57,11 +57,15 @@ public:
 	here_error_e setScalebarEnabled(maps_view_h view, bool enable);
 	here_error_e getScalebarEnabled(maps_view_h view, bool *enabled);
 	here_error_e convertScreenToGeolocation(maps_view_h view, int x, int y, maps_coordinates_h *coord);
-	here_error_e convertGeolocationToScreen(maps_view_h view, const maps_coordinates_h coord, int *x, int *y);
+	here_error_e convertGeolocationToScreen(maps_view_h view,
+								const maps_coordinates_h coord, int *x, int *y);
+	here_error_e captureSnapshot(maps_view_h view, void **data, int *width, int *height,
+								maps_view_colorspace_type_e *cs);
 
 	here_error_e getMinZoomLevel(maps_view_h view, int *zoom);
 	here_error_e getMaxZoomLevel(maps_view_h view, int *zoom);
-	here_error_e onViewObject(maps_view_h view, const maps_view_object_h object, maps_view_object_operation_e operation);
+	here_error_e onViewObject(maps_view_h view, const maps_view_object_h object,
+								maps_view_object_operation_e operation);
 
 private:
 	here_error_e initOpenGL();
@@ -72,7 +76,8 @@ private:
 	static Eina_Bool __idlerCb(void *data);
 	static void __renderingCb(void *data);
 	static void __pixelGetCb(void *data, Evas_Object *obj);
-	static void __processViewObject(maps_view_h view, const maps_view_object_h object, maps_view_object_operation_e operation);
+	static void __processViewObject(maps_view_h view, const maps_view_object_h object,
+								maps_view_object_operation_e operation);
 
 private:
 	Here::Maps::GeoTiledMap *__map;
