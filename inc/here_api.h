@@ -17,7 +17,7 @@
 #define _LOCATION_HERE_API_H_
 
 #include <maps_plugin.h>
-#include <maps_view.h>
+#include <maps_view_plugin.h>
 
 int HerePluginInit(maps_plugin_h *hPlugin, const char *module = NULL);
 
@@ -106,5 +106,7 @@ int HerePluginGetMinZoomLevel(maps_view_h hView, int *nMinZoomLevel);
 int HerePluginGetMaxZoomLevel(maps_view_h hView, int *nMaxZoomLevel);
 
 int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object, maps_view_object_operation_e operation);
+
+int HerePluginCaptureSnapshot(maps_view_h hView, void **data, int *w, int *h, maps_view_colorspace_type_e *cs);
 
 #endif //_LOCATION_HERE_API_H_

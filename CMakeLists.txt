@@ -19,7 +19,6 @@ SET(dependents
 	evas
 	ecore-evas
 	elementary
-	vconf
 	)
 
 INCLUDE(FindPkgConfig)

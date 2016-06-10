@@ -30,7 +30,7 @@
 #include <maps_place_link_object_plugin.h>
 #include <maps_place_editorial_plugin.h>
 #include <maps_place_review_plugin.h>
-#include <maps_place_category_plugin.h>
+#include <maps_place_category.h>
 
 //map engine header
 #include <finder/DiscoveryQuery.h>

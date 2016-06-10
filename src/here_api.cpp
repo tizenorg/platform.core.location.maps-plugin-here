@@ -795,3 +795,14 @@ int HerePluginOnViewObject(maps_view_h hView, const maps_view_object_h object,
 		error = vh->onViewObject(hView, object, operation);
 	return error;
 }
+
+int HerePluginCaptureSnapshot(maps_view_h view, void **data,
+	int *w, int *h, maps_view_colorspace_type_e *cs)
+{
+	HereView *vh = NULL;
+	int maps_error = maps_view_get_maps_plugin_view_handle(view, (void**)&vh);
+	here_error_e error = (here_error_e)ConvertToHereError(maps_error);
+	if (error == HERE_ERROR_NONE && vh)
+		error = vh->captureSnapshot(view, data, w, h, cs);
+	return error;
+}
