@@ -91,6 +91,8 @@ protected:
     double& GetLevel();
 #ifdef TIZEN_MIGRATION
 public:
+    double getScale();
+    void setScale(double scale);
 #endif
     double& GetHeading();
 
