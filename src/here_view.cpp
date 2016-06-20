@@ -547,7 +547,7 @@ here_error_e HereView::captureSnapshot(maps_view_h view, void **data, int *width
 		return HERE_ERROR_OUT_OF_MEMORY;
 	}
 
-	__map->PaintMap(__w, __h);
+	__pixelGetCb(view, NULL);
 	__api->glReadPixels(0, 0, __w, __h, GL_RGBA, GL_UNSIGNED_BYTE, readData);
 	for(int i = 0; i < __h; i++)
 		memcpy((unsigned char*)*data + sizeOfLine * i, readData + sizeOfLine * (__h - i - 1), sizeOfLine);
