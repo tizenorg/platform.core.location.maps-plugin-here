@@ -9,6 +9,8 @@ SET(LIBDIR ${LIBDIR})
 # Dependencies
 SET(dependents
 	glib-2.0
+	gio-2.0
+	gio-unix-2.0
 	gmodule-2.0
 	libxml-2.0
 	dlog

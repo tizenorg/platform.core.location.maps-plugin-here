@@ -31,7 +31,7 @@ INSTALL(FILES config/heremaps-uc-launcher.conf DESTINATION ${SYSCONF_DIR}/dbus-1
 
 # Check external libraries
 INCLUDE(FindPkgConfig)
-pkg_check_modules(UC_LAUNCHER_EXT_LIBS REQUIRED glib-2.0 gthread-2.0 capi-appfw-application capi-system-info evas dlog ecore)
+pkg_check_modules(UC_LAUNCHER_EXT_LIBS REQUIRED glib-2.0 gio-2.0 gio-unix-2.0 gthread-2.0 capi-appfw-application capi-system-info evas dlog ecore)
 
 SET(EXTRA_CFLAGS "")
 FOREACH(flag ${${UC_LAUNCHER_EXT_LIBS}_CFLAGS})

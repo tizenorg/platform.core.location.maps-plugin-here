@@ -31,20 +31,13 @@ typedef struct _heremaps_uc_dbus_s {
 	gchar *signal_path;
 } heremaps_uc_dbus_s;
 
-static void heremaps_uc_ready_cb(GObject *source_object, GAsyncResult *res, gpointer user_data)
-{
-	MAPS_FUNC_ENTER
-
-	GError *error = NULL;
-	g_dbus_proxy_new_finish(res, &error);
-}
-
 EXPORT_API int heremaps_uc_dbus_launch_receiver()
 {
 	MAPS_FUNC_ENTER
 
 	char *bus_addr = NULL;
 	GError *error = NULL;
+	GDBusProxy *proxy = NULL;
 
 #if !GLIB_CHECK_VERSION(2, 35, 0)
 	g_type_init();
@@ -84,7 +77,16 @@ EXPORT_API int heremaps_uc_dbus_launch_receiver()
 	handle->signal_path = g_strdup_printf("%s/%s", handle->service_path, "SAMSUNG");
 	MAPS_LOGD("Object Path [%s]", handle->signal_path);
 
-	g_dbus_proxy_new(handle->conn, G_DBUS_PROXY_FLAGS_NONE, NULL, handle->service_name, handle->signal_path, UC_INTERFACE_NAME, NULL, heremaps_uc_ready_cb, NULL);
+	proxy = g_dbus_proxy_new_sync(handle->conn, G_DBUS_PROXY_FLAGS_NONE, NULL, handle->service_name, handle->signal_path, UC_INTERFACE_NAME, NULL, NULL);
+	if (proxy) {
+		MAPS_LOGD("proxy: %p", proxy);
+		g_object_unref(proxy);
+	} else {
+		if (error) {
+			MAPS_LOGD("Fail to get proxy Error[%s]", error->message);
+			g_error_free(error);
+		}
+	}
 
 	if (handle->conn) {
 		g_object_unref(handle->conn);

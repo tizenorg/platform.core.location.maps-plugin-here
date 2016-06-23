@@ -18,6 +18,29 @@
  */
 
 #include "heremaps-uc-launcher.h"
+#include <gio/gio.h>
+
+#define UC_RECEIVER_NAME	"org.tizen.lbs.Providers.HereMapsUCLauncher"
+
+GMainLoop *loop = NULL;
+
+static void on_bus_acquired(GDBusConnection *conn, const gchar *name, gpointer user_data)
+{
+	LS_LOGD("HereMapsUCLauncher: Acquired the bus <%s>", name);
+
+	g_main_loop_quit(loop);
+	LS_LOGD("HereMapsUCLauncher: g_main_loop_quit");
+}
+
+static void on_name_acquired(GDBusConnection *connection, const gchar *name, gpointer user_data)
+{
+	LS_LOGD("HereMapsUCLauncher: Acquired the name <%s> on the system bus", name);
+}
+
+static void on_name_lost(GDBusConnection *connection, const gchar *name, gpointer user_data)
+{
+	LS_LOGD("HereMapsUCLauncher: Lost the name <%s> on the system bus", name);
+}
 
 static void launch_heremaps_uc()
 {
@@ -28,6 +51,26 @@ static void launch_heremaps_uc()
 	app_control_set_app_id(app_control, "org.tizen.heremaps-uc");
 	app_control_send_launch_request(app_control, NULL, NULL);
 	app_control_destroy(app_control);
+
+	gchar *service_name = g_strdup(UC_RECEIVER_NAME);
+	guint owner_id = g_bus_own_name(G_BUS_TYPE_SESSION, service_name, G_BUS_NAME_OWNER_FLAGS_NONE, on_bus_acquired, on_name_acquired, on_name_lost, NULL, NULL);
+	LS_LOGD("g_bus_own_name id=[%d]", owner_id);
+
+	loop =  g_main_loop_new(NULL, TRUE);
+
+	LS_LOGD("HereMapsUCLauncher: g_main_loop_quit");
+	g_main_loop_run(loop);
+
+	g_main_loop_unref(loop);
+	LS_LOGD("HereMapsUCLauncher: g_main_loop_unref");
+
+	g_bus_unown_name(owner_id);
+	LS_LOGD("g_bus_unown_name");
+
+	g_free(service_name);
+	LS_LOGD("g_free service_name");
+
+	loop = NULL;
 
 	LS_FUNC_EXIT
 }

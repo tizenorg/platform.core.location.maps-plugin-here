@@ -28,6 +28,11 @@
 extern "C" {
 #endif
 
+#ifdef LOG_TAG
+#undef LOG_TAG
+#endif
+#define LOG_TAG "HERE_PLUGIN"
+
 #define MAPS_LOGD(fmt,args...)  LOGD(fmt, ##args)
 #define MAPS_LOGW(fmt,args...)  LOGW(fmt, ##args)
 #define MAPS_LOGI(fmt,args...)  LOGI(fmt, ##args)
