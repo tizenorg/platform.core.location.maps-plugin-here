@@ -290,8 +290,8 @@ here_error_e HereViewObjects::__updateMarker(maps_view_object_h hMarker, GeoMapO
 			w = nw;
 			h = nh;
 			nSize = w * h * 4;
-			maps_view_object_marker_set_size(hMarker, w, h);
 		}
+		maps_view_object_marker_set_size(hMarker, w, h);
 
 		/* convert RGBA to BGRA for GL */
 		_Util::ConvertRGBA2BGRA(dst, (unsigned)w, (unsigned)h);
