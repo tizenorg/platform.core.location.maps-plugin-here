@@ -290,8 +290,8 @@ here_error_e HereViewObjects::__updateMarker(maps_view_object_h hMarker, GeoMapO
 			w = nw;
 			h = nh;
 			nSize = w * h * 4;
-			maps_view_object_marker_set_size(hMarker, w, h);
 		}
+		maps_view_object_marker_set_size(hMarker, w, h);
 
 		/* convert RGBA to BGRA for GL */
 		_Util::ConvertRGBA2BGRA(dst, (unsigned)w, (unsigned)h);
@@ -534,7 +534,7 @@ bool HereViewObjects::__resizeBitmap(unsigned char **curBmp, int curWidth, int c
 	if (!curBmp || curWidth <= 0 || curHeight <= 0 || newWidth <= 0 || newHeight <= 0) return false;
 	if (curWidth == newWidth && curHeight == newHeight) return false;
 
-	unsigned char* newBmp = new unsigned char[newWidth * newHeight * 4];
+	unsigned char *newBmp = (unsigned char*)malloc(newWidth * newHeight * 4);
 
 	double scaleWidth =  (double)newWidth / (double)curWidth;
 	double scaleHeight = (double)newHeight / (double)curHeight;
@@ -553,7 +553,7 @@ bool HereViewObjects::__resizeBitmap(unsigned char **curBmp, int curWidth, int c
 	    }
 	}
 
-	delete [] *curBmp;
+	g_free(*curBmp);
 	*curBmp = newBmp;
 	return true;
 }
