@@ -38,7 +38,7 @@ typedef std::vector< ExtendedAttribute > ExtendedAttributeList;
  * 
  * \ingroup finder
  */
-class ExtendedAttribute
+class EXPORT_API ExtendedAttribute
 {
 public:
     /**

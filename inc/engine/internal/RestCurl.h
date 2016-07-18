@@ -69,10 +69,10 @@ private:
 	bool CreateDetachedThread(void* (*pFunc)(void*), void *pArgs);
 
 	#ifdef TIZEN_SUPPORT_CRYPTO_LOCK
-	static void CRYPTO_MutexLock(int mode, int type, char *file, int line);
-	static void CRYPTO_InitMutexLocks(void);
-	static void CRYPTO_KillMutexLocks(void);
-	static unsigned long CRYPTO_ThreadId(void);
+	static void CryptoMutexLock(int mode, int type, char *file, int line);
+	static void CryptoInitMutexLocks(void);
+	static void CryptoKillMutexLocks(void);
+	static unsigned long CryptoThreadId(void);
 	#endif
 
 	class RestCurlImpl;

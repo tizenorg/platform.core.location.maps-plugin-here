@@ -86,24 +86,24 @@ public:
         MT_Normal_Day_Custom,
         MT_Normal_Night,
         MT_Normal_Night_Grey,
-        MT_Pedestrian_Day,
-        MT_Pedestrian_Day_Mobile,
-        MT_Pedestrian_Night,
-        MT_Pedestrian_Night_Mobile,
-        MT_Carnav_Day_Grey,
         MT_Normal_Day_Mobile,
         MT_Normal_Day_Grey_Mobile,
         MT_Normal_Day_Transit_Mobile,
         MT_Normal_Night_Transit_Mobile,
         MT_Normal_Night_Mobile,
         MT_Normal_Night_Grey_Mobile,
-        MT_Reduced_Day,
-        MT_Reduced_Night,
         MT_Hybrid_Day_Transit,
         MT_Hybrid_Grey_Day,
         MT_Hybrid_Traffic_Day,
         MT_Hybrid_Day_Mobile,
         MT_Terrain_Day_Mobile,
+        MT_Pedestrian_Day,
+        MT_Pedestrian_Day_Mobile,
+        MT_Pedestrian_Night,
+        MT_Pedestrian_Night_Mobile,
+        MT_Reduced_Day,
+        MT_Reduced_Night,
+        MT_Carnav_Day_Grey,
 #endif
         MT_Last_Entry_Undefined         ///< Indicates that the map type is not
                                         ///  defined. 
@@ -191,7 +191,7 @@ public:
      *
      * @return A value indicating the maximum map zoom level.
      */
-    void SetMaximumZoomLevel(double zoom);
+    void SetMaximumZoomLevel(double zoomLevel);
 #endif
    
     /**
@@ -444,7 +444,7 @@ public:
      * 
      * @return An pointer indicating the bitmap of the root tile.
      */
-    DrawableBitmapPtr GetRootPixmap();
+    DrawableBitmapPtr GetRootPixmap() const;
 
     /**
      * This method sets a pointer of a structure of the Evas GL API object that
@@ -482,7 +482,7 @@ public:
      *
      * @return A value indicating the angle of the map.
      */
-    double GetAngle();
+    double GetAngle() const;
 
     /**
      * This method sets a Boolean value indicating if the scale bar is enabled or not.

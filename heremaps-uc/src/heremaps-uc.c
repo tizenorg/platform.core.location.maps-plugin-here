@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2000 - 2011 Samsung Electronics Co., Ltd. All rights reserved.
  *
- * Contact: Jongmun Woo <jongmun.woo@samsung.com>, Young-Ae Kang <youngae.kang@samsung.com>
+ * Contact: Jongmun Woo <jongmun.woo@samsung.com>, Seechan Kim <cbible.kim@samsung.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

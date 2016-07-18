@@ -324,7 +324,7 @@ here_error_e HereViewObjects::__updateMarker(maps_view_object_h hMarker, GeoMapO
 		/* z-order */
 		int z_order = 0;
 		maps_view_object_marker_get_z_order(hMarker, &z_order);
-		hereMarker->SetZorder(z_order);
+		hereMarker->SetZOrder(z_order);
 	} while (0);
 
 	if (img) evas_object_del(img);

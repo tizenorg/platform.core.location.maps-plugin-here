@@ -129,7 +129,7 @@ public:
      * @return A string containing the base URI.
      */
 #ifdef TIZEN_MIGRATION
-    String GetBaseUri();
+    String GetBaseUri() const;
 #else
     static String GetBaseUri();
 #endif

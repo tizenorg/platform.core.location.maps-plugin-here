@@ -323,7 +323,7 @@ public:
      * @return A value indicating the MetricSystem selector for
      *        the given query.
      */
-    GeoRouteQuery::MetricSystem GetMetricSystem(void);
+    GeoRouteQuery::MetricSystem GetMetricSystem(void) const;
 
     /**
      * This method sets the bounding area for the given query.
@@ -339,7 +339,7 @@ public:
      * @return A value indicating the bounding area for
      *        the given query.
      */
-    GeoBoundingBox GetViewBounds(void);
+    GeoBoundingBox GetViewBounds(void) const;
 
     /**
      * This method sets a value that indicates the maximum number of alternative routes
