@@ -617,6 +617,8 @@ void HerePlace::OnPlaceDetailsReply(const PlaceDetailsReply &Reply)
 
 			ProcessPlaceRated(herePlace, mapsPlace);
 
+			ProcessPlaceAttributes(herePlace, mapsPlace);
+
 			if (!isPending)
 				m_PlaceList.push_back(mapsPlace);
 
@@ -1114,6 +1116,55 @@ void HerePlace::ProcessPlaceRated(PlaceDetails herePlace, maps_place_h mapsPlace
 		maps_place_set_related_link(mapsPlace, mapsRelated);
 
 	maps_place_link_object_destroy(mapsRelated);
+}
+
+void HerePlace::ProcessPlaceAttributes(PlaceDetails herePlace, maps_place_h mapsPlace)
+{
+	ExtendedAttributeList hereAttributeList = herePlace.GetExtendedAttributes();
+	ExtendedAttributeList::iterator hereAttribute;
+	maps_item_list_h mapsAttributeList;
+	maps_place_attribute_h mapsAttribute;
+	int error;
+	bool is_valid = false;
+
+	if (hereAttributeList.empty()) return;
+
+	if (maps_item_list_create(&mapsAttributeList) != MAPS_ERROR_NONE) return;
+
+	for (hereAttribute = hereAttributeList.begin(); hereAttribute != hereAttributeList.end(); hereAttribute++) {
+		if (maps_place_attribute_create(&mapsAttribute) != MAPS_ERROR_NONE) continue;
+
+		is_valid = false;
+
+		if (!hereAttribute->GetAttributeType().empty()) {
+			error = maps_place_attribute_set_id(mapsAttribute,
+				(char*)hereAttribute->GetAttributeType().c_str());
+			is_valid |= (error == MAPS_ERROR_NONE);
+		}
+
+		if (!hereAttribute->GetLabel().empty()) {
+			error = maps_place_attribute_set_label(mapsAttribute,
+				(char*)hereAttribute->GetLabel().c_str());
+			is_valid |= (error == MAPS_ERROR_NONE);
+		}
+
+		if (!hereAttribute->GetText().empty()) {
+			error = maps_place_attribute_set_text(mapsAttribute,
+				(char*)hereAttribute->GetText().c_str());
+			is_valid |= (error == MAPS_ERROR_NONE);
+		}
+
+		if (is_valid)
+			maps_place_set_attributes(mapsPlace, mapsAttribute);
+
+		maps_place_link_object_destroy(mapsAttribute);
+	}
+
+	if (maps_item_list_items(mapsAttributeList)) {
+		maps_place_set_attributes(mapsPlace, mapsAttributeList);
+		maps_item_list_remove_all(mapsAttributeList, maps_place_attribute_destroy);
+	}
+	maps_item_list_destroy(mapsAttributeList);
 }
 
 void HerePlace::__flushReplies(int error)
