@@ -271,9 +271,9 @@ public:
     void AbortLoading();
 
 #ifdef TIZEN_SUPPORT_LIMIT_RETRYING_FETCHING_TILES
-    int GetTryCount();
+    int GetTryCount() const;
 
-    int SetTryCount(int cnt);
+    int SetTryCount(int count);
 #endif
 
 private:

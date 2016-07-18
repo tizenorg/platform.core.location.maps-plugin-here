@@ -52,62 +52,149 @@ public:
 
 typedef std::list<TileCache> TileCacheList;
 
+/**
+ *
+ * This class encapsulates a caching system for map tiles based on the file system.
+ *
+ */
+
 class TileFetcherCache
 {
 public:
+    /**
+     * This method is the default constructor.
+     */
 	TileFetcherCache();
 
+    /**
+     * This method is the (virtual) destructor.
+     */
 	virtual ~TileFetcherCache();
 
+    /**
+     * This method is to get the instance of this class.
+     */
 	static TileFetcherCache& GetInstance();
 
+    /**
+     * This method is to clear caching system.
+     */
 	void shutdown();
 
+    /**
+     * This method is to remove a tile having the hash.
+     */
 	bool remove(const int hash);
 
+    /**
+     * This method is to check if there is a tile having the hash.
+     */
 	bool isFound(const int hash);
 
+    /**
+     * This method is to get the iterator of a tile having the hash.
+     */
 	TileCacheList::iterator find(const int hash);
 
+    /**
+     * This method is to read a tile having the hash from own file system.
+     *
+     * @param	hash	A value of hash indicating the tile
+     * @param	buffer	A buffer to store the map tile
+     * @param	size	A size of map tile (bytes)
+     */
 	unsigned long read(const int hash, unsigned char *&buffer, unsigned long &size);
 
+    /**
+     * This method is to write a tile having the hash to own file system.
+     *
+     * @param	hash	A value of hash indicating the tile
+     * @param	buffer	A buffer stored the map tile
+     * @param	size	A size of map tile (bytes)
+     */
 	unsigned long write(const int hash, const unsigned char *buffer, const unsigned long size);
 
+    /**
+     * This method is to clear all of cache files.
+     */
 	void clearCache();
 
-	Here::Maps::RestItemHandle::RequestId load(const Here::Maps::TileKey &rKey, Here::Maps::TileFetcherQueryListener &rListener);
-
+    /**
+     * This method is to abort the request to get a tile from the cache.
+     */
 	void abort(void *pArg);
 
+    /**
+     * This method is to request to get a tile from the cache.
+     */
 	void fire(void *pArg);
 
 private:
 	HERE_MAPS_NO_COPY_NO_ASSIGN(TileFetcherCache);
 
+    /**
+     * This method is to initialize the cache by scanning and building the list of already cached tiles.
+     */
 	void __initCache();
 
+    /**
+     * This method is to compare hit rates of tiles to decide which one will be removed.
+     */
 	static bool __compareTileCache(const TileCache& first, const TileCache& second);
 
+    /**
+     * This method is to check if more tiles can be stored.
+     */
 	bool __checkCapacity(void);
 
+    /**
+     * This method is to check if more tiles can be stored with only free space.
+     */
 	bool __isAvailableSpace(void);
 
+    /**
+     * This method is to check if more tiles can be stored with only the count of tiles.
+     */
 	bool __isAvailableCount(void);
 
+    /**
+     * This method is to get the path where tile files are stored in.
+     */
 	bool __getCachePath(char *path, int size);
 
+    /**
+     * This method is to get the path of the tile.
+     */
 	bool __getFilePath(const int hash, char *path, int size);
 
+    /**
+     * This method is to get the path of the tile.
+     */
 	bool __getFilePath(const char *fname, char *path, int size);
 
+    /**
+     * This method is to get the hash from the file name.
+     */
 	int __parseHash(const char *fname);
 
+    /**
+     * This method is a timer callback to delay loading time.
+     */
 	static gboolean __fireTimer(gpointer data);
 
+    /**
+     * This method is a timer callback to delay loading time.
+     */
 	static gboolean __fireIdler(gpointer data);
 
+    /**
+     * This method is a timer destroyer.
+     */
 	static void __timerDestroy(gpointer data);
 
+    /**
+     * This method is a timer destroyer.
+     */
 	static void __idlerDestroy(gpointer data);
 
 	//members

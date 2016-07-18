@@ -600,14 +600,14 @@ void HerePlace::OnPlaceDetailsReply(const PlaceDetailsReply &Reply)
 			/* location */
 			ProcessPlaceLocation(herePlace, mapsPlace);
 
-			ProcessPlaceContact(herePlace, mapsPlace);
+			ProcessPlaceContacts(herePlace, mapsPlace);
 
-			ProcessPlaceCategory(herePlace, mapsPlace);
+			ProcessPlaceCategories(herePlace, mapsPlace);
 
 			/* tags */
 			/* maps & here not supported */
 
-			ProcessPlaceImage(herePlace, mapsPlace);
+			ProcessPlaceImages(herePlace, mapsPlace);
 
 			ProcessPlaceDetails(herePlace, mapsPlace);
 
@@ -616,6 +616,8 @@ void HerePlace::OnPlaceDetailsReply(const PlaceDetailsReply &Reply)
 			ProcessPlaceRatings(herePlace, mapsPlace);
 
 			ProcessPlaceRated(herePlace, mapsPlace);
+
+			ProcessPlaceAttributes(herePlace, mapsPlace);
 
 			if (!isPending)
 				m_PlaceList.push_back(mapsPlace);
@@ -742,7 +744,7 @@ void HerePlace::ProcessPlaceLocation(PlaceDetails herePlace, maps_place_h mapsPl
 }
 
 
-void HerePlace::ProcessPlaceContact(PlaceDetails herePlace, maps_place_h mapsPlace)
+void HerePlace::ProcessPlaceContacts(PlaceDetails herePlace, maps_place_h mapsPlace)
 {
 	/* contact */
 	ContactDetailsList hereContList = herePlace.GetContactDetails();
@@ -780,8 +782,7 @@ void HerePlace::ProcessPlaceContact(PlaceDetails herePlace, maps_place_h mapsPla
 		}
 
 		if (is_valid)
-			maps_item_list_append(mapsContList, mapsCont,
-				maps_place_contact_clone);
+			maps_item_list_append(mapsContList, mapsCont, maps_place_contact_clone);
 
 		maps_place_contact_destroy(mapsCont);
 	}
@@ -793,7 +794,7 @@ void HerePlace::ProcessPlaceContact(PlaceDetails herePlace, maps_place_h mapsPla
 	maps_item_list_destroy(mapsContList);
 }
 
-void HerePlace::ProcessPlaceCategory(PlaceDetails herePlace, maps_place_h mapsPlace)
+void HerePlace::ProcessPlaceCategories(PlaceDetails herePlace, maps_place_h mapsPlace)
 {
 	CategoryList hereCateList = herePlace.GetCategories();
 	CategoryList::iterator hereCate;
@@ -806,10 +807,11 @@ void HerePlace::ProcessPlaceCategory(PlaceDetails herePlace, maps_place_h mapsPl
 
 	if (maps_item_list_create(&mapsCateList) != MAPS_ERROR_NONE) return;
 
-	// maps-service supports only one category
-	hereCate = hereCateList.begin();
-	if (maps_place_category_create(&mapsCate) == MAPS_ERROR_NONE)
-	{
+	for (hereCate = hereCateList.begin(); hereCate != hereCateList.end(); hereCate++) {
+		if (maps_place_category_create(&mapsCate) != MAPS_ERROR_NONE) continue;
+
+		is_valid = false;
+
 		if (!hereCate->GetCategoryId().ToString().empty()) {
 			error = maps_place_category_set_id(mapsCate,
 				hereCate->GetCategoryId().ToString().c_str());
@@ -828,9 +830,9 @@ void HerePlace::ProcessPlaceCategory(PlaceDetails herePlace, maps_place_h mapsPl
 			is_valid |= (error == MAPS_ERROR_NONE);
 		}
 
-		if (is_valid) {
+		if (is_valid)
 			maps_item_list_append(mapsCateList, mapsCate, maps_place_category_clone);
-		}
+
 		maps_place_category_destroy(mapsCate);
 	}
 
@@ -841,7 +843,7 @@ void HerePlace::ProcessPlaceCategory(PlaceDetails herePlace, maps_place_h mapsPl
 	maps_item_list_destroy(mapsCateList);
 }
 
-void HerePlace::ProcessPlaceImage(PlaceDetails herePlace, maps_place_h mapsPlace)
+void HerePlace::ProcessPlaceImages(PlaceDetails herePlace, maps_place_h mapsPlace)
 {
 	ImageContentList hereImageList = herePlace.GetImageContent();
 	ImageContentList::iterator hereImage;
@@ -1114,6 +1116,56 @@ void HerePlace::ProcessPlaceRated(PlaceDetails herePlace, maps_place_h mapsPlace
 		maps_place_set_related_link(mapsPlace, mapsRelated);
 
 	maps_place_link_object_destroy(mapsRelated);
+}
+
+void HerePlace::ProcessPlaceAttributes(PlaceDetails herePlace, maps_place_h mapsPlace)
+{
+	ExtendedAttributeList hereAttributeList = herePlace.GetExtendedAttributes();
+	ExtendedAttributeList::iterator hereAttribute;
+	maps_item_list_h mapsAttributeList;
+	maps_place_attribute_h mapsAttribute;
+	int error;
+	bool is_valid = false;
+
+	if (hereAttributeList.empty()) return;
+
+	if (maps_item_list_create(&mapsAttributeList) != MAPS_ERROR_NONE) return;
+
+	for (hereAttribute = hereAttributeList.begin(); hereAttribute != hereAttributeList.end(); hereAttribute++) {
+		if (maps_place_attribute_create(&mapsAttribute) != MAPS_ERROR_NONE) continue;
+
+		is_valid = false;
+
+		if (!hereAttribute->GetAttributeType().empty()) {
+			error = maps_place_attribute_set_id(mapsAttribute,
+				(char*)hereAttribute->GetAttributeType().c_str());
+			is_valid |= (error == MAPS_ERROR_NONE);
+		}
+
+		if (!hereAttribute->GetLabel().empty()) {
+			error = maps_place_attribute_set_label(mapsAttribute,
+				(char*)hereAttribute->GetLabel().c_str());
+			is_valid |= (error == MAPS_ERROR_NONE);
+		}
+
+		if (!hereAttribute->GetText().empty()) {
+			error = maps_place_attribute_set_text(mapsAttribute,
+				(char*)hereAttribute->GetText().c_str());
+			is_valid |= (error == MAPS_ERROR_NONE);
+		}
+
+		if (is_valid)
+			maps_item_list_append(mapsAttributeList, mapsAttribute, maps_place_attribute_clone);
+
+		maps_place_attribute_destroy(mapsAttribute);
+	}
+
+	if (maps_item_list_items(mapsAttributeList)) {
+		maps_place_set_attributes(mapsPlace, mapsAttributeList);
+		maps_item_list_remove_all(mapsAttributeList, maps_place_attribute_destroy);
+	}
+
+	maps_item_list_destroy(mapsAttributeList);
 }
 
 void HerePlace::__flushReplies(int error)

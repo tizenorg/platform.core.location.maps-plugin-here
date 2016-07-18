@@ -159,14 +159,14 @@ public:
      *
      * @return A value indicating z-order to the bitmap.
      */
-    int GetZorder() const;
+    int GetZOrder() const;
 
     /**
      * This method sets the marker z-order.
      *
      * @param nZorder A constant value of z-order.
      */
-    void SetZorder(int nZorder);
+    void SetZOrder(int nZorder);
 #endif
 
 private:

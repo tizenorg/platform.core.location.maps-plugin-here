@@ -118,15 +118,23 @@ private:
 
     static void ParseAddress( JsonObject* json_data, Address& address );
 
+#ifdef TIZEN_MIGRATION
+    static void ParseContacts( JsonArray* json_data, ContactDetailsList& contacts );
+
     static void ParseContacts( JsonArray* json_data, const String& key,
                                ContactDetailsList& contacts );
-#ifndef TIZEN_MIGRATION
+
+    static void ParseLinkObject( JsonObject* json_data, LinkObject& link_object );
+#else
+    static void ParseContacts( JsonArray* json_data, const String& key,
+                               ContactDetailsList& contacts );
+
     static void ParseLinkObject( IJsonValue* json_data,
                                    const char* object_name,
                                    LinkObject& link_object );
-#endif
+
     static void ParseLinkObject( JsonObject* json_data, LinkObject& link_object );
-#ifndef TIZEN_MIGRATION
+
     static void ParseLinkObject( JsonObject* json_data,
                                    const char* object_name,
                                    LinkObject& link_object );

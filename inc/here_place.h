@@ -30,6 +30,7 @@
 #include <maps_place_link_object_plugin.h>
 #include <maps_place_editorial_plugin.h>
 #include <maps_place_review_plugin.h>
+#include <maps_place_attribute_plugin.h>
 #include <maps_place_category.h>
 
 //map engine header
@@ -43,6 +44,7 @@
 #include <finder/LinkObject.h>
 #include <finder/Ratings.h>
 #include <finder/RelatedItem.h>
+#include <finder/ExtendedAttribute.h>
 #include <common/GeoLocation.h>
 #include <common/Address.h>
 
@@ -92,13 +94,14 @@ public:
 
 private:
 	void ProcessPlaceLocation(PlaceDetails herePlace, maps_place_h mapsPlace);
-	void ProcessPlaceContact(PlaceDetails herePlace, maps_place_h mapsPlace);
-	void ProcessPlaceCategory(PlaceDetails herePlace, maps_place_h mapsPlace);
-	void ProcessPlaceImage(PlaceDetails herePlace, maps_place_h mapsPlace);
+	void ProcessPlaceContacts(PlaceDetails herePlace, maps_place_h mapsPlace);
+	void ProcessPlaceCategories(PlaceDetails herePlace, maps_place_h mapsPlace);
+	void ProcessPlaceImages(PlaceDetails herePlace, maps_place_h mapsPlace);
 	void ProcessPlaceDetails(PlaceDetails herePlace, maps_place_h mapsPlace);
 	void ProcessPlaceReviews(PlaceDetails herePlace, maps_place_h mapsPlace);
 	void ProcessPlaceRatings(PlaceDetails herePlace, maps_place_h mapsPlace);
 	void ProcessPlaceRated(PlaceDetails herePlace, maps_place_h mapsPlace);
+	void ProcessPlaceAttributes(PlaceDetails herePlace, maps_place_h mapsPlace);
 
 	void __sortList(PlaceList &list);
 	void __flushReplies(int error);
