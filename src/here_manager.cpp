@@ -506,12 +506,12 @@ here_error_e HereManager::CheckAgreement()
 
 		pid_t nProcessId = getpid();
 		ret = app_manager_get_app_id(nProcessId, &strAppId);
-		if (ret != APP_MANAGER_ERROR_NONE)
+		if (ret != APP_MANAGER_ERROR_NONE) {
 			MAPS_LOGI("Get app_id [%ld]. nRet[%d]", nProcessId, ret);
-		else if (!strncmp(strAppId, UTC_APP, strlen(UTC_APP)) ||
+		} else if (!strncmp(strAppId, UTC_APP, strlen(UTC_APP)) ||
 				!strncmp(strAppId, ITC_APP, strlen(ITC_APP)) ||
 				!strncmp(strAppId, UTC_TPK_APP, strlen(UTC_TPK_APP)) ||
-				!strncmp(strAppId, ITC_TPK_APP, strlen(ITC_TPK_APP))) { 
+				!strncmp(strAppId, ITC_TPK_APP, strlen(ITC_TPK_APP))) {
 			MAPS_LOGD("Requested by tct");
 			error = HERE_ERROR_NONE;
 		}
@@ -522,8 +522,9 @@ here_error_e HereManager::CheckAgreement()
 		ret = heremaps_uc_dbus_launch_receiver();
 		if (ret != HEREMAPS_UC_DBUS_ERROR_NONE)
 			MAPS_LOGD("heremaps_uc_dbus_launch_receiver fail");
-	} else
+	} else {
 		MAPS_LOGD("Vconf value of HereMaps is true");
+	}
 
 	if (strAppId != NULL)
 		g_free(strAppId);

@@ -33,11 +33,11 @@ extern "C" {
 #endif
 #define LOG_TAG "HERE_PLUGIN"
 
-#define MAPS_LOGD(fmt,args...)  LOGD(fmt, ##args)
-#define MAPS_LOGW(fmt,args...)  LOGW(fmt, ##args)
-#define MAPS_LOGI(fmt,args...)  LOGI(fmt, ##args)
-#define MAPS_LOGE(fmt,args...)  LOGE(fmt, ##args)
-#define MAPS_SECLOG(fmt,args...)  SECURE_LOGD(fmt, ##args)
+#define MAPS_LOGD(fmt, args...)  LOGD(fmt, ##args)
+#define MAPS_LOGW(fmt, args...)  LOGW(fmt, ##args)
+#define MAPS_LOGI(fmt, args...)  LOGI(fmt, ##args)
+#define MAPS_LOGE(fmt, args...)  LOGE(fmt, ##args)
+#define MAPS_SECLOG(fmt, args...)  SECURE_LOGD(fmt, ##args)
 
 #define MAPS_FUNC_ENTER     MAPS_LOGD("(%s) ENTER", __FUNCTION__);
 #define MAPS_FUNC_EXIT      MAPS_LOGD("(%s) EXIT", __FUNCTION__);

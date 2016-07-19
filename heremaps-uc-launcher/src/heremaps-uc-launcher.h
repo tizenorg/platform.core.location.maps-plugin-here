@@ -52,10 +52,10 @@ extern "C" {
 #define LOG_TAG TAG_UC_LAUNCHER
 #endif
 
-#define LS_LOGD(fmt,args...)  LOGD(fmt, ##args)
-#define LS_LOGW(fmt,args...)  LOGW(fmt, ##args)
-#define LS_LOGI(fmt,args...)  LOGI(fmt, ##args)
-#define LS_LOGE(fmt,args...)  LOGE(fmt, ##args)
+#define LS_LOGD(fmt, args...)  LOGD(fmt, ##args)
+#define LS_LOGW(fmt, args...)  LOGW(fmt, ##args)
+#define LS_LOGI(fmt, args...)  LOGI(fmt, ##args)
+#define LS_LOGE(fmt, args...)  LOGE(fmt, ##args)
 
 #elif UC_LAUNCHER_DLOG_RELEASE      /* if release mode */
 
@@ -64,10 +64,10 @@ extern "C" {
 #define LOG_TAG TAG_UC_LAUNCHER
 #endif
 
-#define LS_LOGD(fmt,args...)  LOGD(fmt, ##args)
-#define LS_LOGW(fmt,args...)  LOGW(fmt, ##args)
-#define LS_LOGI(fmt,args...)  LOGI(fmt, ##args)
-#define LS_LOGE(fmt,args...)  LOGE(fmt, ##args)
+#define LS_LOGD(fmt, args...)  LOGD(fmt, ##args)
+#define LS_LOGW(fmt, args...)  LOGW(fmt, ##args)
+#define LS_LOGI(fmt, args...)  LOGI(fmt, ##args)
+#define LS_LOGE(fmt, args...)  LOGE(fmt, ##args)
 #else                       /* if do not use dlog */
 #define LS_LOGD(...)  g_debug(__VA_ARGS__)
 #define LS_LOGW(...)  g_warning(__VA_ARGS__)
