@@ -134,4 +134,7 @@ extern void Stopwatch_Show(int aIndex);
 extern void Stopwatch_Reset(int aIndex);
 HERE_MAPS_END_NAMESPACE
 
+#undef VERSION
+#define VERSION(a, b, c)	(((a) << 16) + ((b) << 8) + (c))
+
 #endif // HEREMAPS_GLOBAL_H

@@ -1,3 +1,8 @@
+[Version]   maps-plugin-here_0.3.3
+[Date]      28 July 2016
+[Title]     Support to set departure time for routing
+[Developer] Seechan Kim <cbible.kim@samsung.com>
+
 [Version]   maps-plugin-here_0.3.2
 [Date]      07 June 2016
 [Title]     modified internal APIs for maps-service

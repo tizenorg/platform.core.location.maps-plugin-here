@@ -193,6 +193,10 @@ here_error_e HereRoute::PreparePreference(maps_preference_h hPref)
 		g_free(szRealtimeTraffic);
 	}
 
+	time_t timeVal = 0;
+	if (maps_preference_get_route_departure_time(hPref, &timeVal) == MAPS_ERROR_NONE)
+		m_pQuery->SetDepartureTime(timeVal);
+
 	return HERE_ERROR_NONE;
 }
 
