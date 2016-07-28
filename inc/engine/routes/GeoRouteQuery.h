@@ -19,6 +19,7 @@
 #define GEOROUTEQUERY_H
 
 #include <map>
+#include <time.h>
 
 #include "common/HereMaps_global.h"
 #include "common/BaseQuery.h"
@@ -371,6 +372,34 @@ public:
      * @return An integer indicating the realtime traffic status.
      */
     size_t GetRealtimeTraffic(void) const;
+
+    /**
+     * This method sets a value that indicates the departure time.
+     *
+     * @param time An value indicating the departure time.
+     */
+    void SetDepartureTime(time_t time);
+
+    /**
+     * This method retrieves a value that indicates the departure time.
+     *
+     * @return An value indicating the departure time.
+     */
+    time_t GetDepartureTime(void) const;
+
+    /**
+     * This method sets a value that indicates the arrival time.
+     *
+     * @param time An intevalueger indicating the arrival time.
+     */
+    void SetArrivalTime(time_t time);
+
+    /**
+     * This method retrieves a value that indicates the arrival time.
+     *
+     * @return An value indicating the arrival time.
+     */
+    time_t GetArrivalTime(void) const;
 #endif
 
     /**
