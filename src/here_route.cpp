@@ -27,6 +27,8 @@ HereRoute::HereRoute(void *pCbFunc, void *pUserData, int nReqId)
 	m_nReqId = nReqId;
 
 	m_eDistanceUnit = MAPS_DISTANCE_UNIT_M;
+	m_aOriginCoord = NULL;
+	m_aDestinationCoord = NULL;
 }
 
 HereRoute::~HereRoute()
@@ -35,6 +37,8 @@ HereRoute::~HereRoute()
 		delete m_pQuery;
 		m_pQuery = NULL;
 	}
+	maps_coordinates_destroy(m_aOriginCoord);
+	maps_coordinates_destroy(m_aDestinationCoord);
 }
 
 here_error_e HereRoute::PrepareQuery()
@@ -64,6 +68,12 @@ here_error_e HereRoute::PrepareWaypoint(maps_coordinates_h hOrigin, maps_coordin
 	maps_coordinates_h hWaypointList[nWaypointNum];
 	hWaypointList[0] = hOrigin;
 	hWaypointList[1] = hDestination;
+
+	maps_coordinates_destroy(m_aOriginCoord);
+	maps_coordinates_destroy(m_aDestinationCoord);
+
+	maps_coordinates_clone(hOrigin, &m_aOriginCoord);
+	maps_coordinates_clone(hDestination, &m_aDestinationCoord);
 
 	return PrepareWaypoint(hWaypointList, nWaypointNum);
 }
@@ -258,6 +268,9 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 			maps_item_list_h mapsPathList;
 			maps_coordinates_h mapsPath;
 
+			maps_route_set_origin(mapsRoute, m_aOriginCoord);
+			maps_route_set_destination(mapsRoute, m_aDestinationCoord);
+
 			if (maps_item_list_create(&mapsPathList) == MAPS_ERROR_NONE) {
 				GeoCoordinateList::iterator herePath;
 				for (herePath = herePathList.begin(); herePath != herePathList.end(); herePath++) {
@@ -265,13 +278,7 @@ void HereRoute::OnRouteReply(const GeoRouteReply& Reply)
 					double dLng = herePath->GetLongitude();
 
 					if(maps_coordinates_create(dLat, dLng, &mapsPath) == MAPS_ERROR_NONE) {
-						if (herePath == herePathList.begin())
-							maps_route_set_origin(mapsRoute, mapsPath);
-						else if (herePath == herePathList.end()-1)
-							maps_route_set_destination(mapsRoute, mapsPath);
-						else
-							maps_item_list_append(mapsPathList, mapsPath, maps_coordinates_clone);
-
+						maps_item_list_append(mapsPathList, mapsPath, maps_coordinates_clone);
 						maps_coordinates_destroy(mapsPath);
 					}
 				}
@@ -342,24 +349,8 @@ maps_error_e HereRoute::ProcessSegments(maps_route_h mapsRoute, const RouteSegme
 		/* tranvel time */
 		maps_route_segment_set_duration(mapsSegm, hereSegm->GetTravelTime());
 
-		/* origin, destination */
-		GeoCoordinateList herePathList = hereSegm->GetPath();
-		int here_path_list_size = herePathList.size();
-
-		if (here_path_list_size > 0) {
-			GeoCoordinates hereOrig = herePathList.at(0);
-			GeoCoordinates hereDest = herePathList.at(here_path_list_size-1);
-
-			maps_coordinates_h mapsOrig, mapsDest;
-			maps_coordinates_create(hereOrig.GetLatitude(),
-						hereOrig.GetLongitude(), &mapsOrig);
-			maps_coordinates_create(hereDest.GetLatitude(),
-						hereDest.GetLongitude(), &mapsDest);
-			maps_route_segment_set_origin(mapsSegm, mapsOrig);
-			maps_route_segment_set_destination(mapsSegm, mapsDest);
-			maps_coordinates_destroy(mapsOrig);
-			maps_coordinates_destroy(mapsDest);
-		}
+		/* origin, destination and path */
+		ProcessSegmentsPath(mapsSegm, hereSegm->GetPath());
 
 		/* maneuver */
 		ProcessManeuver(mapsSegm, hereSegm->GetManeuverList());
@@ -373,6 +364,41 @@ maps_error_e HereRoute::ProcessSegments(maps_route_h mapsRoute, const RouteSegme
 		maps_item_list_remove_all(mapsSegmList, maps_route_segment_destroy);
 	}
 	maps_item_list_destroy(mapsSegmList);
+
+	return MAPS_ERROR_NONE;
+}
+
+maps_error_e HereRoute::ProcessSegmentsPath(maps_route_segment_h mapsSegm, const GeoCoordinateList &herePathList)
+{
+	int herePathListSize = herePathList.size();
+	GeoCoordinates hereCoord;
+	maps_coordinates_h mapsCoord;
+	maps_item_list_h mapsPathList;
+	maps_error_e error;
+
+	if ((error = (maps_error_e)maps_item_list_create(&mapsPathList)) != MAPS_ERROR_NONE)
+		return error;
+
+	for (int i = 0; i < herePathListSize; i++) {
+		hereCoord = herePathList.at(i);
+		mapsCoord = NULL;
+		maps_coordinates_create(hereCoord.GetLatitude(), hereCoord.GetLongitude(), &mapsCoord);
+		if (mapsCoord) {
+			if (i == 0) {
+				maps_route_segment_set_origin(mapsSegm, mapsCoord);
+			} else if (i == herePathListSize - 1) {
+				maps_route_segment_set_destination(mapsSegm, mapsCoord);
+			}
+			maps_item_list_append(mapsPathList, mapsCoord, maps_coordinates_clone);
+			maps_coordinates_destroy(mapsCoord);
+		}
+	}
+
+	if (maps_item_list_items(mapsPathList)) {
+		maps_route_segment_set_path(mapsSegm, mapsPathList);
+		maps_item_list_remove_all(mapsPathList, maps_coordinates_destroy);
+	}
+	maps_item_list_destroy(mapsPathList);
 
 	return MAPS_ERROR_NONE;
 }
