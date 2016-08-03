@@ -1,3 +1,8 @@
+[Version]   maps-plugin-here_0.3.3
+[Date]      03 Aug 2016
+[Title]     Fixed some problems related with path data of routing
+[Developer] Seechan Kim <cbible.kim@samsung.com>
+
 [Version]   maps-plugin-here_0.3.2
 [Date]      07 June 2016
 [Title]     modified internal APIs for maps-service
