@@ -63,10 +63,13 @@ public:
 
 private:
 	maps_error_e ProcessSegments(maps_route_h mapsRoute, const RouteSegmentList& hereSegmList);
+	maps_error_e ProcessSegmentsPath(maps_route_segment_h mapsSegm, const GeoCoordinateList &herePathList);
 	maps_error_e ProcessManeuver(maps_route_segment_h mapsSegm, const ManeuverList& hereManeList);
 	const double __convertDistanceUnit(const double dValue);
 
 	maps_distance_unit_e m_eDistanceUnit;
+	maps_coordinates_h m_aOriginCoord;
+	maps_coordinates_h m_aDestinationCoord;
 	GeoRouteQuery* m_pQuery;
 };
 
